@@ -32,7 +32,6 @@ public class LiveSchedApplication implements CommandLineRunner {
   @Override
   public void run(String[] args) {
     //to be added
-    return;
   }
 
 }
