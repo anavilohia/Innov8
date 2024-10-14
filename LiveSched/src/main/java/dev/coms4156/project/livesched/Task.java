@@ -10,7 +10,7 @@ import java.util.Map;
 public class Task {
   private final String taskId;
   private Map<ResourceType, Integer> resourceList; // Key = ResoureceType, Value = Units needed
-  private int priority; 
+  private int priority; // value between 1 and 5
   private LocalDateTime startTime;
   private LocalDateTime endTime;
   private double latitude;
@@ -22,27 +22,28 @@ public class Task {
    * @param taskId        the unique ID of the resource
    * @param resourceList  the map of resources and their quantity needed
    * @param priority      the priority of the task
+   * @param startTime     the time that task starts
    * @param endTime       the time that task ends
-   * @param latitude      the latitude of the resource's location
+   * @param latitude      the latitude of the task's location
    * @param longitude     the longitude of the task's location
    */
   public Task(String taskId, Map<ResourceType, Integer> resourceList, int priority, 
-        LocalDateTime endTime, double latitude, double longitude) {
+        LocalDateTime startTime, LocalDateTime endTime, double latitude, double longitude) {
     this.taskId = taskId;
     this.resourceList = resourceList;
     this.priority = priority;
-    this.startTime = LocalDateTime.now(); // Initially starting now
+    this.startTime = startTime;
     this.endTime = endTime;
     this.latitude = latitude;
     this.longitude = longitude;
   }
 
   /**
-   * Set the start time of the task.
+   * Updates the start time of the task.
    *
    * @param startTime the time that task starts
    */
-  public void setStartTime(LocalDateTime startTime) {
+  public void updateStartTime(LocalDateTime startTime) {
     this.startTime = startTime;
   }
 
@@ -56,17 +57,21 @@ public class Task {
   }
 
   /**
-   * Adds a resource needed for the task.
+   * Updates the quantity of or add a resource needed for the task.
    *
    * @param resourceType  the type of resource needed
    * @param quantity      the quantity of the resource needed
    */
-  public void addResource(ResourceType resourceType, int quantity) {
-    resourceList.put(resourceType, quantity);
+  public void updateResource(ResourceType resourceType, int quantity) {
+    if (resourceList.containsKey(resourceType)) {
+      resourceList.replace(resourceType, quantity);
+    } else {
+      resourceList.put(resourceType, quantity);
+    }
   }
 
   /**
-   * Chekcs if all resources needed for the task is available.
+   * Checks if all resources needed for the task is available.
    *
    * @return true if all resources are available, false otherwise
    */
