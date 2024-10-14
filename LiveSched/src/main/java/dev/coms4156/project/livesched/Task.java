@@ -46,7 +46,7 @@ public class Task {
     this.startTime = startTime;
   }
 
-    /**
+  /**
    * Updates the end time of the task.
    *
    * @param endTime the time that task ends
@@ -56,7 +56,7 @@ public class Task {
   }
 
   /**
-   * Adds a resource needed for the task
+   * Adds a resource needed for the task.
    *
    * @param resourceType  the type of resource needed
    * @param quantity      the quantity of the resource needed
@@ -66,13 +66,13 @@ public class Task {
   }
 
   /**
-   * Check if all resources needed for the task is available.
-   * 
-   * @return true if all resources are available, false otherwise.
+   * Chekcs if all resources needed for the task is available.
+   *
+   * @return true if all resources are available, false otherwise
    */
   public boolean checkResourceAvailability() {
-    for (ResourceType resource : resourceList.keySet()){
-      if (resource.getAvailableUnits() < resourceList.get(resource)){
+    for (ResourceType resource : resourceList.keySet()) {
+      if (resource.getAvailableUnits() < resourceList.get(resource)) {
         return false;
       }
     }
