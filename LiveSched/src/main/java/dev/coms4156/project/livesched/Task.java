@@ -99,6 +99,7 @@ public class Task {
    * @param quantity      the quantity of the resource needed
    */
   public void updateResource(ResourceType resourceType, int quantity) {
+    // TODO: Add handling of invalid arguments
     if (resourceList.containsKey(resourceType)) {
       resourceList.replace(resourceType, quantity);
     } else {
