@@ -10,9 +10,7 @@ import java.util.Map;
  */
 public class ResourceType {
   private String typeName;
-  private int totalUnits;
   private Map<String, Resource> resources; // Key = resourceId, Value = resource
-  private int resourceCounter; // Counter to assign next unique resourceId
 
   /**
    * Constructs a new ResourceType object with the given parameters.
@@ -32,34 +30,13 @@ public class ResourceType {
     if (totalUnits < 0) {
       throw new IllegalArgumentException("Number of total units cannot be negative.");
     }
-    validateLatLong(defaultLat, defaultLong);
 
     this.typeName = typeName;
-    this.totalUnits = totalUnits;
     this.resources = new HashMap<>();
 
     // Create initial resources
-    for (int i = 1; i <= totalUnits; i++) {
-      String resourceId = typeName + " " + i;
-      resources.put(resourceId, new Resource(resourceId, defaultLat, defaultLong));
-    }
-
-    this.resourceCounter = totalUnits;
-  }
-
-  /**
-   * Validates that the given latitude and longitude are within their valid ranges.
-   *
-   * @param latitude  the latitude
-   * @param longitude the longitude
-   * @throws IllegalArgumentException if the latitude or longitude is out of bounds
-   */
-  private void validateLatLong(double latitude, double longitude) {
-    if (latitude < -90 || latitude > 90) {
-      throw new IllegalArgumentException("Latitude must be between -90 and 90.");
-    }
-    if (longitude < -180 || longitude > 180) {
-      throw new IllegalArgumentException("Longitude must be between -180 and 180.");
+    for (int resourceNumber = 1; resourceNumber <= totalUnits; resourceNumber++) {
+      addResource(defaultLat, defaultLong);
     }
   }
 
@@ -71,12 +48,10 @@ public class ResourceType {
    * @throws IllegalArgumentException if {@code latitude} or {@code longitude} are out of bounds
    */
   public void addResource(double latitude, double longitude) {
-    validateLatLong(latitude, longitude);
-
-    String resourceId = typeName + " " + (++resourceCounter);
+    int resourceNumber = getTotalUnits() + 1;
+    String resourceId = typeName + " " + resourceNumber;
     Resource newResource = new Resource(resourceId, latitude, longitude);
     resources.put(resourceId, newResource);
-    totalUnits++;
   }
 
   /**
@@ -101,7 +76,7 @@ public class ResourceType {
   }
 
   public int getTotalUnits() {
-    return totalUnits;
+    return resources.size();
   }
 
   /**
@@ -125,5 +100,4 @@ public class ResourceType {
     }
     return count;
   }
-
 }
