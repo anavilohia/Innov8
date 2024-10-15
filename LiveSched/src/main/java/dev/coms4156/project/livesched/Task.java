@@ -26,9 +26,15 @@ public class Task {
    * @param endTime       the time that task ends
    * @param latitude      the latitude of the task's location
    * @param longitude     the longitude of the task's location
+   * @throws IllegalArgumentException if the {@code resourceId} is null or empty,
+   *                                  or if the latitude or longitude is out of bounds
    */
   public Task(String taskId, Map<ResourceType, Integer> resourceList, int priority, 
         LocalDateTime startTime, LocalDateTime endTime, double latitude, double longitude) {
+    if (taskId == null || taskId.trim().isEmpty()) {
+      throw new IllegalArgumentException("Task ID cannot be null or empty.");
+    }
+    validateLatLong(latitude, longitude);
     this.taskId = taskId;
     this.resourceList = resourceList;
     this.priority = priority;
@@ -39,11 +45,31 @@ public class Task {
   }
 
   /**
+   * Validates that the given latitude and longitude are within their valid ranges.
+   *
+   * @param latitude  the latitude
+   * @param longitude the longitude
+   * @throws IllegalArgumentException if the latitude or longitude is out of bounds
+   */
+  private void validateLatLong(double latitude, double longitude) {
+    if (latitude < -90 || latitude > 90) {
+      throw new IllegalArgumentException("Latitude must be between -90 and 90.");
+    }
+    if (longitude < -180 || longitude > 180) {
+      throw new IllegalArgumentException("Longitude must be between -180 and 180.");
+    }
+  }
+
+  /**
    * Updates the start time of the task.
    *
    * @param startTime the time that task starts
+   * @throws IllegalArgumentException if {@code startTime} is null
    */
   public void updateStartTime(LocalDateTime startTime) {
+    if (startTime == null) {
+      throw new IllegalArgumentException("Start time cannot be null.");
+    }
     this.startTime = startTime;
   }
 
@@ -51,8 +77,18 @@ public class Task {
    * Updates the end time of the task.
    *
    * @param endTime the time that task ends
+   * @throws IllegalArgumentException if {@code taskEndTime} is null, in the past, or exactly now
    */
   public void updateEndTime(LocalDateTime endTime) {
+    if (endTime == null) {
+      throw new IllegalArgumentException("End time cannot be null.");
+    }
+    if (endTime.isBefore(LocalDateTime.now())) {
+      throw new IllegalArgumentException("End time cannot be in the past.");
+    }
+    if (endTime.equals(LocalDateTime.now())) {
+      throw new IllegalArgumentException("End time cannot be exactly now.");
+    }
     this.endTime = endTime;
   }
 
@@ -89,8 +125,10 @@ public class Task {
    *
    * @param latitude  the new latitude of the task's location
    * @param longitude the new longitude of the task's location
+   * @throws IllegalArgumentException if {@code latitude} or {@code longitude} are out of bounds
    */
   public void updateLocation(double latitude, double longitude) {
+    validateLatLong(latitude, longitude);
     this.latitude = latitude;
     this.longitude = longitude;
   }
