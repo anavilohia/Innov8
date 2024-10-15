@@ -61,7 +61,7 @@ public class Resource {
     if (time == null) {
       throw new IllegalArgumentException("Time to check availability for cannot be null.");
     }
-    return time.isAfter(availableFrom);
+    return time.isEqual(availableFrom) || time.isAfter(availableFrom);
   }
 
   /**
@@ -70,7 +70,7 @@ public class Resource {
    * @param taskEndTime the time when the task ends
    * @throws IllegalArgumentException if {@code taskEndTime} is null, in the past, or exactly now
    */
-  public void assign(LocalDateTime taskEndTime) {
+  public void assignUntil(LocalDateTime taskEndTime) {
     if (taskEndTime == null) {
       throw new IllegalArgumentException("Task end time cannot be null.");
     }
@@ -103,6 +103,11 @@ public class Resource {
     this.longitude = longitude;
   }
 
+  /**
+   * Gets the ID of the Resource.
+   *
+   * @return A {@code String} of resourceId
+   */
   public String getResourceId() {
     return resourceId;
   }
