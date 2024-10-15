@@ -107,20 +107,6 @@ public class Task {
   }
 
   /**
-   * Checks if all resources needed for the task is available.
-   *
-   * @return true if all resources are available, false otherwise
-   */
-  public boolean checkResourceAvailability() {
-    for (ResourceType resource : resourceList.keySet()) {
-      if (resource.getAvailableUnits() < resourceList.get(resource)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
    * Updates the location of the task.
    *
    * @param latitude  the new latitude of the task's location
