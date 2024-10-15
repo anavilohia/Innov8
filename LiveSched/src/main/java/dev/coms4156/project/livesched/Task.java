@@ -97,8 +97,17 @@ public class Task {
    *
    * @param resourceType  the type of resource needed
    * @param quantity      the quantity of the resource needed
+   * @throws IllegalArgumentException if {@code resourceType} is null 
+   *                                  or {@code quantity} is negative
    */
   public void updateResource(ResourceType resourceType, int quantity) {
+    if (resourceType == null) {
+      throw new IllegalArgumentException("Resource type cannot be null.");
+    }
+    if (quantity < 0) {
+      throw new IllegalArgumentException("Quantity cannot be negative.");
+    }
+    
     if (resourceList.containsKey(resourceType)) {
       resourceList.replace(resourceType, quantity);
     } else {
