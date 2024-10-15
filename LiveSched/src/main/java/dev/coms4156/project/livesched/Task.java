@@ -34,7 +34,7 @@ public class Task {
     if (taskId == null || taskId.trim().isEmpty()) {
       throw new IllegalArgumentException("Task ID cannot be null or empty.");
     }
-    validateLatLong(latitude, longitude);
+    validateLatLong(latitude, longitude);  // TODO (janelim0414): Create Location class to store latitude, longitude pair. Make validateLatLong reusable in this class. 
     this.taskId = taskId;
     this.resourceList = resourceList;
     this.priority = priority;
