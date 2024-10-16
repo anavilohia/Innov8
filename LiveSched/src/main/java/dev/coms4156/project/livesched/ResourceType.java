@@ -11,6 +11,7 @@ import java.util.Map;
 public class ResourceType {
   private String typeName;
   private Map<String, Resource> resources; // Key = resourceId, Value = resource
+  private Location location;
 
   /**
    * Constructs a new ResourceType object with the given parameters.
