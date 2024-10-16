@@ -4,3 +4,4 @@
 - https://www.codejava.net/testing/junit-test-exception-examples-how-to-assert-an-exception-is-thrown
 - https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDateTime.html
 - https://javarevisited.blogspot.com/2017/01/how-to-create-localdatetime-in-java-8.html
+- https://www.tutorialspoint.com/javatime/javatime_localdatetime_truncatedto.htm
