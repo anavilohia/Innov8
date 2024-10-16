@@ -14,8 +14,7 @@ public class Task {
   private int priority; // value between 1 and 5
   private LocalDateTime startTime;
   private LocalDateTime endTime;
-  private double latitude;
-  private double longitude;
+  private Location location;
 
   /**
    * Constructs a new Task object with the given parameters.
@@ -43,16 +42,13 @@ public class Task {
     }
     validatePriority(priority);
     validateStartEndTimes(startTime, endTime);
-    validateLatLong(latitude, longitude);
-    // TODO (janelim0414): Create Location class to store latitude, longitude pair.
-    //                     Make validateLatLong reusable in this class.
+
     this.taskId = taskId;
     this.resourceList = resourceList;
     this.priority = priority;
     this.startTime = startTime;
     this.endTime = endTime;
-    this.latitude = latitude;
-    this.longitude = longitude;
+    this.location = new Location(latitude, longitude);
   }
 
   /**
@@ -99,22 +95,6 @@ public class Task {
     }
     if (endTime.isBefore(startTime) || endTime.isEqual(startTime)) {
       throw new IllegalArgumentException("End time cannot be before or same as the start time.");
-    }
-  }
-
-  /**
-   * Validates that the given latitude and longitude are within their valid ranges.
-   *
-   * @param latitude  the latitude
-   * @param longitude the longitude
-   * @throws IllegalArgumentException if the latitude or longitude is out of bounds
-   */
-  private void validateLatLong(double latitude, double longitude) {
-    if (latitude < -90 || latitude > 90) {
-      throw new IllegalArgumentException("Latitude must be between -90 and 90.");
-    }
-    if (longitude < -180 || longitude > 180) {
-      throw new IllegalArgumentException("Longitude must be between -180 and 180.");
     }
   }
 
@@ -173,9 +153,7 @@ public class Task {
    * @throws IllegalArgumentException if {@code latitude} or {@code longitude} are out of bounds
    */
   public void updateLocation(double latitude, double longitude) {
-    validateLatLong(latitude, longitude);
-    this.latitude = latitude;
-    this.longitude = longitude;
+    this.location = new Location(latitude, longitude);
   }
 
   public Map<ResourceType, Integer> getResources() {
@@ -187,7 +165,7 @@ public class Task {
   }
 
   public String getLocation() {
-    return latitude + ", " + longitude;
+    return location.getCoordinates();
   }
 
   public int getPriority() {
