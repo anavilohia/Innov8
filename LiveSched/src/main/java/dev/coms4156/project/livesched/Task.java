@@ -74,7 +74,7 @@ public class Task {
    */
   private void validateStartEndTimes(LocalDateTime startTime, LocalDateTime endTime) {
     // Capture current time and truncate to minutes for comparison
-    LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+    final LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
 
     if (startTime == null) {
       throw new IllegalArgumentException("Start time cannot be null.");
