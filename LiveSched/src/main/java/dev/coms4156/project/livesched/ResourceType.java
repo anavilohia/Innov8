@@ -17,13 +17,13 @@ public class ResourceType {
    *
    * @param typeName      the type of resource (e.g., "bed", "doctor")
    * @param totalUnits    the total number of units for this resource type
-   * @param defaultLat    the latitude of the resources' default location
-   * @param defaultLong   the longitude of the resources' default location
+   * @param latitude    the latitude of the resource type's default location
+   * @param longitude   the longitude of the resource type's default location
    * @throws IllegalArgumentException if {@code typeName} is null or empty,
    *                                  if {@code totalUnits} is negative,
    *                                  or if the latitude or longitude is out of bounds
    */
-  public ResourceType(String typeName, int totalUnits, double defaultLat, double defaultLong) {
+  public ResourceType(String typeName, int totalUnits, double latitude, double longitude) {
     if (typeName == null || typeName.trim().isEmpty()) {
       throw new IllegalArgumentException("Resource type name cannot be null or empty.");
     }
@@ -33,24 +33,23 @@ public class ResourceType {
 
     this.typeName = typeName;
     this.resources = new HashMap<>();
+    this.location = new Location(latitude, longitude);
 
     // Create initial resources
     for (int resourceNumber = 1; resourceNumber <= totalUnits; resourceNumber++) {
-      addResource(defaultLat, defaultLong);
+      addResource();
     }
   }
 
   /**
    * Adds a new resource with the specified location.
    *
-   * @param latitude    the latitude of the new resource's location
-   * @param longitude   the longitude of the new resource's location
    * @throws IllegalArgumentException if {@code latitude} or {@code longitude} are out of bounds
    */
-  public void addResource(double latitude, double longitude) {
+  public void addResource() {
     int resourceNumber = getTotalUnits() + 1;
     String resourceId = typeName + " " + resourceNumber;
-    Resource newResource = new Resource(resourceId, latitude, longitude);
+    Resource newResource = new Resource(resourceId);
     resources.put(resourceId, newResource);
   }
 
@@ -99,5 +98,16 @@ public class ResourceType {
       }
     }
     return count;
+  }
+
+  /**
+   * Updates the location of the resource.
+   *
+   * @param latitude  the new latitude of the resource's location
+   * @param longitude the new longitude of the resource's location
+   * @throws IllegalArgumentException if the latitude or longitude is out of bounds
+   */
+  public void updateLocation(double latitude, double longitude) {
+    this.location = new Location(latitude, longitude);
   }
 }
