@@ -1,7 +1,7 @@
 package dev.coms4156.project.livesched;
 
 /**
- * Represents a location using geographic coordinate system.
+ * Represents a location using a geographic coordinate system.
  * This class stores the latitude and longitude values of a location on a map.
  */
 public class Location {
@@ -9,7 +9,7 @@ public class Location {
   private double longitude;
 
   /**
-   * Constructs a new ResourceType object with the given parameters.
+   * Constructs a new Location object with the given parameters.
    *
    * @param latitude    the latitude
    * @param longitude   the longitude
