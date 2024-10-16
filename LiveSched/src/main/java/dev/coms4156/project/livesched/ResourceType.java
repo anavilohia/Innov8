@@ -6,24 +6,25 @@ import java.util.Map;
 
 /**
  * Represents a specific type or group of resources.
- * This class stores the total number of units and the resources within the resource type.
+ * This class stores the resources within the resource type and the location of the resource type.
  */
 public class ResourceType {
   private String typeName;
   private Map<String, Resource> resources; // Key = resourceId, Value = resource
+  private Location location;
 
   /**
    * Constructs a new ResourceType object with the given parameters.
    *
    * @param typeName      the type of resource (e.g., "bed", "doctor")
    * @param totalUnits    the total number of units for this resource type
-   * @param defaultLat    the latitude of the resources' default location
-   * @param defaultLong   the longitude of the resources' default location
+   * @param latitude    the latitude of the resource type's default location
+   * @param longitude   the longitude of the resource type's default location
    * @throws IllegalArgumentException if {@code typeName} is null or empty,
    *                                  if {@code totalUnits} is negative,
    *                                  or if the latitude or longitude is out of bounds
    */
-  public ResourceType(String typeName, int totalUnits, double defaultLat, double defaultLong) {
+  public ResourceType(String typeName, int totalUnits, double latitude, double longitude) {
     if (typeName == null || typeName.trim().isEmpty()) {
       throw new IllegalArgumentException("Resource type name cannot be null or empty.");
     }
@@ -33,24 +34,21 @@ public class ResourceType {
 
     this.typeName = typeName;
     this.resources = new HashMap<>();
+    this.location = new Location(latitude, longitude);
 
     // Create initial resources
     for (int resourceNumber = 1; resourceNumber <= totalUnits; resourceNumber++) {
-      addResource(defaultLat, defaultLong);
+      addResource();
     }
   }
 
   /**
-   * Adds a new resource with the specified location.
-   *
-   * @param latitude    the latitude of the new resource's location
-   * @param longitude   the longitude of the new resource's location
-   * @throws IllegalArgumentException if {@code latitude} or {@code longitude} are out of bounds
+   * Adds a new resource within this resource type.
    */
-  public void addResource(double latitude, double longitude) {
+  public void addResource() {
     int resourceNumber = getTotalUnits() + 1;
     String resourceId = typeName + " " + resourceNumber;
-    Resource newResource = new Resource(resourceId, latitude, longitude);
+    Resource newResource = new Resource(resourceId);
     resources.put(resourceId, newResource);
   }
 
@@ -79,12 +77,16 @@ public class ResourceType {
     return resources.size();
   }
 
+  public String getLocation() {
+    return location.getCoordinates();
+  }
+
   /**
-   * Counts the number of available units at the specified time.
+   * Counts the number of available resources within this resource type at the specified time.
    *
    * @param time the time at which to check availability
    *
-   * @return the number of available units at the given time
+   * @return the number of available resources at the given time
    * @throws IllegalArgumentException if the time is null
    */
   public int countAvailableUnits(LocalDateTime time) {
@@ -99,5 +101,16 @@ public class ResourceType {
       }
     }
     return count;
+  }
+
+  /**
+   * Updates the location of the resource type.
+   *
+   * @param latitude  the new latitude of the resource type's location
+   * @param longitude the new longitude of the resource type's location
+   * @throws IllegalArgumentException if the latitude or longitude is out of bounds
+   */
+  public void updateLocation(double latitude, double longitude) {
+    this.location = new Location(latitude, longitude);
   }
 }
