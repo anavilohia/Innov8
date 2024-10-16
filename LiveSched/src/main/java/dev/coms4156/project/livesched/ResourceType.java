@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * Represents a specific type or group of resources.
- * This class stores the total number of units and the resources within the resource type.
+ * This class stores the resources within the resource type and the location of the resource type.
  */
 public class ResourceType {
   private String typeName;
@@ -43,9 +43,7 @@ public class ResourceType {
   }
 
   /**
-   * Adds a new resource with the specified location.
-   *
-   * @throws IllegalArgumentException if {@code latitude} or {@code longitude} are out of bounds
+   * Adds a new resource within this resource type.
    */
   public void addResource() {
     int resourceNumber = getTotalUnits() + 1;
@@ -84,11 +82,11 @@ public class ResourceType {
   }
 
   /**
-   * Counts the number of available units at the specified time.
+   * Counts the number of available resources within this resource type at the specified time.
    *
    * @param time the time at which to check availability
    *
-   * @return the number of available units at the given time
+   * @return the number of available resources at the given time
    * @throws IllegalArgumentException if the time is null
    */
   public int countAvailableUnits(LocalDateTime time) {
@@ -106,10 +104,10 @@ public class ResourceType {
   }
 
   /**
-   * Updates the location of the resource.
+   * Updates the location of the resource type.
    *
-   * @param latitude  the new latitude of the resource's location
-   * @param longitude the new longitude of the resource's location
+   * @param latitude  the new latitude of the resource type's location
+   * @param longitude the new longitude of the resource type's location
    * @throws IllegalArgumentException if the latitude or longitude is out of bounds
    */
   public void updateLocation(double latitude, double longitude) {
