@@ -38,7 +38,9 @@ public class ResourceType {
 
     // Create initial resources
     for (int resourceNumber = 1; resourceNumber <= totalUnits; resourceNumber++) {
-      addResource();
+      String resourceId = typeName + " " + resourceNumber;
+      Resource newResource = new Resource(resourceId);
+      resources.put(resourceId, newResource);
     }
   }
 
