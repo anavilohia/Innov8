@@ -79,6 +79,10 @@ public class ResourceType {
     return resources.size();
   }
 
+  public String getLocation() {
+    return location.getCoordinates();
+  }
+
   /**
    * Counts the number of available units at the specified time.
    *
