@@ -38,16 +38,14 @@ public class ResourceType {
 
     // Create initial resources
     for (int resourceNumber = 1; resourceNumber <= totalUnits; resourceNumber++) {
-      String resourceId = typeName + " " + resourceNumber;
-      Resource newResource = new Resource(resourceId);
-      resources.put(resourceId, newResource);
+      addResource();
     }
   }
 
   /**
    * Adds a new resource within this resource type.
    */
-  public void addResource() {
+  public final void addResource() {
     int resourceNumber = getTotalUnits() + 1;
     String resourceId = typeName + " " + resourceNumber;
     Resource newResource = new Resource(resourceId);
@@ -75,7 +73,7 @@ public class ResourceType {
     return null;
   }
 
-  public int getTotalUnits() {
+  public final int getTotalUnits() {
     return resources.size();
   }
 
