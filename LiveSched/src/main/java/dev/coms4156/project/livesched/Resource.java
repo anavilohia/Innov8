@@ -1,12 +1,17 @@
 package dev.coms4156.project.livesched;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * Represents a resource that can be assigned to a task.
  * This class stores the id and availability of the resource.
  */
-public class Resource {
+public class Resource implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 1003L;
+
   private final String resourceId;
   private LocalDateTime availableFrom;
 
