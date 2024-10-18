@@ -121,7 +121,8 @@ public class TaskUnitTests {
   @Test
   void getLocationTest() {
     Location location = new Location(latitude, longitude);
-    assertEquals(location.getCoordinates(), testTask.getLocation().getCoordinates(), "Location should match.");
+    assertEquals(location.getCoordinates(), testTask.getLocation().getCoordinates(),
+            "Location should match.");
   }
 
   /**

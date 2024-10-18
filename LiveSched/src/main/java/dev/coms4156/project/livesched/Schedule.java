@@ -1,8 +1,11 @@
 package dev.coms4156.project.livesched;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 /**
  * Coordinates scheduling given a Task and a List of ResourceTypes.
@@ -11,62 +14,98 @@ import java.util.Map;
  */
 public class Schedule {
   private final String scheduleId;
-  private Task task;
+  private PriorityQueue<Task> tasks;
   private List<ResourceType> resourceTypes;
   private List<ResourceType> candidates;
+  private double maxDistance;
 
   /**
-   * Constructs a new Task object with the given parameters.
+   * Constructs a new Schedule object with the given parameters.
    *
    * @param scheduleId        the unique ID of the schedule
-   * @param task              task to provide resource to
-   * @param resourceTypes     list of available resource types
-   * @param radius            maxinmum distance from task to resource
+   * @param resourceTypes     list of all resource types
+   * @param maxDistance       maxinmum distance from task to resource
    */
-  public Schedule(String scheduleId, Task task, List<ResourceType> resourceTypes, double radius) {
+  public Schedule(String scheduleId, List<ResourceType> resourceTypes, double maxDistance) {
     this.scheduleId = scheduleId;
-    this.task = task;
     this.resourceTypes = resourceTypes;
-    this.candidates = findAvailableResources(radius);
+    this.maxDistance = maxDistance;
+
+    Comparator<Task> comparator = new TaskComparator();
+    this.tasks = new PriorityQueue<Task>(comparator);  // queue of tasks in order of priority
   }
 
   /**
-   * Given a distance range from the location of this Task,
+   * Given a maximum distance range from the location of a Task,
    * returns a list of all available ResourceTypes nearby, if exists.
    *
-   * @param radius  maximum distance from current location
-   * @return list of all available ResourceTypes nearby; otherwise, empty list.
+   * @param task         high priority task that needs to be matched with a resource type
+   * @return first ResourceType matched; otherwise, null.
    */
-  public List<ResourceType> findAvailableResources(double radius) {
-    List<ResourceType> result = new ArrayList<>();
-    Map<ResourceType, Integer> resourceNeeded = this.task.getResources();
-    Location taskLoc = this.task.getLocation();
-    // for each resource type
-    // check whether it is within the provided distance and is available
-    // if so, add to result
-    // otherwise, disregard
+
+  public ResourceType matchTaskWithResource(Task task) {
+    Map<ResourceType, Integer> resourceNeeded = task.getResources();
+    Location taskLoc = task.getLocation();
     for (ResourceType resourceType : resourceTypes) {
       Location resourceLoc = resourceType.getLocation();
       double distance = taskLoc.getDistance(resourceLoc);
-      // this means resourceType is what we're looking for
-      if (distance <= radius && resourceNeeded.containsKey(resourceType)) {
-        // this means the resourceType has the resource task is looking for at startTime
-        // and there are enough resources
+      if (distance <= maxDistance && resourceNeeded.containsKey(resourceType)) {
         if (resourceType.findAvailableResource(task.getStartTime()) != null
                 && resourceNeeded.get(resourceType) <= resourceType.getTotalUnits()) {
-          result.add(resourceType);
+          return resourceType;
         }
       }
     }
-    return result;
+    return null;
+  }
+
+  //  public List<ResourceType> matchTaskWithResource(Task task) {
+  //    List<ResourceType> result = new ArrayList<>();
+  //    Map<ResourceType, Integer> resourceNeeded = task.getResources();
+  //    Location taskLoc = task.getLocation();
+  //    for (ResourceType resourceType : resourceTypes) {
+  //      Location resourceLoc = resourceType.getLocation();
+  //      double distance = taskLoc.getDistance(resourceLoc);
+  //      if (distance <= maxDistance && resourceNeeded.containsKey(resourceType)) {
+  //        if (resourceType.findAvailableResource(task.getStartTime()) != null
+  //                && resourceNeeded.get(resourceType) <= resourceType.getTotalUnits()) {
+  //          result.add(resourceType);
+  //        }
+  //      }
+  //    }
+  //    return result;
+  //  }
+
+  /**
+   * Receives task from network by adding given task to a priority queue.
+   *
+   * @param task the task to add to the queue
+   */
+  public void receiveTask(Task task) {
+    tasks.add(task);
+  }
+
+  /**
+   * Processes task by removing task from the queue.
+   *
+   * @return matched Task, ResourceType pair
+   */
+  public Map<Task, ResourceType> processTask() {
+    Task task = tasks.remove();
+    ResourceType resourceType = matchTaskWithResource(task);
+    assignResourceToTask(resourceType, task);
+    Map<Task, ResourceType> pair = new HashMap<>();
+    pair.put(task, resourceType);
+    return pair;
   }
 
   /**
    * Assigns the resource to a task until the specified end time.
    *
    * @param resourceType the resource type to assign a task to
+   * @param task         the task to be matched with resource
    */
-  public void assignTaskToResource(ResourceType resourceType) {
+  public void assignResourceToTask(ResourceType resourceType, Task task) {
     resourceType.findAvailableResource(task.getStartTime()).assignUntil(task.getEndTime());
     task.getResources().remove(resourceType);
   }
