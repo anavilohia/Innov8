@@ -146,6 +146,29 @@ public class Task {
   }
 
   /**
+   * Returns a string representation of the task, including its id, location,
+   * start and end time, priority and the resources needed.
+   *
+   * @return A string representing the task.
+   */
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    result.append(taskId).append(" ")
+            .append("Location: ").append(location.getCoordinates()).append("\n")
+            .append("Start: ").append(startTime.toString()).append("\n")
+            .append("End: ").append(endTime.toString()).append("\n")
+            .append("Priority: ").append(String.valueOf(priority)).append("\n")
+            .append("Resources Needed:\n");
+    for (Map.Entry<ResourceType, Integer> entry : resourceList.entrySet()) {
+      ResourceType key = entry.getKey();
+      Integer value = entry.getValue();
+      result.append(key.toString()).append(": \n")
+              .append(String.valueOf(value)).append("\n");
+    }
+    return result.toString();
+  }
+
+  /**
    * Updates the location of the task.
    *
    * @param latitude  the new latitude of the task's location

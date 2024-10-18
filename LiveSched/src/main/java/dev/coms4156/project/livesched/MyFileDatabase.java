@@ -148,6 +148,21 @@ public class MyFileDatabase {
   }
 
   /**
+   * Gets task by Id from the database.
+   *
+   * @return a list containing all Task objects
+   */
+  public Task getTaskById(String taskId) {
+    List<Task> tasks = this.allTasks;
+    for (Task task : tasks) {
+      if (task.getTaskId() == taskId) {
+        return task;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Returns a string representation of the database.
    *
    * @return a string representation of the database

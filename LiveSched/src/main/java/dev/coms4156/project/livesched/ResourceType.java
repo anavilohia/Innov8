@@ -104,6 +104,26 @@ public class ResourceType {
   }
 
   /**
+   * Returns a string representation of the resource type, including its name,
+   * resources and location.
+   *
+   * @return A string representing the task.
+   */
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    result.append(typeName).append(" ")
+            .append("Location: ").append(location.getCoordinates()).append("\n")
+            .append("Resources: \n");
+    for (Map.Entry<String, Resource> entry : resources.entrySet()) {
+      String key = entry.getKey();
+      Resource value = entry.getValue();
+      result.append(key).append(": \n")
+              .append(value.toString).append("\n");
+    }
+    return result.toString();
+  }
+
+  /**
    * Updates the location of the resource type.
    *
    * @param latitude  the new latitude of the resource type's location
