@@ -81,6 +81,10 @@ public class ResourceType {
     return location;
   }
 
+  public String getTypeName() {
+    return typeName;
+  }
+
   /**
    * Counts the number of available resources within this resource type at the specified time.
    *
