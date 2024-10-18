@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class Task {
   private final String taskId;
-  private Map<ResourceType, Integer> resourceList; // Key = ResoureceType, Value = Units needed
+  private Map<ResourceType, Integer> resourceList; // Key = ResourceType, Value = Units needed
   private int priority; // value between 1 and 5
   private LocalDateTime startTime;
   private LocalDateTime endTime;
@@ -20,7 +20,7 @@ public class Task {
    * Constructs a new Task object with the given parameters.
    *
    * @param taskId        the unique ID of the resource
-   * @param resourceList  the map of resources and their quantity needed
+   * @param resourceList  the map of ResourceTypes and their quantity needed
    * @param priority      the priority of the task
    * @param startTime     the time that task starts
    * @param endTime       the time that task ends
@@ -32,7 +32,7 @@ public class Task {
    *                                  if {@code startTime} or {@code endTime} is invalid,
    *                                  or if {@code latitude} or {@code longitude} is out of bounds
    */
-  public Task(String taskId, Map<ResourceType, Integer> resourceList, int priority, 
+  public Task(String taskId, Map<ResourceType, Integer> resourceList, int priority,
         LocalDateTime startTime, LocalDateTime endTime, double latitude, double longitude) {
     if (taskId == null || taskId.trim().isEmpty()) {
       throw new IllegalArgumentException("Task ID cannot be null or empty.");
@@ -164,8 +164,8 @@ public class Task {
     return taskId;
   }
 
-  public String getLocation() {
-    return location.getCoordinates();
+  public Location getLocation() {
+    return location;
   }
 
   public int getPriority() {

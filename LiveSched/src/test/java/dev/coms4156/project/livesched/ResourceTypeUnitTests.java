@@ -166,12 +166,12 @@ class ResourceTypeUnitTests {
    */
   @Test
   void getLocationTest() {
-    String expectedResult = testLatitude + ", " + testLongitude;
-    assertEquals(testResourceType.getLocation(), expectedResult,
+    String expectedResult = new Location(testLatitude, testLongitude).getCoordinates();
+    assertEquals(testResourceType.getLocation().getCoordinates(), expectedResult,
         "Resource location should be " + expectedResult);
 
-    expectedResult = testLongitude + ", " + testLatitude;
-    assertNotEquals(testResourceType.getLocation(), expectedResult,
+    expectedResult = new Location(testLongitude, testLatitude).getCoordinates();
+    assertNotEquals(testResourceType.getLocation().getCoordinates(), expectedResult,
         "Resource location should not be " + expectedResult);
 
     assertNotEquals(testResourceType.getLocation(), "",
@@ -183,8 +183,8 @@ class ResourceTypeUnitTests {
    */
   @Test
   void updateLocationTest() {
-    String expectedResult = testLatitude + ", " + testLongitude;
-    assertEquals(testResourceType.getLocation(), expectedResult,
+    String expectedResult = new Location(testLatitude, testLongitude).getCoordinates();
+    assertEquals(testResourceType.getLocation().getCoordinates(), expectedResult,
         "Resource location should be " + expectedResult + " before update");
 
     IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -200,7 +200,7 @@ class ResourceTypeUnitTests {
         "Exception message should match for longitude out of bounds");
 
     testResourceType.updateLocation(-90.0, 145.34);
-    assertEquals(testResourceType.getLocation(), "-90.0, 145.34",
+    assertEquals(testResourceType.getLocation().getCoordinates(), "-90.0, 145.34",
         "Resource location should be -90.0, 145.34 after update");
   }
 

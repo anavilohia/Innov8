@@ -37,8 +37,33 @@ public class Location {
     }
   }
 
+  /**
+   * Calculates a distance between this location and given location,
+   * using Haversine method.
+   *
+   * @param location  the location
+   * @return distance between two locations in kilometers (km)
+   */
+  public double getDistance(Location location) {
+    final int radius = 6371;  // Radius of Earth in km
+    double lat1 = Math.toRadians(this.latitude);
+    double lat2 = Math.toRadians(location.getLatitude());
+    double lng1 = Math.toRadians(this.longitude);
+    double lng2 = Math.toRadians(location.getLongitude());
+    return Math.acos(Math.sin(lat1) * Math.sin(lat2)
+            + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lng1 - lng2)) * radius;
+  }
+
   public String getCoordinates() {
     return latitude + ", " + longitude;
+  }
+
+  public double getLatitude() {
+    return latitude;
+  }
+
+  public double getLongitude() {
+    return longitude;
   }
 
 }
