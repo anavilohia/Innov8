@@ -174,6 +174,7 @@ public class RouteController {
       Task newTask = new Task(taskId, resourceTypeList, priority,
               startTimeFormatted, endTimeFormatted, latitude, longitude);
       LiveSchedApplication.myFileDatabase.addTask(newTask);
+      return new ResponseEntity<>("Attribute was updated successfully.", HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
     }
@@ -199,6 +200,43 @@ public class RouteController {
     try {
       ResourceType newResourceType = new ResourceType(typeName, totalUnits, latitude, longitude);
       LiveSchedApplication.myFileDatabase.addResourceType(newResourceType);
+      return new ResponseEntity<>("Attribute was updated successfully.", HttpStatus.OK);
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+  /**
+   * Attempts to modify resource type for a specified task to the database.
+   *
+   * @param taskId          A {@code String} representing the task
+   *                        the client wants to modify the resource type for.
+   * @param typeName        A {@code String} representing the resource type to modify.
+   * @param quantity        A {@code int} representing quantity of resource types to set.
+   *
+   * @return               A {@code ResponseEntity} object containing an HTTP 200
+   *                       response with an appropriate message or the proper status
+   *                       code in tune with what has happened.
+   */
+  @PatchMapping(value = "/modifyResourceType", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> modifyResourceType(@RequestParam(value = "taskId") String taskId,
+                                           @RequestParam(value = "typeName") String typeName,
+                                           @RequestParam(value = "quantity") int quantity) {
+    try {
+      boolean doesTaskExist = retrieveTask(taskId).getStatusCode() == HttpStatus.OK;
+      if (doesTaskExist) {
+        List<ResourceType> resourceTypeList;
+        resourceTypeList = LiveSchedApplication.myFileDatabase.getAllResourceTypes();
+        Task task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
+        for (ResourceType resourceType : resourceTypeList) {
+          if (resourceType.getTypeName() == typeName) {
+            task.updateResource(resourceType, quantity);
+            return new ResponseEntity<>("Attribute was updated successfully.", HttpStatus.OK);
+          }
+        }
+        return new ResponseEntity<>("ResourceType Not Found", HttpStatus.NOT_FOUND);
+      }
+      return new ResponseEntity<>("Task Not Found", HttpStatus.NOT_FOUND);
     } catch (Exception e) {
       return handleException(e);
     }
