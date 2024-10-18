@@ -1,7 +1,8 @@
-
 - https://github.com/Programming-Systems-Lab/4156-Miniproject-2024-Students-Java.git
 - https://www.baeldung.com/junit-assert-exception
 - https://www.codejava.net/testing/junit-test-exception-examples-how-to-assert-an-exception-is-thrown
 - https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDateTime.html
 - https://javarevisited.blogspot.com/2017/01/how-to-create-localdatetime-in-java-8.html
 - https://www.tutorialspoint.com/javatime/javatime_localdatetime_truncatedto.htm
+- https://github.com/griffinnewbold/COMS-4156-Service?tab=readme-ov-file
+- https://github.com/anavilohia/4156-Miniproject/blob/main/README.md
