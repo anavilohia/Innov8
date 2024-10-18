@@ -64,11 +64,11 @@ public class Schedule {
     for (ResourceType resourceType : resourceTypes) {
       Location resourceLoc = resourceType.getLocation();
       double distance = taskLoc.getDistance(resourceLoc);
-      if (distance <= maxDistance && resourceNeeded.containsKey(resourceType)) {
-        if (resourceType.findAvailableResource(task.getStartTime()) != null
-                && resourceNeeded.get(resourceType) <= resourceType.getTotalUnits()) {
-          return resourceType;
-        }
+      if (distance <= maxDistance
+          && resourceNeeded.containsKey(resourceType)
+          && resourceType.findAvailableResource(task.getStartTime()) != null
+          && resourceNeeded.get(resourceType) <= resourceType.getTotalUnits()) {
+        return resourceType;
       }
     }
     return null;
