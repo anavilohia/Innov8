@@ -1,10 +1,16 @@
 package dev.coms4156.project.livesched;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * Represents a location using a geographic coordinate system.
  * This class stores the latitude and longitude values of a location on a map.
  */
-public class Location {
+public class Location implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 1004L;
+
   private double latitude;
   private double longitude;
 

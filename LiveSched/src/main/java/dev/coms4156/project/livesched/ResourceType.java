@@ -1,5 +1,7 @@
 package dev.coms4156.project.livesched;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +10,10 @@ import java.util.Map;
  * Represents a specific type or group of resources.
  * This class stores the resources within the resource type and the location of the resource type.
  */
-public class ResourceType {
+public class ResourceType implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 1002L;
+
   private String typeName;
   private Map<String, Resource> resources; // Key = resourceId, Value = resource
   private Location location;

@@ -1,5 +1,7 @@
 package dev.coms4156.project.livesched;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -8,7 +10,10 @@ import java.util.Map;
  * Represents a task that has to be done. 
  * This class stores the id, resources needed, and the location of the task.
  */
-public class Task {
+public class Task implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 1001L;
+
   private final String taskId;
   private Map<ResourceType, Integer> resourceList; // Key = ResourceType, Value = Units needed
   private int priority; // value between 1 and 5
