@@ -77,8 +77,8 @@ public class ResourceType {
     return resources.size();
   }
 
-  public String getLocation() {
-    return location.getCoordinates();
+  public Location getLocation() {
+    return location;
   }
 
   /**

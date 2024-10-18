@@ -121,7 +121,8 @@ public class TaskUnitTests {
   @Test
   void getLocationTest() {
     Location location = new Location(latitude, longitude);
-    assertEquals(location.getCoordinates(), testTask.getLocation(), "Location should match.");
+    assertEquals(location.getCoordinates(), testTask.getLocation().getCoordinates(),
+            "Location should match.");
   }
 
   /**
@@ -237,7 +238,7 @@ public class TaskUnitTests {
     Location newLocation = new Location(newLatitude, newLongitude);
 
     testTask.updateLocation(newLatitude, newLongitude);
-    assertEquals(newLocation.getCoordinates(), testTask.getLocation(),
+    assertEquals(newLocation.getCoordinates(), testTask.getLocation().getCoordinates(),
         "Location of task should be updated to the new location.");
 
     assertThrows(IllegalArgumentException.class, () ->
