@@ -150,7 +150,7 @@ public class MyFileDatabase {
   /**
    * Gets task by Id from the database.
    *
-   * @return a list containing all Task objects
+   * @return a Task object with specified taskId
    */
   public Task getTaskById(String taskId) {
     List<Task> tasks = this.allTasks;
@@ -160,6 +160,24 @@ public class MyFileDatabase {
       }
     }
     return null;
+  }
+
+  /**
+   * Adds a task to the database.
+   *
+   */
+  public void addTask(Task task) {
+
+    this.allTasks.add(task);
+  }
+
+  /**
+   * Adds a resource type to the database.
+   *
+   */
+  public void addResourceType(ResourceType resourceType) {
+
+    this.allResourceTypes.add(resourceType);
   }
 
   /**

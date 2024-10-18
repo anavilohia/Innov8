@@ -118,7 +118,7 @@ public class ResourceType {
       String key = entry.getKey();
       Resource value = entry.getValue();
       result.append(key).append(": \n")
-              .append(value.toString).append("\n");
+              .append(value.toString()).append("\n");
     }
     return result.toString();
   }

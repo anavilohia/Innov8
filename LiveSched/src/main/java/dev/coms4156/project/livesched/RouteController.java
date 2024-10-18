@@ -1,10 +1,17 @@
 package dev.coms4156.project.livesched;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -38,7 +45,7 @@ public class RouteController {
       taskList = LiveSchedApplication.myFileDatabase.getAllTasks();
       String res = "";
       for (Task task : taskList) {
-        res.append(task.toString());
+        res = res + task.toString();
       }
       if (res.isEmpty()) {
         return new ResponseEntity<>("Tasks Not Found", HttpStatus.NOT_FOUND);
@@ -61,7 +68,7 @@ public class RouteController {
    *         an HTTP 200 response or, an appropriate message indicating the proper response.
    */
   @GetMapping(value = "/retrieveTask", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> retrieveTasks(@RequestParam(value = "taskId") String taskId) {
+  public ResponseEntity<?> retrieveTask(@RequestParam(value = "taskId") String taskId) {
     try {
       Task task;
       task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
@@ -89,7 +96,7 @@ public class RouteController {
       resourceTypeList = LiveSchedApplication.myFileDatabase.getAllResourceTypes();
       String res = "";
       for (ResourceType resourceType : resourceTypeList) {
-        res.append(resourceType.toString());
+        res = res + resourceType.toString();
       }
       if (res.isEmpty()) {
         return new ResponseEntity<>("ResourceTypes Not Found", HttpStatus.NOT_FOUND);
@@ -112,7 +119,8 @@ public class RouteController {
    *         an HTTP 200 response or, an appropriate message indicating the proper response.
    */
   @GetMapping(value = "/retrieveResourcesFromTask", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> retrieveResourcesFromTask(@RequestParam(value = "resourceId") String taskId) {
+  public ResponseEntity<?> retrieveResourcesFromTask(
+          @RequestParam(value = "resourceId") String taskId) {
     try {
       boolean doesTaskExist = retrieveTask(taskId).getStatusCode() == HttpStatus.OK;
       if (doesTaskExist) {
@@ -123,19 +131,82 @@ public class RouteController {
         String res = "";
         for (ResourceType resourceType : resourceTypeList) {
           if (resourcesNeeded.containsKey(resourceType)) {
-            res.append(resourceType.toString());
+            res = res + resourceType.toString();
           }
         }
         if (res.isEmpty()) {
           return new ResponseEntity<>("ResourceType Not Found", HttpStatus.NOT_FOUND);
         } else {
-          return return new ResponseEntity<>(res, HttpStatus.OK);
+          return new ResponseEntity<>(res, HttpStatus.OK);
         }
       }
       return new ResponseEntity<>("Task Not Found", HttpStatus.NOT_FOUND);
     } catch (Exception e) {
       return handleException(e);
     }
+  }
+
+  /**
+   * Attempts to add a task to the database.
+   *
+   * @param priority       A {@code int} representing the priority of the new task.
+   * @param startTime      A {@code String} representing the start time of the new task.
+   * @param endTime        A {@code String} representing the end time of the new task.
+   * @param latitude       A {@code double} representing the latitude of the new task.
+   * @param longitude      A {@code double} representing the longitude of the new task.
+   *
+   * @return               A {@code ResponseEntity} object containing an HTTP 200
+   *                       response with an appropriate message or the proper status
+   *                       code in tune with what has happened.
+   */
+  @PatchMapping(value = "/addTask", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> addTask(@RequestParam(value = "priority") int priority,
+                                          @RequestParam(value = "startTime") String startTime,
+                                          @RequestParam(value = "endTime") String endTime,
+                                          @RequestParam(value = "latitude") double latitude,
+                                          @RequestParam(value = "longitude") double longitude) {
+    try {
+      String taskId = String.valueOf(LiveSchedApplication.myFileDatabase.getAllTasks().size());
+      Map<ResourceType, Integer> resourceTypeList = new HashMap<>();
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+      LocalDateTime startTimeFormatted = LocalDateTime.parse(startTime, formatter);
+      LocalDateTime endTimeFormatted = LocalDateTime.parse(endTime, formatter);
+      Task newTask = new Task(taskId, resourceTypeList, priority,
+              startTimeFormatted, endTimeFormatted, latitude, longitude);
+      LiveSchedApplication.myFileDatabase.addTask(newTask);
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+  /**
+   * Attempts to add a resource type to the database.
+   *
+   * @param typeName       A {@code String} representing the name of the new resource type.
+   * @param totalUnits      A {@code int} representing the number of units of its resources.
+   * @param latitude        A {@code double} representing the latitude of the new resource type.
+   * @param longitude      A {@code double} representing the longitude of the new resource type.
+   *
+   * @return               A {@code ResponseEntity} object containing an HTTP 200
+   *                       response with an appropriate message or the proper status
+   *                       code in tune with what has happened.
+   */
+  @PatchMapping(value = "/addResourceType", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> addResourceType(@RequestParam(value = "typeName") String typeName,
+                                          @RequestParam(value = "totalUnits") int totalUnits,
+                                          @RequestParam(value = "latitude") double latitude,
+                                          @RequestParam(value = "longitude") double longitude) {
+    try {
+      ResourceType newResourceType = new ResourceType(typeName, totalUnits, latitude, longitude);
+      LiveSchedApplication.myFileDatabase.addResourceType(newResourceType);
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+  private ResponseEntity<?> handleException(Exception e) {
+    System.out.println(e.toString());
+    return new ResponseEntity<>("An Error has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
 }
