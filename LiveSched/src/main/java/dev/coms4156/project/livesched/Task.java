@@ -153,17 +153,17 @@ public class Task {
    */
   public String toString() {
     StringBuilder result = new StringBuilder();
-    result.append(taskId).append(" ")
-            .append("Location: ").append(location.getCoordinates()).append("\n")
-            .append("Start: ").append(startTime.toString()).append("\n")
-            .append("End: ").append(endTime.toString()).append("\n")
+    result.append("Task ID: ").append(taskId).append("; ")
+            .append("Location: ").append(location.getCoordinates()).append("; ")
+            .append("Start: ").append(startTime.toString()).append("; ")
+            .append("End: ").append(endTime.toString()).append("; ")
             .append("Priority: ").append(String.valueOf(priority)).append("\n")
-            .append("Resources Needed:\n");
+            .append("Resources Needed: \n");
     for (Map.Entry<ResourceType, Integer> entry : resourceList.entrySet()) {
       ResourceType key = entry.getKey();
       Integer value = entry.getValue();
-      result.append(key.toString()).append(": \n")
-              .append(String.valueOf(value)).append("\n");
+      result.append(String.valueOf(value)).append(" of the following resource type is needed: \n")
+              .append(key.toString()).append("\n");
     }
     return result.toString();
   }

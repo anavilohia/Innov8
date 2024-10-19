@@ -101,8 +101,8 @@ public class Resource {
    */
   public String toString() {
     StringBuilder result = new StringBuilder();
-    result.append(resourceId).append(": ")
-            .append(availableFrom.toString()).append("\n");
+    result.append("Resource ID: ").append(resourceId).append("; ")
+            .append("Available From: ").append(availableFrom.toString()).append("\n");
     return result.toString();
   }
 

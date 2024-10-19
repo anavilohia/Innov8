@@ -115,14 +115,13 @@ public class ResourceType {
    */
   public String toString() {
     StringBuilder result = new StringBuilder();
-    result.append(typeName).append(" ")
+    result.append("Resource Type: ").append(typeName).append("; ")
             .append("Location: ").append(location.getCoordinates()).append("\n")
-            .append("Resources: \n");
+            .append("Available Resources: \n");
     for (Map.Entry<String, Resource> entry : resources.entrySet()) {
       String key = entry.getKey();
       Resource value = entry.getValue();
-      result.append(key).append(": \n")
-              .append(value.toString()).append("\n");
+      result.append(value.toString());
     }
     return result.toString();
   }
