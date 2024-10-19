@@ -119,7 +119,7 @@ public class RouteController {
    */
   @GetMapping(value = "/retrieveResourcesFromTask", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> retrieveResourcesFromTask(
-          @RequestParam(value = "resourceId") String taskId) {
+          @RequestParam(value = "taskId") String taskId) {
     try {
       boolean doesTaskExist = retrieveTask(taskId).getStatusCode() == HttpStatus.OK;
       if (doesTaskExist) {
@@ -245,5 +245,4 @@ public class RouteController {
     System.out.println(e.toString());
     return new ResponseEntity<>("An Error has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
   }
-
 }

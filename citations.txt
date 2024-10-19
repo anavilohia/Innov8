@@ -6,3 +6,5 @@
 - https://www.tutorialspoint.com/javatime/javatime_localdatetime_truncatedto.htm
 - https://github.com/griffinnewbold/COMS-4156-Service?tab=readme-ov-file
 - https://github.com/anavilohia/4156-Miniproject/blob/main/README.md
+- https://stackoverflow.com/questions/17840483/how-to-have-java-method-return-generic-list-of-any-type
+- https://stackoverflow.com/questions/27969797/how-to-make-java-method-that-accepts-any-object-as-parameter
