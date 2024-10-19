@@ -95,7 +95,7 @@ https://innov8-livesched.ue.r.appspot.com
 
 A successful connection should lead you to a homepage that displays the following message:
 
-![img_1.png](img_1.png)
+<img width="991" alt="Screenshot 2024-10-18 at 11 47 37 PM" src="https://github.com/user-attachments/assets/595f76e7-22b3-47d3-99fd-951f13822dd8">
 
 Additional data requests and tests can be made using a service like [Postman](https://www.postman.com/) using the following format:
 
