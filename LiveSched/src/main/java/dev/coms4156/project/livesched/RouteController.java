@@ -108,42 +108,45 @@ public class RouteController {
     }
   }
 
-  /**
-   * Returns the details of resource types a task needs.
-   *
-   * @param taskId A {@code String} representing the task of the resources the user wishes
-   *                 to retrieve.
-   *
-   * @return A {@code ResponseEntity} object containing either the details of the ResourceTypes and
-   *         an HTTP 200 response or, an appropriate message indicating the proper response.
-   */
-  @GetMapping(value = "/retrieveResourcesFromTask", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> retrieveResourcesFromTask(
-          @RequestParam(value = "taskId") String taskId) {
-    try {
-      boolean doesTaskExist = retrieveTask(taskId).getStatusCode() == HttpStatus.OK;
-      if (doesTaskExist) {
-        List<ResourceType> resourceTypeList;
-        Task task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
-        Map<ResourceType, Integer> resourcesNeeded = task.getResources();
-        resourceTypeList = LiveSchedApplication.myFileDatabase.getAllResourceTypes();
-        String res = "";
-        for (ResourceType resourceType : resourceTypeList) {
-          if (resourcesNeeded.containsKey(resourceType)) {
-            res = res + resourceType.toString();
-          }
-        }
-        if (res.isEmpty()) {
-          return new ResponseEntity<>("ResourceType Not Found", HttpStatus.NOT_FOUND);
-        } else {
-          return new ResponseEntity<>(res, HttpStatus.OK);
-        }
-      }
-      return new ResponseEntity<>("Task Not Found", HttpStatus.NOT_FOUND);
-    } catch (Exception e) {
-      return handleException(e);
-    }
-  }
+  // to be re-add in Iteration 2 after testing
+
+  // /**
+  //  * Returns the details of resource types a task needs.
+  //  *
+  //  * @param taskId A {@code String} representing the task of the resources the user wishes
+  //  *                 to retrieve.
+  //  *
+  //  * @return A {@code ResponseEntity} object containing
+  //  either the details of the ResourceTypes and
+  //  *         an HTTP 200 response or, an appropriate message indicating the proper response.
+  //  */
+  // @GetMapping(value = "/retrieveResourcesFromTask", produces = MediaType.APPLICATION_JSON_VALUE)
+  // public ResponseEntity<?> retrieveResourcesFromTask(
+  //         @RequestParam(value = "taskId") String taskId) {
+  //   try {
+  //     boolean doesTaskExist = retrieveTask(taskId).getStatusCode() == HttpStatus.OK;
+  //     if (doesTaskExist) {
+  //       List<ResourceType> resourceTypeList;
+  //       Task task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
+  //       Map<ResourceType, Integer> resourcesNeeded = task.getResources();
+  //       resourceTypeList = LiveSchedApplication.myFileDatabase.getAllResourceTypes();
+  //       String res = "";
+  //       for (ResourceType resourceType : resourceTypeList) {
+  //         if (resourcesNeeded.containsKey(resourceType)) {
+  //           res = res + resourceType.toString();
+  //         }
+  //       }
+  //       if (res.isEmpty()) {
+  //         return new ResponseEntity<>("ResourceType Not Found", HttpStatus.NOT_FOUND);
+  //       } else {
+  //         return new ResponseEntity<>(res, HttpStatus.OK);
+  //       }
+  //     }
+  //     return new ResponseEntity<>("Task Not Found", HttpStatus.NOT_FOUND);
+  //   } catch (Exception e) {
+  //     return handleException(e);
+  //   }
+  // }
 
   /**
    * Attempts to add a task to the database.

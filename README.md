@@ -143,17 +143,6 @@ This section describes the endpoints that the service provides, as well as their
 * Upon Failure:
   * HTTP 404 Status Code with "ResourceTypes Not Found" if there are no resource types.
   * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
- 
-#### GET /retrieveResourcesFromTask
-* Expected Input Parameters: taskId (String)
-* Expected Output: A String containing the details of the resourceTypes needed for the specified task. (ResponseEntity\<String\>)
-* Returns the details of resource types a task needs.
-* Upon Success:
-  * HTTP 200 Status Code with the resource types in the response body.
-* Upon Failure:
-  * HTTP 404 Status Code with "Task Not Found" if the task does not exist.
-  * HTTP 404 Status Code with "ResourceType Not Found" if no resource types are found for the task.
-  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
 
 #### PATCH /addTask
 * Expected Input Parameters: priority (int), startTime (String), endTime (String), latitude (double), longitude (double)
@@ -234,8 +223,6 @@ The following tools were used in the development and modification of this reposi
      <img width="1043" alt="Screenshot 2024-10-18 at 9 29 22 PM" src="https://github.com/user-attachments/assets/2b23b9f3-4ee9-44d7-a4b8-bcb66c326cb5">
    * `/retrieveResourceTypes`
      <img width="1044" alt="Screenshot 2024-10-18 at 9 29 46 PM" src="https://github.com/user-attachments/assets/c644667c-77cf-4853-ad7b-7134ad91f370">
-   * `/retrieveResourcesFromTask?taskld=ER-1`
-     <img width="1043" alt="Screenshot 2024-10-18 at 9 32 47 PM" src="https://github.com/user-attachments/assets/a9aa1730-6158-4ed0-be9a-02621e0a50a5">
    * `/addTask?priority=1&startTime=2024-10-19 09:14&endTime=2024-10-19 10:14&latitude=20&longitude=-10`
      <img width="1042" alt="Screenshot 2024-10-18 at 9 40 56 PM" src="https://github.com/user-attachments/assets/9bdd4472-ab8f-4fb3-936d-3099ad1e255b">
      <img width="1064" alt="Screenshot 2024-10-18 at 10 18 22 PM" src="https://github.com/user-attachments/assets/c8f08166-3bd9-4378-9774-4ac37fb5103c">
