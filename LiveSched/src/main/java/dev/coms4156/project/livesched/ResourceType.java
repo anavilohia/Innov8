@@ -124,7 +124,6 @@ public class ResourceType implements Serializable {
             .append("Location: ").append(location.getCoordinates()).append("\n")
             .append("Available Resources: \n");
     for (Map.Entry<String, Resource> entry : resources.entrySet()) {
-      String key = entry.getKey();
       Resource value = entry.getValue();
       result.append(value.toString());
     }
