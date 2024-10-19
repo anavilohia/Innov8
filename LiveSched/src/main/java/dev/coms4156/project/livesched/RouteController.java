@@ -2,7 +2,6 @@ package dev.coms4156.project.livesched;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -229,7 +228,7 @@ public class RouteController {
         resourceTypeList = LiveSchedApplication.myFileDatabase.getAllResourceTypes();
         Task task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
         for (ResourceType resourceType : resourceTypeList) {
-          if (resourceType.getTypeName() == typeName) {
+          if (resourceType.getTypeName().equals(typeName)) {
             task.updateResource(resourceType, quantity);
             return new ResponseEntity<>("Attribute was updated successfully.", HttpStatus.OK);
           }
@@ -246,5 +245,4 @@ public class RouteController {
     System.out.println(e.toString());
     return new ResponseEntity<>("An Error has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
   }
-
 }

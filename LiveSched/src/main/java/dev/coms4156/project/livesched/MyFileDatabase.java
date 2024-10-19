@@ -155,7 +155,7 @@ public class MyFileDatabase {
   public Task getTaskById(String taskId) {
     List<Task> tasks = this.allTasks;
     for (Task task : tasks) {
-      if (task.getTaskId() == taskId) {
+      if (task.getTaskId().equals(taskId)) {
         return task;
       }
     }
