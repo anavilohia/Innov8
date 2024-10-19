@@ -107,7 +107,82 @@ Additional data requests and tests can be made using a service like [Postman](ht
 
 This section describes the endpoints that the service provides, as well as their inputs and outputs. 
 
-[ADD ENDPOINT DETAILS]
+#### GET /index
+* Expected Input Parameters: N/A
+* Expected Output: Welcome message (String)
+* Redirects to the homepage.
+* Upon Success:
+  * HTTP 200 Status Code with a welcome message in the response body.
+
+#### GET /retrieveTasks
+* Expected Input Parameters: N/A
+* Expected Output: A String containing the details of all tasks (ResponseEntity\<String\>)
+* Returns the details of all tasks in the database.
+* Upon Success:
+  * HTTP 200 Status Code with a list of tasks in the response body.
+* Upon Failure:
+  * HTTP 404 Status Code with "Tasks Not Found" if there are no tasks.
+  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
+ 
+#### GET /retrieveTask
+* Expected Input Parameters: taskId (String)
+* Expected Output: A String containing the details of the specified task (ResponseEntity\<String\>)
+* Returns the details of a specified task in the database.
+* Upon Success:
+  * HTTP 200 Status Code with the task's details in the response body.
+* Upon Failure:
+  * HTTP 404 Status Code with "Task Not Found" if the specified task does not exist.
+  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
+
+#### GET /retrieveResourceTypes
+* Expected Input Parameters: N/A
+* Expected Output: A String containing the details of all resourcetypes (ResponseEntity\<String\>)
+* Returns the details of all resource types in the database.
+* Upon Success:
+  * HTTP 200 Status Code with the list of resource types in the response body.
+* Upon Failure:
+  * HTTP 404 Status Code with "ResourceTypes Not Found" if there are no resource types.
+  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
+ 
+#### GET /retrieveResourcesFromTask
+* Expected Input Parameters: taskId (String)
+* Expected Output: A String containing the details of the resourceTypes needed for the specified task. (ResponseEntity\<String\>)
+* Returns the details of resource types a task needs.
+* Upon Success:
+  * HTTP 200 Status Code with the resource types in the response body.
+* Upon Failure:
+  * HTTP 404 Status Code with "Task Not Found" if the task does not exist.
+  * HTTP 404 Status Code with "ResourceType Not Found" if no resource types are found for the task.
+  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
+
+#### PATCH /addTask
+* Expected Input Parameters: priority (int), startTime (String), endTime (String), latitude (double), longitude (double)
+* Expected Output: A String confirming the task was added successfully. (ResponseEntity\<String\>)
+* Attempts to add a task to the database.
+* Upon Success:
+  * HTTP 200 Status Code with "Attribute was updated successfully." in the response body.
+* Upon Failure:
+  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
+ 
+#### PATCH /addResourceType
+* Expected Input Parameters: typeName (String), totalUnits (int), latitude (double), longitude (double)
+* Expected Output: A String confirming the resource type was added successfully. (ResponseEntity\<String\>)
+* Attempts to add a resource type to the database.
+* Upon Success:
+  * HTTP 200 Status Code with "Attribute was updated successfully." in the response body.
+* Upon Failure:
+  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
+ 
+#### PATCH /modifyResourceType
+* Expected Input Parameters: typeName (String), totalUnits (int), latitude (double), longitude (double)
+* Expected Output: A String confirming the resource type for the task was modified successfully. (ResponseEntity\<String\>)
+* Attempts to modify resource type for a specified task to the database.
+* Upon Success:
+  * HTTP 200 Status Code with "Attribute was updated successfully." in the response body.
+* Upon Failure:
+  * HTTP 404 Status Code with "Task Not Found" if the task does not exist.
+  * HTTP 404 Status Code with "ResourceType Not Found" if the resource type does not exist.
+  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
 
 ---------------------------------------------
 
@@ -127,7 +202,7 @@ The following tools were used in the development and modification of this reposi
   * Currently, this needs to be manually run using the code specified in above sections, it is not a part of the CI pipeline
   * It can also be run using the "Checkstyle-IDEA" plugin for IntelliJ
   * Most recent checkstyle results \
-    [ADD SCREENSHOT]
+    <img width="646" alt="Screenshot 2024-10-18 at 8 53 33 PM" src="https://github.com/user-attachments/assets/f052aaf8-43e2-4c2b-8b94-200024cf20a8">
 * PMD
   * Performs static analysis of the Java code, generating errors and warnings as needed
   * Currently, this needs to be manually run using the code specified in above sections, it is not a part of the CI pipeline
@@ -144,8 +219,9 @@ The following tools were used in the development and modification of this reposi
 * JaCoCo
   * JaCoCo generates code test coverage reports such as branch analysis
   * Currently, this needs to be manually run using the code specified in above sections, it is not a part of the CI pipeline
-  * Most recent jacoco report \
-    [ADD SCREENSHOT]
+  * Most recent jacoco report with 76% overall branch coverage\
+    <img width="1011" alt="Screenshot 2024-10-18 at 8 57 32 PM" src="https://github.com/user-attachments/assets/f8f89d18-3b42-475b-af7e-3068ad993f0d">
+
 * Postman
   * Used for testing that the API and its endpoints work as intended
 
