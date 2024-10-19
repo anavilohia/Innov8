@@ -202,7 +202,8 @@ The following tools were used in the development and modification of this reposi
   * Currently, this needs to be manually run using the code specified in above sections, it is not a part of the CI pipeline
   * It can also be run using the "Checkstyle-IDEA" plugin for IntelliJ
   * Most recent checkstyle results \
-    <img width="646" alt="Screenshot 2024-10-18 at 8 53 33 PM" src="https://github.com/user-attachments/assets/f052aaf8-43e2-4c2b-8b94-200024cf20a8">
+    <img width="650" alt="Screenshot 2024-10-18 at 10 49 14 PM" src="https://github.com/user-attachments/assets/d78ed7ab-477d-47e3-97a9-e8142f7c9d59">
+
 * PMD
   * Performs static analysis of the Java code, generating errors and warnings as needed
   * Currently, this needs to be manually run using the code specified in above sections, it is not a part of the CI pipeline
@@ -212,15 +213,15 @@ The following tools were used in the development and modification of this reposi
     <ruleset>/rulesets/java/maven-pmd-plugin-default.xml</ruleset>
     ```
   * Most recent PMD results \
-    [ADD SCREENSHOT]
+    <img width="1214" alt="Screenshot 2024-10-18 at 10 51 10 PM" src="https://github.com/user-attachments/assets/f4a8f933-4dbe-4584-a206-82ad23c49e00">
 * JUnit
   * JUnit tests get run automatically as part of the CI pipeline
   * They can also be manually run using the code specified in above sections
 * JaCoCo
   * JaCoCo generates code test coverage reports such as branch analysis
   * Currently, this needs to be manually run using the code specified in above sections, it is not a part of the CI pipeline
-  * Most recent jacoco report with 76% overall branch coverage\
-    <img width="1011" alt="Screenshot 2024-10-18 at 8 57 32 PM" src="https://github.com/user-attachments/assets/f8f89d18-3b42-475b-af7e-3068ad993f0d">
+  * Most recent jacoco report with 74% overall branch coverage\
+    <img width="1465" alt="Screenshot 2024-10-18 at 10 57 11 PM" src="https://github.com/user-attachments/assets/2d89ce68-00ba-4eec-8ca2-a9a467059aea">
 
 * Postman
   * Used for testing that the API and its endpoints work as intended
