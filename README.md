@@ -91,15 +91,15 @@ mvn pmd:check
 
 This service is currently available as a google cloud based instance that can be accessed using the following url:
 
-[ADD URL]
+https://innov8-livesched.ue.r.appspot.com
 
 A successful connection should lead you to a homepage that displays the following message:
 
-[ADD IMAGE OF HOMEPAGE]
+![img_1.png](img_1.png)
 
 Additional data requests and tests can be made using a service like [Postman](https://www.postman.com/) using the following format:
 
-[ADD URL]/endpoint?arg=value&ar=value
+https://innov8-livesched.ue.r.appspot.com/endpoint?arg=value&ar=value
 
 ---------------------------------------------
 
