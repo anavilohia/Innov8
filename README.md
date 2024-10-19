@@ -99,7 +99,7 @@ A successful connection should lead you to a homepage that displays the followin
 
 Additional data requests and tests can be made using a service like [Postman](https://www.postman.com/) using the following format:
 
-https://innov8-livesched.ue.r.appspot.com/endpoint?arg=value&ar=value
+https://innov8-livesched.ue.r.appspot.com/endpoint?arg=value&arg=value
 
 ---------------------------------------------
 
