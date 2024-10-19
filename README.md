@@ -224,7 +224,29 @@ The following tools were used in the development and modification of this reposi
 
 * Postman
   * Used for testing that the API and its endpoints work as intended
+  * API Endpoint Test Results
+   * `/index`
+     <img width="855" alt="Screenshot 2024-10-18 at 9 26 47 PM" src="https://github.com/user-attachments/assets/2fdb2da3-b6bc-431f-8989-6f02e25dfaf8">  
+   * `/retrieveTasks`
+     <img width="1055" alt="Screenshot 2024-10-18 at 9 27 33 PM" src="https://github.com/user-attachments/assets/cf4f1965-fbdd-4d38-a47f-b4751a0c0de5">
+   * `/retrieveTask?taskId=ER-1`
+     <img width="1043" alt="Screenshot 2024-10-18 at 9 29 22 PM" src="https://github.com/user-attachments/assets/2b23b9f3-4ee9-44d7-a4b8-bcb66c326cb5">
+   * `/retrieveResourceTypes`
+     <img width="1044" alt="Screenshot 2024-10-18 at 9 29 46 PM" src="https://github.com/user-attachments/assets/c644667c-77cf-4853-ad7b-7134ad91f370">
+   * `/retrieveResourcesFromTask?taskld=ER-1`
+     <img width="1043" alt="Screenshot 2024-10-18 at 9 32 47 PM" src="https://github.com/user-attachments/assets/a9aa1730-6158-4ed0-be9a-02621e0a50a5">
+   * `/addTask?priority=1&startTime=2024-10-19 09:14&endTime=2024-10-19 10:14&latitude=20&longitude=-10`
+     <img width="1042" alt="Screenshot 2024-10-18 at 9 40 56 PM" src="https://github.com/user-attachments/assets/9bdd4472-ab8f-4fb3-936d-3099ad1e255b">
+     <img width="1064" alt="Screenshot 2024-10-18 at 10 18 22 PM" src="https://github.com/user-attachments/assets/c8f08166-3bd9-4378-9774-4ac37fb5103c">
+   * `/addResourceType?typeName=Table&totalUnits=10&latitude=30&longitude=-40`
+     <img width="1052" alt="Screenshot 2024-10-18 at 9 42 18 PM" src="https://github.com/user-attachments/assets/c2924406-a2e9-4e06-be73-613bb0eed61f">
+     <img width="1039" alt="Screenshot 2024-10-18 at 10 19 33 PM" src="https://github.com/user-attachments/assets/9c6d4a6f-1c5b-4ccb-968f-368eb18b6044">
+   * `/modifyResourceType?taskId=ER-1&typeName=Doctor&quantity=1`
+     <img width="1051" alt="Screenshot 2024-10-18 at 10 27 42 PM" src="https://github.com/user-attachments/assets/6a4fa3ee-d6dc-4581-871d-2994c550b650">
+     <img width="1052" alt="Screenshot 2024-10-18 at 10 29 13 PM" src="https://github.com/user-attachments/assets/2514d7e1-4ad7-4bd6-9f49-d14a4da0125c">
 
+
+     
 ---------------------------------------------
 
 citations.txt is located at root level of this repository, it specifies urls for all resources used as reference in the development of this repository
