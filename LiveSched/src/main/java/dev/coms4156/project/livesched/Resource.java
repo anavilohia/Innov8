@@ -98,4 +98,17 @@ public class Resource implements Serializable {
     this.availableFrom = availableFrom;
   }
 
+  /**
+   * Returns a string representation of the resource,
+   * including its id and start time.
+   *
+   * @return A string representing the task.
+   */
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    result.append(resourceId).append(": ")
+            .append(availableFrom.toString()).append("\n");
+    return result.toString();
+  }
+
 }

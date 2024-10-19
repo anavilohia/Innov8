@@ -130,7 +130,7 @@ public class LiveSchedApplication implements CommandLineRunner {
   private static final String TASK_FILE_PATH = "./tasks.txt";
   private static final String RESOURCE_TYPE_FILE_PATH = "./resourceTypes.txt";
 
-  private static MyFileDatabase myFileDatabase;
+  public static MyFileDatabase myFileDatabase;
   private static boolean saveData = true;
 
 }
