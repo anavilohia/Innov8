@@ -15,7 +15,7 @@ Jungyun Kim (jk4661) \
 Nathan Philip Zepeda (npz2000)
 
 Team member conrtibutions can be found on the JIRA project at this link: 
-[Innov8 JIRA backlog](https://innov8-columbia.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog?atlOrigin=eyJpIjoiMTk0YTliNjU4ZmE1NGMzOWIzNzNkNDQ1M2QzZDU5N2UiLCJwIjoiaiJ9)
+[Innov8 JIRA - List of tasks](https://innov8-columbia.atlassian.net/jira/software/projects/SCRUM/list?atlOrigin=eyJpIjoiZDMwOWM1ZTQyMGQxNGRhNjg1MzUxM2Y0Mzc5YmNlZDEiLCJwIjoiaiJ9)
 
 ## Project
 
