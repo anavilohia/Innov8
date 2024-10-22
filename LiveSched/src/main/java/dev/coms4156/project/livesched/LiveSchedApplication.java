@@ -143,19 +143,20 @@ public class LiveSchedApplication implements CommandLineRunner {
     }
   }
 
+  public static MyFileDatabase myFileDatabase;
+  public static boolean useGCS = false; // Default is local mode (Not use Google Cloud Storage)
+
   private static final String TASK_FILE_PATH = "/tmp/tasks.txt";
   private static final String RESOURCE_TYPE_FILE_PATH = "/tmp/resourceTypes.txt";
   private static final String TASK_OBJECT_NAME =  "gcs_tasks.txt";
   private static final String RESOURCE_TYPE_OBJECT_NAME = "gcs_resourceTypes.txt";
-
-  public static MyFileDatabase myFileDatabase;
+  private static final String APP_ENGINE_ENV = "standard"; // Constant for environment check
   private static boolean saveData = true;
-  public static boolean useGCS = false; // Default is local mode (Not use Google Cloud Storage)
 
   // Detect App Engine environment and enable GCS if running in App Engine
   static {
     String env = System.getenv("GAE_ENV");
-    if ("standard".equals(env)) {
+    if (APP_ENGINE_ENV.equals(env)) {
       useGCS = true;
       System.out.println("Running in App Engine: GCS enabled.");
     }
