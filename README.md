@@ -14,6 +14,9 @@ Jonghyun Lee (jl6509) \
 Jungyun Kim (jk4661) \
 Nathan Philip Zepeda (npz2000)
 
+Team member conrtibutions can be found on the JIRA project at this link: 
+[Innov8 JIRA backlog](https://innov8-columbia.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog?atlOrigin=eyJpIjoiMTk0YTliNjU4ZmE1NGMzOWIzNzNkNDQ1M2QzZDU5N2UiLCJwIjoiaiJ9)
+
 ## Project
 
 LiveSched: 
