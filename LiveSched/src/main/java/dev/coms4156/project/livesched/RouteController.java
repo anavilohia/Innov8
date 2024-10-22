@@ -168,7 +168,7 @@ public class RouteController {
                                           @RequestParam(value = "latitude") double latitude,
                                           @RequestParam(value = "longitude") double longitude) {
     try {
-      String taskId = String.valueOf(LiveSchedApplication.myFileDatabase.getAllTasks().size());
+      String taskId = String.valueOf(LiveSchedApplication.myFileDatabase.getAllTasks().size() + 1);
       Map<ResourceType, Integer> resourceTypeList = new HashMap<>();
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
       LocalDateTime startTimeFormatted = LocalDateTime.parse(startTime, formatter);
