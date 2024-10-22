@@ -29,7 +29,7 @@ class MyFileDatabaseUnitTests {
   void setUp() {
     String taskPath = new File(tempDir, TASK_FILE).getAbsolutePath();
     String resourcePath = new File(tempDir, RESOURCE_FILE).getAbsolutePath();
-    database = new MyFileDatabase(1, taskPath, resourcePath);
+    database = new MyFileDatabase(1, taskPath, resourcePath, taskPath, resourcePath);
   }
 
   @Test

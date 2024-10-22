@@ -37,15 +37,31 @@ public class LiveSchedApplication implements CommandLineRunner {
    */
   @Override
   public void run(String[] args) {
+    boolean isSetupMode = false;
+
     for (String arg : args) {
-      if (arg.equals("setup")) {
-        myFileDatabase = new MyFileDatabase(1, TASK_FILE_PATH, RESOURCE_TYPE_FILE_PATH);
-        setupDataFile();
-        System.out.println("System setup completed.");
-        return;
+      switch (arg) {
+        case "setup":
+          isSetupMode = true;
+          break;
+        case "--useGCS":
+          useGCS = true;
+          System.out.println("GCS operations enabled.");
+          break;
+        default:
+          System.out.println("Unknown argument: " + arg);
       }
     }
-    myFileDatabase = new MyFileDatabase(0, TASK_FILE_PATH, RESOURCE_TYPE_FILE_PATH);
+
+    if (isSetupMode) {
+      myFileDatabase = new MyFileDatabase(1, TASK_FILE_PATH, RESOURCE_TYPE_FILE_PATH,
+          TASK_OBJECT_NAME, RESOURCE_TYPE_OBJECT_NAME);
+      setupDataFile();
+      System.out.println("System setup completed.");
+      return;
+    }
+    myFileDatabase = new MyFileDatabase(0, TASK_FILE_PATH, RESOURCE_TYPE_FILE_PATH,
+        TASK_OBJECT_NAME, RESOURCE_TYPE_OBJECT_NAME);
     System.out.println("System start up.");
   }
 
@@ -127,10 +143,21 @@ public class LiveSchedApplication implements CommandLineRunner {
     }
   }
 
-  private static final String TASK_FILE_PATH = "./tasks.txt";
-  private static final String RESOURCE_TYPE_FILE_PATH = "./resourceTypes.txt";
+  private static final String TASK_FILE_PATH = "/tmp/tasks.txt";
+  private static final String RESOURCE_TYPE_FILE_PATH = "/tmp/resourceTypes.txt";
+  private static final String TASK_OBJECT_NAME =  "gcs_tasks.txt";
+  private static final String RESOURCE_TYPE_OBJECT_NAME = "gcs_resourceTypes.txt";
 
   public static MyFileDatabase myFileDatabase;
   private static boolean saveData = true;
+  public static boolean useGCS = false; // Default is local mode (Not use Google Cloud Storage)
 
+  // Detect App Engine environment and enable GCS if running in App Engine
+  static {
+    String env = System.getenv("GAE_ENV");
+    if ("standard".equals(env)) {
+      useGCS = true;
+      System.out.println("Running in App Engine: GCS enabled.");
+    }
+  }
 }

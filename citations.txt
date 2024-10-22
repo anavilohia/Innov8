@@ -8,3 +8,5 @@
 - https://github.com/anavilohia/4156-Miniproject/blob/main/README.md
 - https://stackoverflow.com/questions/17840483/how-to-have-java-method-return-generic-list-of-any-type
 - https://stackoverflow.com/questions/27969797/how-to-make-java-method-that-accepts-any-object-as-parameter
+- https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-java
+- https://cloud.google.com/storage/docs/downloading-objects

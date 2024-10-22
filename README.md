@@ -35,7 +35,10 @@ To build and use this service you must install the following:
 
 ## Building and Running a Local Instance
 
-To set up and run the repository after installation, you can use the following commands inside LiveSched folder:
+To set up and run the repository after installation, you can use the following commands inside LiveSched folder. 
+By default, the service operates in local mode, saving and loading files from local storage.
+If you would like to use Google Cloud Storage (GCS), you can enable GCS operations by passing the `--useGCS` flag as noted below.
+But please note that if you plan to run the service with GCS enabled, you need to install and set up [Google Cloud CLI](https://cloud.google.com/sdk/docs/install-sdk). 
 <br/>
 <br/>
 
@@ -45,13 +48,23 @@ cd LiveSched
 ```
 
 ### Setup
+If you want to set up an example database for the first time or want to reset it, run and terminate after you see the message "System setup completed":
 ```
 mvn spring-boot:run -Dspring-boot.run.arguments="setup"
 ```
+If you want to enable GCS during setup:
+```
+mvn spring-boot:run -Dspring-boot.run.arguments="setup --useGCS"
+```
 
 ### Run
+To run the service normally (in local mode by default):
 ```
 mvn spring-boot:run
+```
+If you want to enable GCS operations:
+```
+mvn spring-boot:run -Dspring-boot.run.arguments="--useGCS"
 ```
 
 ### Build and test
@@ -100,6 +113,9 @@ A successful connection should lead you to a homepage that displays the followin
 Additional data requests and tests can be made using a service like [Postman](https://www.postman.com/) using the following format:
 
 https://innov8-livesched.ue.r.appspot.com/endpoint?arg=value&arg=value
+
+Note:
+For the cloud based instance, GCS operations are enabled by default, meaning the service will load and save files to Google Cloud Storage without any additional configuration.
 
 ---------------------------------------------
 
