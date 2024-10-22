@@ -182,7 +182,7 @@ This section describes the endpoints that the service provides, as well as their
   * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
  
 #### PATCH /modifyResourceType
-* Expected Input Parameters: typeName (String), totalUnits (int), latitude (double), longitude (double)
+* Expected Input Parameters: taskId (String), typeName (String), quantity (int)
 * Expected Output: A String confirming the resource type for the task was modified successfully. (ResponseEntity\<String\>)
 * Attempts to modify resource type for a specified task to the database.
 * Upon Success:
