@@ -270,6 +270,37 @@ public class RouteController {
     }
   }
 
+  /**
+   * Attempts to delete a resourceType from the database.
+   *
+   * @param typeName        A {@code String} representing the resource type to delete.
+   *
+   * @return               A {@code ResponseEntity} object containing an HTTP 200
+   *                       response with an appropriate message or the proper status
+   *                       code in tune with what has happened.
+   */
+  @DeleteMapping(value = "/deleteResourceType", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> deleteResourceType(@RequestParam(value = "typeName") String typeName) {
+    try {
+      List<Task> tasks = LiveSchedApplication.myFileDatabase.getAllTasks();
+      List<ResourceType> resourceTypeList = LiveSchedApplication.myFileDatabase.getAllResourceTypes();
+      for (ResourceType resourceType : resourceTypeList) {
+        if (resourceType.getTypeName().equals(typeName)) {
+          for (Task task : tasks) {
+            if (task.getResources().containsKey(resourceType)) {
+              return new ResponseEntity<>("Cannot delete a resourceType currently in use", HttpStatus.BAD_REQUEST);
+            }
+          }
+          LiveSchedApplication.myFileDatabase.deleteResourceType(resourceType);
+          return new ResponseEntity<>(typeName + " successfully deleted", HttpStatus.OK);
+        }
+      }
+      return new ResponseEntity<>("ResourceType Not Found", HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
   private ResponseEntity<?> handleException(Exception e) {
     System.out.println(e.toString());
     return new ResponseEntity<>("An Error has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
