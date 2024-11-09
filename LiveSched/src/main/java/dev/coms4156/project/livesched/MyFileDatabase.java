@@ -270,6 +270,14 @@ public class MyFileDatabase {
   }
 
   /**
+   * Deletes a task to the database.
+   *
+   */
+  public void deleteTask(Task task) {
+    this.allTasks.remove(task);
+  }
+
+  /**
    * Adds a resource type to the database.
    *
    */

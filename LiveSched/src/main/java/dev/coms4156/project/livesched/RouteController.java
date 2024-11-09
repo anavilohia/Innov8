@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -177,6 +178,31 @@ public class RouteController {
               startTimeFormatted, endTimeFormatted, latitude, longitude);
       LiveSchedApplication.myFileDatabase.addTask(newTask);
       return new ResponseEntity<>("Attribute was updated successfully.", HttpStatus.OK);
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+  /**
+   * Attempts to delete a task from the database.
+   *
+   * @param taskId           A {@code String} representing the taskId of task to be deleted.
+   *
+   * @return               A {@code ResponseEntity} object containing an HTTP 200
+   *                       response with an appropriate message or the proper status
+   *                       code in tune with what has happened.
+   */
+  @DeleteMapping(value = "/deleteTask", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> deleteTask(@RequestParam(value = "taskId") String taskId) {
+    try {
+      Task task;
+      task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
+      if (task == null) {
+        return new ResponseEntity<>("Task Not Found", HttpStatus.NOT_FOUND);
+      } else {
+        LiveSchedApplication.myFileDatabase.deleteTask(task);
+        return new ResponseEntity<>(taskId + " successfully deleted", HttpStatus.OK);
+      }
     } catch (Exception e) {
       return handleException(e);
     }
