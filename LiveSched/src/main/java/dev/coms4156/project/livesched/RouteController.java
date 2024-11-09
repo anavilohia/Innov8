@@ -292,7 +292,7 @@ public class RouteController {
             }
           }
           LiveSchedApplication.myFileDatabase.deleteResourceType(resourceType);
-          return new ResponseEntity<>("Attribute was updated successfully.", HttpStatus.OK);
+          return new ResponseEntity<>(typeName + " successfully deleted", HttpStatus.OK);
         }
       }
       return new ResponseEntity<>("ResourceType Not Found", HttpStatus.NOT_FOUND);
