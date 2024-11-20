@@ -280,14 +280,14 @@ public class RouteController {
   public ResponseEntity<?> deleteResourceType(@RequestParam(value = "typeName") String typeName) {
     try {
       List<Task> tasks = LiveSchedApplication.myFileDatabase.getAllTasks();
-      List<ResourceType> resourceTypeList = LiveSchedApplication.myFileDatabase
-          .getAllResourceTypes();
+      List<ResourceType> resourceTypeList =
+          LiveSchedApplication.myFileDatabase.getAllResourceTypes();
       for (ResourceType resourceType : resourceTypeList) {
         if (resourceType.getTypeName().equals(typeName)) {
           for (Task task : tasks) {
             if (task.getResources().containsKey(resourceType)) {
-              return new ResponseEntity<>(
-                  "Cannot delete a resourceType currently in use", HttpStatus.BAD_REQUEST);
+              return new ResponseEntity<>("Cannot delete a resourceType currently in use",
+                  HttpStatus.BAD_REQUEST);
             }
           }
           LiveSchedApplication.myFileDatabase.deleteResourceType(resourceType);
