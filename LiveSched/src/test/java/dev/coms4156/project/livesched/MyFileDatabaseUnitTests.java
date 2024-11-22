@@ -21,6 +21,7 @@ class MyFileDatabaseUnitTests {
   private MyFileDatabase database;
   private static final String TASK_FILE = "tasks.dat";
   private static final String RESOURCE_FILE = "resources.dat";
+  private static final String SCHEDULE_FILE = "schedules.dat";
 
   @TempDir
   File tempDir;
@@ -29,7 +30,10 @@ class MyFileDatabaseUnitTests {
   void setUp() {
     String taskPath = new File(tempDir, TASK_FILE).getAbsolutePath();
     String resourcePath = new File(tempDir, RESOURCE_FILE).getAbsolutePath();
-    database = new MyFileDatabase(1, taskPath, resourcePath, taskPath, resourcePath);
+    String schedulePath = new File(tempDir, SCHEDULE_FILE).getAbsolutePath();
+    database = new MyFileDatabase(1,
+        taskPath, resourcePath, schedulePath,
+        taskPath, resourcePath, schedulePath);
   }
 
   @Test
@@ -37,6 +41,7 @@ class MyFileDatabaseUnitTests {
     assertNotNull(database);
     assertTrue(database.getAllTasks().isEmpty());
     assertTrue(database.getAllResourceTypes().isEmpty());
+    assertTrue(database.getAllSchedules().isEmpty());
   }
 
   @Test
@@ -56,9 +61,17 @@ class MyFileDatabaseUnitTests {
   }
 
   @Test
+  void testSetAndGetAllSchedules() {
+    List<Schedule> schedules = new ArrayList<>();
+    schedules.add(createDummySchedule());
+    database.setAllSchedules(schedules);
+    assertEquals(1, database.getAllSchedules().size());
+  }
+
+  @Test
   void testInvalidContentType() {
-    assertThrows(IllegalArgumentException.class, () -> database.saveContentsToFile(3));
-    assertThrows(IllegalArgumentException.class, () -> database.deSerializeObjectFromFile(3));
+    assertThrows(IllegalArgumentException.class, () -> database.saveContentsToFile(4));
+    assertThrows(IllegalArgumentException.class, () -> database.deSerializeObjectFromFile(4));
   }
 
   @Test
@@ -68,6 +81,9 @@ class MyFileDatabaseUnitTests {
 
     database.setAllResourceTypes(null);
     assertTrue(database.getAllResourceTypes().isEmpty());
+
+    database.setAllSchedules(null);
+    assertTrue(database.getAllSchedules().isEmpty());
   }
 
   @Test
@@ -86,5 +102,9 @@ class MyFileDatabaseUnitTests {
 
   private ResourceType createDummyResourceType() {
     return new ResourceType("DummyResource", 5, 0, 0);
+  }
+
+  private Schedule createDummySchedule() {
+    return new Schedule("DummySchedule", new ArrayList<>(), 10);
   }
 }

@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RouteController {
 
+  final String TASK_ID = "taskId";
+
   /**
    * Redirects to the homepage.
    *
@@ -64,7 +66,7 @@ public class RouteController {
    *         an HTTP 200 response or, an appropriate message indicating the proper response.
    */
   @GetMapping(value = "/retrieveTask", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> retrieveTask(@RequestParam(value = "taskId") String taskId) {
+  public ResponseEntity<?> retrieveTask(@RequestParam(value = TASK_ID) String taskId) {
     try {
       Task task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
 
@@ -105,45 +107,82 @@ public class RouteController {
     }
   }
 
-  // to be re-add in Iteration 2 after testing
+  /**
+   * Returns the details of all schedules in the database.
+   *
+   * @return A {@code ResponseEntity} object containing either a list of all Schedules and
+   *         an HTTP 200 response, or an appropriate message indicating the proper response.
+   */
+  @GetMapping(value = "/retrieveSchedules", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> retrieveSchedules() {
+    try {
+      List<Schedule> scheduleList = LiveSchedApplication.myFileDatabase.getAllSchedules();
 
-  // /**
-  //  * Returns the details of resource types a task needs.
-  //  *
-  //  * @param taskId A {@code String} representing the task of the resources the user wishes
-  //  *                 to retrieve.
-  //  *
-  //  * @return A {@code ResponseEntity} object containing
-  //  either the details of the ResourceTypes and
-  //  *         an HTTP 200 response or, an appropriate message indicating the proper response.
-  //  */
-  // @GetMapping(value = "/retrieveResourcesFromTask", produces = MediaType.APPLICATION_JSON_VALUE)
-  // public ResponseEntity<?> retrieveResourcesFromTask(
-  //         @RequestParam(value = "taskId") String taskId) {
-  //   try {
-  //     boolean doesTaskExist = retrieveTask(taskId).getStatusCode() == HttpStatus.OK;
-  //     if (doesTaskExist) {
-  //       List<ResourceType> resourceTypeList;
-  //       Task task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
-  //       Map<ResourceType, Integer> resourcesNeeded = task.getResources();
-  //       resourceTypeList = LiveSchedApplication.myFileDatabase.getAllResourceTypes();
-  //       String res = "";
-  //       for (ResourceType resourceType : resourceTypeList) {
-  //         if (resourcesNeeded.containsKey(resourceType)) {
-  //           res = res + resourceType.toString();
-  //         }
-  //       }
-  //       if (res.isEmpty()) {
-  //         return new ResponseEntity<>("ResourceType Not Found", HttpStatus.NOT_FOUND);
-  //       } else {
-  //         return new ResponseEntity<>(res, HttpStatus.OK);
-  //       }
-  //     }
-  //     return new ResponseEntity<>("Task Not Found", HttpStatus.NOT_FOUND);
-  //   } catch (Exception e) {
-  //     return handleException(e);
-  //   }
-  // }
+      if (scheduleList == null || scheduleList.isEmpty()) {
+        return new ResponseEntity<>("Schedules Not Found", HttpStatus.NOT_FOUND);
+      } else {
+        return new ResponseEntity<>(scheduleList, HttpStatus.OK);
+      }
+
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+  /**
+   * Returns the details of a specified schedule in the database.
+   *
+   * @param scheduleId     A {@code String} representing the schedule the user wishes
+   *                       to retrieve.
+   *
+   * @return A {@code ResponseEntity} object containing either the details of the Task and
+   *         an HTTP 200 response or, an appropriate message indicating the proper response.
+   */
+  @GetMapping(value = "/retrieveSchedule", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> retrieveSchedule(@RequestParam(value = "scheduleId") String scheduleId) {
+    try {
+      Schedule schedule = LiveSchedApplication.myFileDatabase.getScheduleById(scheduleId);
+
+      if (schedule == null) {
+        return new ResponseEntity<>("Schedule Not Found", HttpStatus.NOT_FOUND);
+      } else {
+        return new ResponseEntity<>(schedule, HttpStatus.OK);
+      }
+
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+  /**
+   * Returns the schedule for user tasks and resources.
+   *
+   * @param maxDistance    A {@code double} representing the max distance
+   *                       the user wishes between schedule tasks and resources.
+   *
+   * @return A {@code ResponseEntity} object containing either the details of the Schedule and
+   *         an HTTP 200 response or, an appropriate message indicating the proper response.
+   */
+  @GetMapping(value = "/createSchedule", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> createSchedule(@RequestParam(value = "maxDistance") double maxDistance) {
+    try {
+      List<Task> taskList = LiveSchedApplication.myFileDatabase.getAllTasks();
+
+      if (taskList == null || taskList.isEmpty()) {
+        return new ResponseEntity<>("Tasks Not Found", HttpStatus.NOT_FOUND);
+      } else {
+        String scheduleId =
+            String.valueOf(LiveSchedApplication.myFileDatabase.getAllSchedules().size() + 1);
+        Schedule newSchedule = new Schedule(scheduleId, taskList, maxDistance);
+        newSchedule.createSchedule();
+        LiveSchedApplication.myFileDatabase.addSchedule(newSchedule);
+        return new ResponseEntity<>(newSchedule, HttpStatus.OK);
+      }
+
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
 
   /**
    * Attempts to add a task to the database.
@@ -181,6 +220,30 @@ public class RouteController {
   }
 
   /**
+   * Attempts to unschedule a task from a specific schedule in database.
+   *
+   * @param taskId        A {@code String} representing the id of the task
+   *                      to be removed from schedule.
+   * @param scheduleId    A {@code String} representing the id of the schedule to be modified.
+   *
+   * @return A {@code ResponseEntity} object containing the modified Schedule and an HTTP 200
+   *          status code or the proper status code in tune with what has happened.
+   */
+  @PatchMapping(value = "/unscheduleTask", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> unscheduleTask(@RequestParam(value = TASK_ID) String taskId,
+                                   @RequestParam(value = "scheduleId") String scheduleId) {
+    try {
+      Schedule schedule = LiveSchedApplication.myFileDatabase.getScheduleById(scheduleId);
+      Task task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
+      schedule.unscheduleTask(task);
+      Map<Task, List<Resource>> newSchedule = schedule.getTaskSchedule();
+      return new ResponseEntity<>(newSchedule, HttpStatus.OK);
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+  /**
    * Attempts to delete a task from the database.
    *
    * @param taskId           A {@code String} representing the taskId of task to be deleted.
@@ -190,7 +253,7 @@ public class RouteController {
    *                       code in tune with what has happened.
    */
   @DeleteMapping(value = "/deleteTask", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> deleteTask(@RequestParam(value = "taskId") String taskId) {
+  public ResponseEntity<?> deleteTask(@RequestParam(value = TASK_ID) String taskId) {
     try {
       Task task;
       task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
@@ -244,7 +307,7 @@ public class RouteController {
    *                       code in tune with what has happened.
    */
   @PatchMapping(value = "/modifyResourceType", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> modifyResourceType(@RequestParam(value = "taskId") String taskId,
+  public ResponseEntity<?> modifyResourceType(@RequestParam(value = TASK_ID) String taskId,
                                            @RequestParam(value = "typeName") String typeName,
                                            @RequestParam(value = "quantity") int quantity) {
     try {
