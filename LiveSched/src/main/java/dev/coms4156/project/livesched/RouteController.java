@@ -148,15 +148,15 @@ public class RouteController {
   /**
    * Attempts to add a task to the database.
    *
+   * @param taskName       A {@code String} representing the name of the new task.
    * @param priority       A {@code int} representing the priority of the new task.
    * @param startTime      A {@code String} representing the start time of the new task.
    * @param endTime        A {@code String} representing the end time of the new task.
    * @param latitude       A {@code double} representing the latitude of the new task.
    * @param longitude      A {@code double} representing the longitude of the new task.
    *
-   * @return               A {@code ResponseEntity} object containing an HTTP 200
-   *                       response with an appropriate message or the proper status
-   *                       code in tune with what has happened.
+   * @return A {@code ResponseEntity} object containing the created Task object and an HTTP 200
+   *          status code or the proper status code in tune with what has happened.
    */
   @PatchMapping(value = "/addTask", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> addTask(@RequestParam(value = "taskName") String taskName,
@@ -174,7 +174,7 @@ public class RouteController {
       Task newTask = new Task(taskId, taskName, resourceTypeList, priority,
               startTimeFormatted, endTimeFormatted, latitude, longitude);
       LiveSchedApplication.myFileDatabase.addTask(newTask);
-      return new ResponseEntity<>("Attribute was updated successfully.", HttpStatus.OK);
+      return new ResponseEntity<>(newTask, HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
     }
