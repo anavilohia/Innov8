@@ -190,7 +190,8 @@ public class RouteControllerUnitTests {
         endTime, latitude, longitude);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertEquals("Attribute was updated successfully.", response.getBody());
+    Task responseBody = (Task) response.getBody();
+    assertEquals("3", responseBody.getTaskId(), "New task ID should match '3'");
     assertEquals(initialSize + 1, testDatabase.getAllTasks().size());
   }
 
