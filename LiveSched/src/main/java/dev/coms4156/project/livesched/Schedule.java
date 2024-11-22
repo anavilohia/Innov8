@@ -104,7 +104,7 @@ public class Schedule {
   /**
    * Completes a task by removing it from allTasks and taskSchedule.
    */
-  public void completeTask(Task task) {
+  public void unscheduleTask(Task task) {
     if (!tasks.contains(task)) {
       throw new IllegalArgumentException("Task not found in the tasks list.");
     }
@@ -118,20 +118,11 @@ public class Schedule {
     tasks.remove(task);
   }
 
-  /**
-   * Receives task from network by adding given task to a priority queue.
-   *
-   * @param task the task to add to the queue
-   * @throws IllegalArgumentException if task is null
-   */
-  public void receiveTask(Task task) {
-    if (task == null) {
-      throw new IllegalArgumentException("Task cannot be null.");
-    }
-    tasks.add(task);
-  }
-
   public String getScheduleId() {
     return scheduleId;
+  }
+
+  public Map<Task, List<Resource>> getTaskSchedule() {
+    return taskSchedule;
   }
 }

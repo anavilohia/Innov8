@@ -164,11 +164,11 @@ This section describes the endpoints that the service provides, as well as their
   * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
 
 #### PATCH /addTask
-* Expected Input Parameters: priority (int), startTime (String), endTime (String), latitude (double), longitude (double)
-* Expected Output: A String confirming the task was added successfully. (ResponseEntity\<String\>)
+* Expected Input Parameters: taskName (String), priority (int), startTime (String), endTime (String), latitude (double), longitude (double)
+* Expected Output: A JSON object containing the details of the newly added task
 * Attempts to add a task to the database.
 * Upon Success:
-  * HTTP 200 Status Code with "Attribute was updated successfully." in the response body.
+  * HTTP 200 Status Code with the task's details in the response body.
 * Upon Failure:
   * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
  

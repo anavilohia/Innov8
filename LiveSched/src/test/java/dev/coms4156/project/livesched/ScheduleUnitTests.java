@@ -109,10 +109,10 @@ public class ScheduleUnitTests {
   }
 
   /**
-   * Test for completeTask method in Schedule class.
+   * Test for unscheduleTask method in Schedule class.
    */
   @Test
-  void completeTaskTest() {
+  void unscheduleTaskTest() {
     when(mockTask1.getResources()).thenReturn(Map.of(mockResourceType, 1));
     when(mockTask1.getLocation()).thenReturn(taskLocation);
     when(mockResourceType.getLocation()).thenReturn(resourceLocation);
@@ -121,29 +121,14 @@ public class ScheduleUnitTests {
 
     Schedule scheduleForInvalidTask = new Schedule(testScheduleId, mockTasks, maxDistance);
     assertThrows(IllegalArgumentException.class,
-        () -> scheduleForInvalidTask.completeTask(mock(Task.class)),
-        "completeTask method should throw exception when completing invalid task");
+        () -> scheduleForInvalidTask.unscheduleTask(mock(Task.class)),
+        "unscheduleTask method should throw exception when unscheduling invalid task");
 
     Schedule scheduleForValidTask = new Schedule(testScheduleId, mockTasks, maxDistance);
     scheduleForValidTask.createSchedule();
-    assertDoesNotThrow(() -> scheduleForValidTask.completeTask(mockTask1),
-        "completeTask method should not throw exception when completing valid task");
+    assertDoesNotThrow(() -> scheduleForValidTask.unscheduleTask(mockTask1),
+        "unscheduleTask method should not throw exception when unscheduling valid task");
     verify(mockResource1, times(1)).release();
-  }
-
-  /**
-   * Test for receiveTask method in Schedule class.
-   */
-  @Test
-  void receiveTaskTest() {
-    Schedule schedule = new Schedule(testScheduleId, mockTasks, maxDistance);
-    Task newTask = mock(Task.class);
-    schedule.receiveTask(newTask);
-    assertEquals(3, schedule.createSchedule().size(),
-        "Total tasks in Schedule object should update after receiveTask");
-
-    assertThrows(IllegalArgumentException.class, () -> schedule.receiveTask(null),
-        "receiveTask method should throw exception for null task value");
   }
 
   /**

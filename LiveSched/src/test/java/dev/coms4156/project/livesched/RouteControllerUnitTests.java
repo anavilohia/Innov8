@@ -35,7 +35,8 @@ public class RouteControllerUnitTests {
     private List<ResourceType> testResourceTypes = new ArrayList<>();
 
     public TestMyFileDatabase() {
-      super(1, "testTaskPath", "testResourcePath", "testTaskObject", "testResourceObject");
+      super(1, "testTaskPath", "testResourcePath", "testSchedulePath",
+          "testTaskObject", "testResourceObject", "testScheduleObject");
     }
 
     @Override
@@ -190,7 +191,8 @@ public class RouteControllerUnitTests {
         endTime, latitude, longitude);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertEquals("Attribute was updated successfully.", response.getBody());
+    Task responseBody = (Task) response.getBody();
+    assertEquals("3", responseBody.getTaskId(), "New task ID should match '3'");
     assertEquals(initialSize + 1, testDatabase.getAllTasks().size());
   }
 
