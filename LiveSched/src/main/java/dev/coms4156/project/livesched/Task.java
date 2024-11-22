@@ -15,6 +15,7 @@ public class Task implements Serializable {
   private static final long serialVersionUID = 1001L;
 
   private final String taskId;
+  private String taskName;
   private Map<ResourceType, Integer> resourceList; // Key = ResourceType, Value = Units needed
   private int priority; // value between 1 and 5
   private LocalDateTime startTime;
@@ -24,7 +25,8 @@ public class Task implements Serializable {
   /**
    * Constructs a new Task object with the given parameters.
    *
-   * @param taskId        the unique ID of the resource
+   * @param taskId        the unique ID of the task
+   * @param taskName      the name of the task
    * @param resourceList  the map of ResourceTypes and their quantity needed
    * @param priority      the priority of the task
    * @param startTime     the time that task starts
@@ -32,15 +34,19 @@ public class Task implements Serializable {
    * @param latitude      the latitude of the task's location
    * @param longitude     the longitude of the task's location
    * @throws IllegalArgumentException if the {@code taskId} is null or empty,
+   *                                  if the {@code taskName} is null or empty,
    *                                  if {@code resourceList} is null,
    *                                  if {@code priority} is out of the allowed range,
    *                                  if {@code startTime} or {@code endTime} is invalid,
    *                                  or if {@code latitude} or {@code longitude} is out of bounds
    */
-  public Task(String taskId, Map<ResourceType, Integer> resourceList, int priority,
+  public Task(String taskId, String taskName, Map<ResourceType, Integer> resourceList, int priority,
         LocalDateTime startTime, LocalDateTime endTime, double latitude, double longitude) {
     if (taskId == null || taskId.trim().isEmpty()) {
       throw new IllegalArgumentException("Task ID cannot be null or empty.");
+    }
+    if (taskName == null || taskName.trim().isEmpty()) {
+      throw new IllegalArgumentException("Task name cannot be null or empty.");
     }
     if (resourceList == null) {
       throw new IllegalArgumentException("Resource list cannot be null.");
@@ -49,6 +55,7 @@ public class Task implements Serializable {
     validateStartEndTimes(startTime, endTime);
 
     this.taskId = taskId;
+    this.taskName = taskName;
     this.resourceList = resourceList;
     this.priority = priority;
     this.startTime = startTime;
@@ -190,6 +197,10 @@ public class Task implements Serializable {
 
   public String getTaskId() {
     return taskId;
+  }
+
+  public String getTaskName() {
+    return taskName;
   }
 
   public Location getLocation() {

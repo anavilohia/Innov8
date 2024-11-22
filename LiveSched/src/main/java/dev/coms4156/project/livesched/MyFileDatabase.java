@@ -287,6 +287,15 @@ public class MyFileDatabase {
   }
 
   /**
+   * Deletes a resource type to the database.
+   *
+   */
+  public void deleteResourceType(ResourceType resourceType) {
+
+    this.allResourceTypes.remove(resourceType);
+  }
+
+  /**
    * Returns a string representation of the database.
    *
    * @return a string representation of the database

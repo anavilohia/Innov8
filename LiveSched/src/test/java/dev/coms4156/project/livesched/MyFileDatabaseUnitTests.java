@@ -80,7 +80,8 @@ class MyFileDatabaseUnitTests {
     Map<ResourceType, Integer> resources = new HashMap<>();
     resources.put(createDummyResourceType(), 1);
     return new Task(
-        "DummyTask", resources, 1, LocalDateTime.now(), LocalDateTime.now().plusHours(1), 0, 0);
+        "DummyTask", "DummyTask", resources, 1,
+        LocalDateTime.now(), LocalDateTime.now().plusHours(1), 0, 0);
   }
 
   private ResourceType createDummyResourceType() {

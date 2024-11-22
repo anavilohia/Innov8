@@ -135,7 +135,7 @@ This section describes the endpoints that the service provides, as well as their
 
 #### GET /retrieveTasks
 * Expected Input Parameters: N/A
-* Expected Output: A String containing the details of all tasks (ResponseEntity\<String\>)
+* Expected Output: A JSON array containing the details of all tasks
 * Returns the details of all tasks in the database.
 * Upon Success:
   * HTTP 200 Status Code with a list of tasks in the response body.
@@ -145,7 +145,7 @@ This section describes the endpoints that the service provides, as well as their
  
 #### GET /retrieveTask
 * Expected Input Parameters: taskId (String)
-* Expected Output: A String containing the details of the specified task (ResponseEntity\<String\>)
+* Expected Output: A JSON object containing the details of the specified task
 * Returns the details of a specified task in the database.
 * Upon Success:
   * HTTP 200 Status Code with the task's details in the response body.

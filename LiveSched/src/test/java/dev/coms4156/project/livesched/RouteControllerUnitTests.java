@@ -113,9 +113,9 @@ public class RouteControllerUnitTests {
     resources.put(resourceType1, 2);
     resources.put(resourceType2, 3);
 
-    Task task1 = new Task("1", resources, 1, 
+    Task task1 = new Task("1", "task1", resources, 1,
         LocalDateTime.now(), LocalDateTime.now().plusHours(1), 40.7128, -74.0060);
-    Task task2 = new Task("2", new HashMap<>(), 2, 
+    Task task2 = new Task("2", "task2", new HashMap<>(), 2,
         LocalDateTime.now(), LocalDateTime.now().plusHours(2), 40.7128, -74.0060);
     testDatabase.addTestTask(task1);
     testDatabase.addTestTask(task2);
@@ -138,9 +138,10 @@ public class RouteControllerUnitTests {
     ResponseEntity<?> response = routeController.retrieveTasks();
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
-    String responseBody = (String) response.getBody();
-    assertTrue(responseBody.contains("1"), "Response should contain the first task ID");
-    assertTrue(responseBody.contains("2"), "Response should contain the second task ID");
+    List<Task> responseBody = (List<Task>) response.getBody();
+    assertEquals(2, responseBody.size(), "Response should contain 2 tasks");
+    assertEquals("1", responseBody.get(0).getTaskId(), "First task ID should be '1'");
+    assertEquals("2", responseBody.get(1).getTaskId(), "Second task ID should be '2'");
   }
 
   /**
@@ -151,8 +152,8 @@ public class RouteControllerUnitTests {
     ResponseEntity<?> response = routeController.retrieveTask("1");
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
-    String responseBody = (String) response.getBody();
-    assertTrue(responseBody.contains("1"), "Response should contain the requested task ID");
+    Task responseBody = (Task) response.getBody();
+    assertEquals("1", responseBody.getTaskId(), "Task ID should match '1'");
   }
 
   /**
@@ -185,7 +186,7 @@ public class RouteControllerUnitTests {
 
     int initialSize = testDatabase.getAllTasks().size();
 
-    ResponseEntity<?> response = routeController.addTask(priority, startTime, 
+    ResponseEntity<?> response = routeController.addTask("TestTask", priority, startTime,
         endTime, latitude, longitude);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());

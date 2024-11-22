@@ -113,21 +113,21 @@ public class ResourceType implements Serializable {
   }
 
   /**
-   * Returns a string representation of the resource type, including its name,
-   * resources and location.
+   * Returns a string representation of the resource type.
    *
-   * @return A string representing the task.
+   * @return A string representing the resource type.
    */
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append("Resource Type: ").append(typeName).append("; ")
-            .append("Location: ").append(location.getCoordinates()).append("\n")
-            .append("Available Resources: \n");
-    for (Map.Entry<String, Resource> entry : resources.entrySet()) {
-      Resource value = entry.getValue();
-      result.append(value.toString());
-    }
-    return result.toString();
+    //    StringBuilder result = new StringBuilder();
+    //    result.append("Resource Type: ").append(typeName).append("; ")
+    //            .append("Location: ").append(location.getCoordinates()).append("\n")
+    //            .append("Available Resources: \n");
+    //    for (Map.Entry<String, Resource> entry : resources.entrySet()) {
+    //      Resource value = entry.getValue();
+    //      result.append(value.toString());
+    //    }
+    //    return result.toString();
+    return typeName;
   }
 
   /**

@@ -35,22 +35,18 @@ public class RouteController {
   /**
    * Returns the details of all tasks in the database.
    *
-   * @return A {@code ResponseEntity} object containing either the details of the Tasks and
-   *         an HTTP 200 response or, an appropriate message indicating the proper response.
+   * @return A {@code ResponseEntity} object containing either a list of all Tasks and
+   *         an HTTP 200 response, or an appropriate message indicating the proper response.
    */
   @GetMapping(value = "/retrieveTasks", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> retrieveTasks() {
     try {
-      List<Task> taskList;
-      taskList = LiveSchedApplication.myFileDatabase.getAllTasks();
-      String res = "";
-      for (Task task : taskList) {
-        res = res + task.toString();
-      }
-      if (res.isEmpty()) {
+      List<Task> taskList = LiveSchedApplication.myFileDatabase.getAllTasks();
+
+      if (taskList == null || taskList.isEmpty()) {
         return new ResponseEntity<>("Tasks Not Found", HttpStatus.NOT_FOUND);
       } else {
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return new ResponseEntity<>(taskList, HttpStatus.OK);
       }
 
     } catch (Exception e) {
@@ -70,12 +66,12 @@ public class RouteController {
   @GetMapping(value = "/retrieveTask", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> retrieveTask(@RequestParam(value = "taskId") String taskId) {
     try {
-      Task task;
-      task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
+      Task task = LiveSchedApplication.myFileDatabase.getTaskById(taskId);
+
       if (task == null) {
         return new ResponseEntity<>("Task Not Found", HttpStatus.NOT_FOUND);
       } else {
-        return new ResponseEntity<>(task.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(task, HttpStatus.OK);
       }
 
     } catch (Exception e) {
@@ -163,18 +159,19 @@ public class RouteController {
    *                       code in tune with what has happened.
    */
   @PatchMapping(value = "/addTask", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> addTask(@RequestParam(value = "priority") int priority,
-                                          @RequestParam(value = "startTime") String startTime,
-                                          @RequestParam(value = "endTime") String endTime,
-                                          @RequestParam(value = "latitude") double latitude,
-                                          @RequestParam(value = "longitude") double longitude) {
+  public ResponseEntity<?> addTask(@RequestParam(value = "taskName") String taskName,
+                                   @RequestParam(value = "priority") int priority,
+                                   @RequestParam(value = "startTime") String startTime,
+                                   @RequestParam(value = "endTime") String endTime,
+                                   @RequestParam(value = "latitude") double latitude,
+                                   @RequestParam(value = "longitude") double longitude) {
     try {
       String taskId = String.valueOf(LiveSchedApplication.myFileDatabase.getAllTasks().size() + 1);
       Map<ResourceType, Integer> resourceTypeList = new HashMap<>();
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
       LocalDateTime startTimeFormatted = LocalDateTime.parse(startTime, formatter);
       LocalDateTime endTimeFormatted = LocalDateTime.parse(endTime, formatter);
-      Task newTask = new Task(taskId, resourceTypeList, priority,
+      Task newTask = new Task(taskId, taskName, resourceTypeList, priority,
               startTimeFormatted, endTimeFormatted, latitude, longitude);
       LiveSchedApplication.myFileDatabase.addTask(newTask);
       return new ResponseEntity<>("Attribute was updated successfully.", HttpStatus.OK);
@@ -265,6 +262,39 @@ public class RouteController {
         return new ResponseEntity<>("ResourceType Not Found", HttpStatus.NOT_FOUND);
       }
       return new ResponseEntity<>("Task Not Found", HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+  /**
+   * Attempts to delete a resourceType from the database.
+   *
+   * @param typeName        A {@code String} representing the resource type to delete.
+   *
+   * @return               A {@code ResponseEntity} object containing an HTTP 200
+   *                       response with an appropriate message or the proper status
+   *                       code in tune with what has happened.
+   */
+  @DeleteMapping(value = "/deleteResourceType", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> deleteResourceType(@RequestParam(value = "typeName") String typeName) {
+    try {
+      List<Task> tasks = LiveSchedApplication.myFileDatabase.getAllTasks();
+      List<ResourceType> resourceTypeList =
+          LiveSchedApplication.myFileDatabase.getAllResourceTypes();
+      for (ResourceType resourceType : resourceTypeList) {
+        if (resourceType.getTypeName().equals(typeName)) {
+          for (Task task : tasks) {
+            if (task.getResources().containsKey(resourceType)) {
+              return new ResponseEntity<>("Cannot delete a resourceType currently in use",
+                  HttpStatus.BAD_REQUEST);
+            }
+          }
+          LiveSchedApplication.myFileDatabase.deleteResourceType(resourceType);
+          return new ResponseEntity<>(typeName + " successfully deleted", HttpStatus.OK);
+        }
+      }
+      return new ResponseEntity<>("ResourceType Not Found", HttpStatus.NOT_FOUND);
     } catch (Exception e) {
       return handleException(e);
     }
