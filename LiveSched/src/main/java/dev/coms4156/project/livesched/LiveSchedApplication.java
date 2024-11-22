@@ -54,14 +54,16 @@ public class LiveSchedApplication implements CommandLineRunner {
     }
 
     if (isSetupMode) {
-      myFileDatabase = new MyFileDatabase(1, TASK_FILE_PATH, RESOURCE_TYPE_FILE_PATH,
-          TASK_OBJECT_NAME, RESOURCE_TYPE_OBJECT_NAME);
+      myFileDatabase = new MyFileDatabase(1,
+          TASK_FILE_PATH, RESOURCE_TYPE_FILE_PATH, SCHEDULE_FILE_PATH,
+          TASK_OBJECT_NAME, RESOURCE_TYPE_OBJECT_NAME, SCHEDULE_OBJECT_NAME);
       setupDataFile();
       System.out.println("System setup completed.");
       return;
     }
-    myFileDatabase = new MyFileDatabase(0, TASK_FILE_PATH, RESOURCE_TYPE_FILE_PATH,
-        TASK_OBJECT_NAME, RESOURCE_TYPE_OBJECT_NAME);
+    myFileDatabase = new MyFileDatabase(0,
+        TASK_FILE_PATH, RESOURCE_TYPE_FILE_PATH, SCHEDULE_FILE_PATH,
+        TASK_OBJECT_NAME, RESOURCE_TYPE_OBJECT_NAME, SCHEDULE_OBJECT_NAME);
     System.out.println("System start up.");
   }
 
@@ -140,6 +142,7 @@ public class LiveSchedApplication implements CommandLineRunner {
     if (saveData) {
       myFileDatabase.saveContentsToFile(1); // Save tasks
       myFileDatabase.saveContentsToFile(2); // Save resourceTypes
+      myFileDatabase.saveContentsToFile(3); // Save schedule
     }
   }
 
@@ -148,8 +151,10 @@ public class LiveSchedApplication implements CommandLineRunner {
 
   private static final String TASK_FILE_PATH = "/tmp/tasks.txt";
   private static final String RESOURCE_TYPE_FILE_PATH = "/tmp/resourceTypes.txt";
+  private static final String SCHEDULE_FILE_PATH = "/tmp/schedules.txt";
   private static final String TASK_OBJECT_NAME =  "gcs_tasks.txt";
   private static final String RESOURCE_TYPE_OBJECT_NAME = "gcs_resourceTypes.txt";
+  private static final String SCHEDULE_OBJECT_NAME = "gcs_schedules.txt";
   private static final String APP_ENGINE_ENV = "standard"; // Constant for environment check
   private static boolean saveData = true;
 

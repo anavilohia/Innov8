@@ -32,22 +32,32 @@ public class MyFileDatabase {
    *                 0 for loading from files, 1 for initializing an empty database
    * @param taskFilePath the path to the file containing serialized task entries
    * @param resourceTypeFilePath the path to the file containing serialized resourceTypes entries
+   * @param scheduleFilePath the path to the file containing serialized schedule entries
    * @param taskObjectName the name of the task object in GCS
    * @param resourceTypeObjectName the name of the resource type object in GCS
    */
-  public MyFileDatabase(int flag, String taskFilePath, String resourceTypeFilePath,
-                        String taskObjectName, String resourceTypeObjectName) {
+  public MyFileDatabase(int flag,
+                        String taskFilePath,
+                        String resourceTypeFilePath,
+                        String scheduleFilePath,
+                        String taskObjectName,
+                        String resourceTypeObjectName,
+                        String scheduleObjectName) {
     this.taskFilePath = taskFilePath;
     this.resourceTypeFilePath = resourceTypeFilePath;
+    this.scheduleFilePath = scheduleFilePath;
     this.taskObjectName = taskObjectName;
     this.resourceTypeObjectName = resourceTypeObjectName;
+    this.scheduleObjectName = scheduleObjectName;
 
     if (flag == 0) {
       this.allTasks = deSerializeObjectFromFile(taskContentType);
       this.allResourceTypes = deSerializeObjectFromFile(resourceTypeContentType);
+      this.allSchedules = deSerializeObjectFromFile(scheduleContentType);
     } else {
       this.allTasks = new ArrayList<>();
       this.allResourceTypes = new ArrayList<>();
+      this.allSchedules = new ArrayList<>();
     }
   }
 
@@ -70,6 +80,15 @@ public class MyFileDatabase {
   }
 
   /**
+   * Sets allSchedules of the database.
+   *
+   * @param schedules the list of all schedules to be added to database
+   */
+  public void setAllSchedules(List<Schedule> schedules) {
+    this.allSchedules = schedules == null ? new ArrayList<>() : schedules;
+  }
+
+  /**
    * Deserializes the object from file. Throws exception if data in file is invalid.
    *
    * @param contentType the type of content to deserialize
@@ -85,6 +104,9 @@ public class MyFileDatabase {
     } else if (contentType == resourceTypeContentType) {
       filePath = resourceTypeFilePath;
       gcsObjectName = resourceTypeObjectName;
+    } else if (contentType == scheduleContentType) {
+      filePath = scheduleFilePath;
+      gcsObjectName = scheduleObjectName;
     } else {
       throw new IllegalArgumentException("Invalid content type in file.");
     }
@@ -106,6 +128,7 @@ public class MyFileDatabase {
     }
 
     try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filePath))) {
+      final String INVALID_OBJ_TYPE_ERROR = "Invalid object type in file.";
       Object obj = in.readObject();
       if (obj instanceof List<?> listObj) {
 
@@ -113,15 +136,17 @@ public class MyFileDatabase {
 
         for (Object value : listObj) {
           if (contentType == taskContentType && !(value instanceof Task)) {
-            throw new IllegalArgumentException("Invalid object type in file.");
+            throw new IllegalArgumentException(INVALID_OBJ_TYPE_ERROR);
           } else if (contentType == resourceTypeContentType && !(value instanceof ResourceType)) {
-            throw new IllegalArgumentException("Invalid object type in file.");
+            throw new IllegalArgumentException(INVALID_OBJ_TYPE_ERROR);
+          } else if (contentType == scheduleContentType && !(value instanceof Schedule)) {
+            throw new IllegalArgumentException(INVALID_OBJ_TYPE_ERROR);
           }
           finalList.add((T) value);
         }
         return finalList;
       } else {
-        throw new IllegalArgumentException("Invalid object type in file.");
+        throw new IllegalArgumentException(INVALID_OBJ_TYPE_ERROR);
       }
     } catch (IOException | ClassNotFoundException e) {
       if (LOGGER.isLoggable(Level.SEVERE)) {
@@ -169,6 +194,9 @@ public class MyFileDatabase {
     } else if (contentType == resourceTypeContentType) {
       filePath = resourceTypeFilePath;
       gcsObjectName = resourceTypeObjectName;
+    } else if (contentType == scheduleContentType) {
+      filePath = scheduleFilePath;
+      gcsObjectName = scheduleObjectName;
     } else {
       throw new IllegalArgumentException("Invalid content type in file.");
     }
@@ -178,6 +206,8 @@ public class MyFileDatabase {
         out.writeObject(allTasks);
       } else if (contentType == resourceTypeContentType) {
         out.writeObject(allResourceTypes);
+      } else if (contentType == scheduleContentType) {
+        out.writeObject(allSchedules);
       }
 
       if (LOGGER.isLoggable(Level.INFO)) {
@@ -246,6 +276,15 @@ public class MyFileDatabase {
   }
 
   /**
+   * Gets all Schedules from the database.
+   *
+   * @return a list containing all Schedule objects
+   */
+  public List<Schedule> getAllSchedules() {
+    return this.allSchedules;
+  }
+
+  /**
    * Gets task by Id from the database.
    *
    * @return a Task object with specified taskId
@@ -296,6 +335,38 @@ public class MyFileDatabase {
   }
 
   /**
+   * Gets schedule by Id from the database.
+   *
+   * @return a Schedule object with specified scheduleId
+   */
+  public Schedule getScheduleById(String scheduleId) {
+    List<Schedule> schedules = this.allSchedules;
+    for (Schedule schedule : schedules) {
+      if (schedule.getScheduleId().equals(scheduleId)) {
+        return schedule;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Adds a schedule to the database.
+   *
+   */
+  public void addSchedule(Schedule schedule) {
+
+    this.allSchedules.add(schedule);
+  }
+
+  /**
+   * Deletes a schedule from the database.
+   *
+   */
+  public void deleteSchedule(Schedule schedule) {
+    this.allSchedules.remove(schedule);
+  }
+
+  /**
    * Returns a string representation of the database.
    *
    * @return a string representation of the database
@@ -309,6 +380,7 @@ public class MyFileDatabase {
 
   private final int taskContentType = 1;
   private final int resourceTypeContentType = 2;
+  private final int scheduleContentType = 3;
 
   /**
    * Google Cloud Storage service instance used to interact with the GCS bucket.
@@ -331,6 +403,11 @@ public class MyFileDatabase {
   private final String resourceTypeFilePath;
 
   /**
+   * The path to the file containing the ResourceType entries.
+   */
+  private final String scheduleFilePath;
+
+  /**
    * The object name under which the Task data is stored in the GCS bucket.
    */
   private final String taskObjectName;
@@ -341,6 +418,11 @@ public class MyFileDatabase {
   private final String resourceTypeObjectName;
 
   /**
+   * The object name under which the ResourceType data is stored in the GCS bucket.
+   */
+  private final String scheduleObjectName;
+
+  /**
    * The list of tasks to be assigned.
    */
   private List<Task> allTasks;
@@ -349,6 +431,11 @@ public class MyFileDatabase {
    * The list of all resourceTypes available.
    */
   private List<ResourceType> allResourceTypes;
+
+  /**
+   * The list of all resourceTypes available.
+   */
+  private List<Schedule> allSchedules;
 
   /**
    * Logger to print information and exceptions.

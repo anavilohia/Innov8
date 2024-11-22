@@ -35,7 +35,8 @@ public class RouteControllerUnitTests {
     private List<ResourceType> testResourceTypes = new ArrayList<>();
 
     public TestMyFileDatabase() {
-      super(1, "testTaskPath", "testResourcePath", "testTaskObject", "testResourceObject");
+      super(1, "testTaskPath", "testResourcePath", "testSchedulePath",
+          "testTaskObject", "testResourceObject", "testScheduleObject");
     }
 
     @Override
