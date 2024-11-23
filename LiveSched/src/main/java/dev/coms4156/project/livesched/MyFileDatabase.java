@@ -266,7 +266,7 @@ public class MyFileDatabase {
    */
   public List<Task> getAllTasks(String clientId) {
     return this.allTasks.stream()
-            .filter(task -> task.getClientId() == clientId)
+            .filter(task -> task.getClientId().equals(clientId))
             .collect(Collectors.toList());
   }
 
@@ -286,7 +286,7 @@ public class MyFileDatabase {
    */
   public List<Schedule> getAllSchedules(String clientId) {
     return this.allSchedules.stream()
-            .filter(schedule -> schedule.getClientId() == clientId)
+            .filter(schedule -> schedule.getClientId().equals(clientId))
             .collect(Collectors.toList());
   }
 
