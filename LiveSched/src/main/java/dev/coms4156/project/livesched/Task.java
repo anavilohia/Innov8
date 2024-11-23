@@ -21,6 +21,7 @@ public class Task implements Serializable {
   private LocalDateTime startTime;
   private LocalDateTime endTime;
   private Location location;
+  private String clientId;
 
   /**
    * Constructs a new Task object with the given parameters.
@@ -33,6 +34,7 @@ public class Task implements Serializable {
    * @param endTime       the time that task ends
    * @param latitude      the latitude of the task's location
    * @param longitude     the longitude of the task's location
+   * @param clientId      the ID of client that owns this task
    * @throws IllegalArgumentException if the {@code taskId} is null or empty,
    *                                  if the {@code taskName} is null or empty,
    *                                  if {@code resourceList} is null,
@@ -40,8 +42,9 @@ public class Task implements Serializable {
    *                                  if {@code startTime} or {@code endTime} is invalid,
    *                                  or if {@code latitude} or {@code longitude} is out of bounds
    */
-  public Task(String taskId, String taskName, Map<ResourceType, Integer> resourceList, int priority,
-        LocalDateTime startTime, LocalDateTime endTime, double latitude, double longitude) {
+  public Task(String taskId, String taskName, Map<ResourceType, Integer> resourceList,
+              int priority, LocalDateTime startTime, LocalDateTime endTime,
+              double latitude, double longitude, String clientId) {
     if (taskId == null || taskId.trim().isEmpty()) {
       throw new IllegalArgumentException("Task ID cannot be null or empty.");
     }
@@ -50,6 +53,9 @@ public class Task implements Serializable {
     }
     if (resourceList == null) {
       throw new IllegalArgumentException("Resource list cannot be null.");
+    }
+    if (clientId == null || clientId.trim().isEmpty()) {
+      throw new IllegalArgumentException("Client ID cannot be null or empty.");
     }
     validatePriority(priority);
     validateStartEndTimes(startTime, endTime);
@@ -61,6 +67,7 @@ public class Task implements Serializable {
     this.startTime = startTime;
     this.endTime = endTime;
     this.location = new Location(latitude, longitude);
+    this.clientId = clientId;
   }
 
   /**
@@ -182,7 +189,8 @@ public class Task implements Serializable {
             .append("Location: ").append(location.getCoordinates()).append("; ")
             .append("Start: ").append(startTime.toString()).append("; ")
             .append("End: ").append(endTime.toString()).append("; ")
-            .append("Priority: ").append(String.valueOf(priority)).append("\n")
+            .append("Priority: ").append(String.valueOf(priority)).append("; ")
+            .append("Client ID: ").append(clientId).append("\n")
             .append("Resources Needed: \n");
     for (Map.Entry<ResourceType, Integer> entry : resourceList.entrySet()) {
       ResourceType key = entry.getKey();
@@ -230,6 +238,10 @@ public class Task implements Serializable {
 
   public LocalDateTime getEndTime() {
     return endTime;
+  }
+
+  public String getClientId() {
+    return clientId;
   }
 
 }

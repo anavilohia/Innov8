@@ -18,6 +18,7 @@ public class Schedule {
   private Queue<Task> tasks;
   private double maxDistance;
   private Map<Task, List<Resource>> taskSchedule = new LinkedHashMap<>();
+  private String clientId;
 
   /**
    * Constructs a new Schedule object with the given parameters.
@@ -25,10 +26,11 @@ public class Schedule {
    * @param scheduleId        the unique ID of the schedule
    * @param tasks             list of all tasks
    * @param maxDistance       maximum distance from task to resource
+   * @param clientId          the ID client that owns this schedule
    * @throws IllegalArgumentException if scheduleId is null or empty, resourceTypes is null,
    *                                  or maxDistance is negative
    */
-  public Schedule(String scheduleId, List<Task> tasks, double maxDistance) {
+  public Schedule(String scheduleId, List<Task> tasks, double maxDistance, String clientId) {
     if (scheduleId == null || scheduleId.trim().isEmpty()) {
       throw new IllegalArgumentException("Schedule ID cannot be null or empty.");
     }
@@ -38,12 +40,16 @@ public class Schedule {
     if (maxDistance < 0) {
       throw new IllegalArgumentException("Maximum distance cannot be negative.");
     }
+    if (clientId == null || clientId.trim().isEmpty()) {
+      throw new IllegalArgumentException("Client ID cannot be null or empty.");
+    }
     this.scheduleId = scheduleId;
     this.maxDistance = maxDistance;
 
     Comparator<Task> comparator = new TaskComparator();
     this.tasks = new PriorityQueue<Task>(comparator);  // queue of tasks in order of priority
     this.tasks.addAll(tasks);
+    this.clientId = clientId;
   }
 
   /**
@@ -124,5 +130,9 @@ public class Schedule {
 
   public Map<Task, List<Resource>> getTaskSchedule() {
     return taskSchedule;
+  }
+
+  public String getClientId() {
+    return clientId;
   }
 }

@@ -100,7 +100,7 @@ public class LiveSchedApplication implements CommandLineRunner {
     Task emergency = new Task(
         "1", "ER", emergencyResources, 1,
         LocalDateTime.now(), LocalDateTime.now().plusHours(3),
-        40.81, -73.96);
+        40.81, -73.96, "User_1");
 
     List<Task> allTasks = new ArrayList<>();
     allTasks.add(emergency);
@@ -112,7 +112,7 @@ public class LiveSchedApplication implements CommandLineRunner {
     Task checkup = new Task(
         "2", "checkup", checkupResources, 3,
         LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(2).plusMinutes(30),
-        40.81, -73.96);
+        40.81, -73.96, "User_2");
 
     allTasks.add(checkup);
 
@@ -123,7 +123,7 @@ public class LiveSchedApplication implements CommandLineRunner {
     Task patientTransport = new Task(
         "3", "transport", transportResources, 2,
         LocalDateTime.now().plusMinutes(15), LocalDateTime.now().plusMinutes(45),
-        40.83, -73.91);
+        40.83, -73.91, "User_3");
 
     allTasks.add(patientTransport);
 

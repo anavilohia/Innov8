@@ -40,7 +40,7 @@ public class RouteControllerUnitTests {
     }
 
     @Override
-    public List<Task> getAllTasks() {
+    public List<Task> getAllTasks(String clientId) {
       return testTasks;
     }
 
@@ -50,9 +50,9 @@ public class RouteControllerUnitTests {
     }
 
     @Override
-    public Task getTaskById(String taskId) {
+    public Task getTaskById(String taskId, String clientId) {
       return testTasks.stream()
-          .filter(t -> t.getTaskId().equals(taskId))
+          .filter(t -> t.getTaskId().equals(taskId) && t.getClientId().equals(clientId))
           .findFirst()
           .orElse(null);
     }
@@ -115,9 +115,9 @@ public class RouteControllerUnitTests {
     resources.put(resourceType2, 3);
 
     Task task1 = new Task("1", "task1", resources, 1,
-        LocalDateTime.now(), LocalDateTime.now().plusHours(1), 40.7128, -74.0060);
+        LocalDateTime.now(), LocalDateTime.now().plusHours(1), 40.7128, -74.0060, "User_1");
     Task task2 = new Task("2", "task2", new HashMap<>(), 2,
-        LocalDateTime.now(), LocalDateTime.now().plusHours(2), 40.7128, -74.0060);
+        LocalDateTime.now(), LocalDateTime.now().plusHours(2), 40.7128, -74.0060, "User_2");
     testDatabase.addTestTask(task1);
     testDatabase.addTestTask(task2);
   }
@@ -136,13 +136,12 @@ public class RouteControllerUnitTests {
    */
   @Test
   void retrieveTasksTest() {
-    ResponseEntity<?> response = routeController.retrieveTasks();
+    ResponseEntity<?> response = routeController.retrieveTasks("User_1");
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     List<Task> responseBody = (List<Task>) response.getBody();
-    assertEquals(2, responseBody.size(), "Response should contain 2 tasks");
+    assertEquals(1, responseBody.size(), "Response should contain 1 task");
     assertEquals("1", responseBody.get(0).getTaskId(), "First task ID should be '1'");
-    assertEquals("2", responseBody.get(1).getTaskId(), "Second task ID should be '2'");
   }
 
   /**
@@ -150,7 +149,7 @@ public class RouteControllerUnitTests {
    */
   @Test
   void retrieveTaskTest() {
-    ResponseEntity<?> response = routeController.retrieveTask("1");
+    ResponseEntity<?> response = routeController.retrieveTask("1", "User_1");
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     Task responseBody = (Task) response.getBody();
@@ -185,15 +184,15 @@ public class RouteControllerUnitTests {
     double latitude = 40.7128;
     double longitude = -74.0060;
 
-    int initialSize = testDatabase.getAllTasks().size();
+    int initialSize = testDatabase.getAllTasks("User_1").size();
 
     ResponseEntity<?> response = routeController.addTask("TestTask", priority, startTime,
-        endTime, latitude, longitude);
+        endTime, latitude, longitude, "User_1");
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     Task responseBody = (Task) response.getBody();
     assertEquals("3", responseBody.getTaskId(), "New task ID should match '3'");
-    assertEquals(initialSize + 1, testDatabase.getAllTasks().size());
+    assertEquals(initialSize + 1, testDatabase.getAllTasks("User_1").size());
   }
 
   /**
@@ -226,12 +225,12 @@ public class RouteControllerUnitTests {
     int quantity = 3;
 
     ResponseEntity<?> response = routeController.modifyResourceType(taskId, 
-        typeName, quantity);
+        typeName, quantity, "User_1");
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals("Attribute was updated successfully.", response.getBody());
 
-    Task updatedTask = testDatabase.getTaskById("1");
+    Task updatedTask = testDatabase.getTaskById("1", "User_1");
     ResourceType resourceType = testDatabase.getAllResourceTypes().stream()
         .filter(rt -> rt.getTypeName().equals(typeName))
         .findFirst()

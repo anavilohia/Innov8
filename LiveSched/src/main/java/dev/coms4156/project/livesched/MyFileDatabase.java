@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a file-based database that stores and manages {@code Task} and
@@ -23,6 +24,8 @@ import java.util.logging.Logger;
  * from both local files and Google Cloud Storage (GCS), ensuring data persistence.
  */
 public class MyFileDatabase {
+
+  private static final String INVALID_OBJ_TYPE_ERROR = "Invalid object type in file.";
 
   /**
    * Constructs a MyFileDatabase object and loads up the data structures with
@@ -128,7 +131,6 @@ public class MyFileDatabase {
     }
 
     try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filePath))) {
-      final String INVALID_OBJ_TYPE_ERROR = "Invalid object type in file.";
       Object obj = in.readObject();
       if (obj instanceof List<?> listObj) {
 
@@ -260,10 +262,12 @@ public class MyFileDatabase {
   /**
    * Gets all tasks from the database.
    *
-   * @return a list containing all Task objects
+   * @return a list containing all Task objects owned by speciied client
    */
-  public List<Task> getAllTasks() {
-    return this.allTasks;
+  public List<Task> getAllTasks(String clientId) {
+    return this.allTasks.stream()
+            .filter(task -> task.getClientId() == clientId)
+            .collect(Collectors.toList());
   }
 
   /**
@@ -278,10 +282,12 @@ public class MyFileDatabase {
   /**
    * Gets all Schedules from the database.
    *
-   * @return a list containing all Schedule objects
+   * @return a list containing all Schedule objects owned by specified client
    */
-  public List<Schedule> getAllSchedules() {
-    return this.allSchedules;
+  public List<Schedule> getAllSchedules(String clientId) {
+    return this.allSchedules.stream()
+            .filter(schedule -> schedule.getClientId() == clientId)
+            .collect(Collectors.toList());
   }
 
   /**
@@ -289,8 +295,8 @@ public class MyFileDatabase {
    *
    * @return a Task object with specified taskId
    */
-  public Task getTaskById(String taskId) {
-    List<Task> tasks = this.allTasks;
+  public Task getTaskById(String taskId, String clientId) {
+    List<Task> tasks = getAllTasks(clientId);
     for (Task task : tasks) {
       if (task.getTaskId().equals(taskId)) {
         return task;
@@ -339,8 +345,8 @@ public class MyFileDatabase {
    *
    * @return a Schedule object with specified scheduleId
    */
-  public Schedule getScheduleById(String scheduleId) {
-    List<Schedule> schedules = this.allSchedules;
+  public Schedule getScheduleById(String scheduleId, String clientId) {
+    List<Schedule> schedules = getAllSchedules(clientId);
     for (Schedule schedule : schedules) {
       if (schedule.getScheduleId().equals(scheduleId)) {
         return schedule;

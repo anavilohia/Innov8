@@ -26,6 +26,7 @@ public class TaskUnitTests {
   private final String taskName = "TestTask";
   private final double latitude = 40.81;
   private final double longitude = -73.96;
+  private final String clientId = "User_1";
   private LocalDateTime startTime;
   private LocalDateTime endTime;
   private ResourceType resourceType;
@@ -41,7 +42,8 @@ public class TaskUnitTests {
     resourceList = new HashMap<>();
     resourceType = new ResourceType("testResourceType", 5, latitude, longitude);
     resourceList.put(resourceType, 2);
-    testTask = new Task(taskId, taskName, resourceList, 3, startTime, endTime, latitude, longitude);
+    testTask = new Task(taskId, taskName, resourceList, 3, startTime, endTime,
+            latitude, longitude, clientId);
   }
 
   /**
@@ -50,55 +52,73 @@ public class TaskUnitTests {
   @Test
   void constructorTest() {
     assertDoesNotThrow(() ->
-            new Task(taskId, taskName, resourceList, 3, startTime, endTime, latitude, longitude),
+            new Task(taskId, taskName, resourceList, 3, startTime, endTime,
+                    latitude, longitude, clientId),
         "Task constructor should not throw an exception with valid parameters.");
 
     assertThrows(IllegalArgumentException.class, () ->
-            new Task(null, taskName, resourceList, 3, startTime, endTime, latitude, longitude),
+            new Task(null, taskName, resourceList, 3, startTime, endTime,
+                    latitude, longitude, clientId),
         "Task constructor should throw an exception if task ID is null.");
 
     assertThrows(IllegalArgumentException.class, () ->
-            new Task("  ", taskName, resourceList, 3, startTime, endTime, latitude, longitude),
+            new Task("  ", taskName, resourceList, 3, startTime, endTime,
+                    latitude, longitude, clientId),
         "Task constructor should throw an exception if task ID is empty.");
 
     assertThrows(IllegalArgumentException.class, () ->
-            new Task(taskId, taskName, null, 3, startTime, endTime, latitude, longitude),
+            new Task(taskId, taskName, null, 3, startTime, endTime,
+                    latitude, longitude, clientId),
         "Task constructor should throw an exception if resourceList is null.");
 
     assertThrows(IllegalArgumentException.class, () ->
-            new Task(taskId, taskName, resourceList, -1, startTime, endTime, latitude, longitude),
+            new Task(taskId, taskName, resourceList, -1, startTime, endTime,
+                    latitude, longitude, clientId),
         "Task constructor should throw an exception if priority is less than 1.");
 
     assertThrows(IllegalArgumentException.class, () ->
-            new Task(taskId, taskName, resourceList, 6, startTime, endTime, latitude, longitude),
+            new Task(taskId, taskName, resourceList, 6, startTime, endTime,
+                    latitude, longitude, clientId),
         "Task constructor should throw an exception if priority is greater than 5.");
 
     assertThrows(IllegalArgumentException.class, () ->
-            new Task(taskId, taskName, resourceList, 3, null, endTime, latitude, longitude),
+            new Task(taskId, taskName, resourceList, 3, null, endTime,
+                    latitude, longitude, clientId),
         "Task constructor should throw an exception if startTime is null.");
 
     assertThrows(IllegalArgumentException.class, () ->
             new Task(taskId, taskName, resourceList, 3, LocalDateTime.now().minusHours(1), endTime,
-                latitude, longitude),
+                latitude, longitude, clientId),
         "Task constructor should throw an exception if startTime is in the past.");
 
     assertThrows(IllegalArgumentException.class, () ->
-            new Task(taskId, taskName, resourceList, 3, startTime, null, latitude, longitude),
+            new Task(taskId, taskName, resourceList, 3, startTime, null,
+                    latitude, longitude, clientId),
         "Task constructor should throw an exception if endTime is null.");
 
     assertThrows(IllegalArgumentException.class, () ->
             new Task(taskId, taskName, resourceList, 3, startTime,
-                LocalDateTime.now().minusHours(1), latitude, longitude),
+                LocalDateTime.now().minusHours(1), latitude, longitude, clientId),
         "Task constructor should throw an exception if endTime is in the past.");
 
     assertThrows(IllegalArgumentException.class, () ->
             new Task(taskId, taskName, resourceList, 3, startTime, startTime.minusMinutes(10),
-                latitude, longitude),
+                latitude, longitude, clientId),
         "Task constructor should throw an exception if endTime is before startTime.");
 
     assertThrows(IllegalArgumentException.class, () ->
-            new Task(taskId, taskName, resourceList, 3, startTime, startTime, latitude, longitude),
+            new Task(taskId, taskName, resourceList, 3, startTime, startTime,
+                    latitude, longitude, clientId),
         "Task constructor should throw an exception if endTime is the same as startTime.");
+
+    assertThrows(IllegalArgumentException.class, () ->
+                    new Task(taskId, taskName, resourceList, 3, startTime, endTime,
+                            latitude, longitude, null),
+            "Task constructor should throw an exception if clientId is an empty string.");
+    assertThrows(IllegalArgumentException.class, () ->
+                    new Task(taskId, taskName, resourceList, 3, startTime, endTime,
+                            latitude, longitude, " "),
+            "Task constructor should throw an exception if clientId is an empty string.");
   }
 
   /**
@@ -149,6 +169,14 @@ public class TaskUnitTests {
   @Test
   void getEndTimeTest() {
     assertEquals(endTime, testTask.getEndTime(), "End time should match.");
+  }
+
+  /**
+   * Test for getClientId method in Task class.
+   */
+  @Test
+  void getClientIdTest() {
+    assertEquals(clientId, testTask.getClientId(), "Client ID should match.");
   }
 
   /**
