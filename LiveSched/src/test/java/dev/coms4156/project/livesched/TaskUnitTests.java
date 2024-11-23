@@ -2,6 +2,7 @@ package dev.coms4156.project.livesched;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -227,6 +228,11 @@ public class TaskUnitTests {
     assertThrows(IllegalArgumentException.class, () ->
         testTask.updateResource(newResourceType, -1),
         "Quantity for new resource type should not be negative.");
+
+    testTask.updateResource(newResourceType, 0);
+
+    assertFalse(testTask.getResources().containsKey(newResourceType),
+        "New resource type should be removed from the resource list.");
   }
 
   /**

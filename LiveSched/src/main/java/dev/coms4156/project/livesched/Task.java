@@ -135,7 +135,7 @@ public class Task implements Serializable {
   }
 
   /**
-   * Updates the quantity of or add a resource needed for the task.
+   * Updates the quantity of, add, or remove a resource needed for the task.
    *
    * @param resourceType  the type of resource needed
    * @param quantity      the quantity of the resource needed
@@ -149,11 +149,24 @@ public class Task implements Serializable {
     if (quantity < 0) {
       throw new IllegalArgumentException("Quantity cannot be negative.");
     }
-    
-    if (resourceList.containsKey(resourceType)) {
-      resourceList.replace(resourceType, quantity);
+
+    // Find an existing ResourceType with the same typeName
+    ResourceType existingType = null;
+    for (ResourceType type : resourceList.keySet()) {
+      if (type.getTypeName().equals(resourceType.getTypeName())) {
+        existingType = type;
+        break;
+      }
+    }
+
+    if (existingType != null) {
+      if (quantity == 0) {
+        resourceList.remove(existingType); // Remove existing ResourceType from the list
+      } else {
+        resourceList.replace(existingType, quantity); // Update quantity of existing ResourceType
+      }
     } else {
-      resourceList.put(resourceType, quantity);
+      resourceList.put(resourceType, quantity); // Add new ResourceType and its quantity
     }
   }
 
