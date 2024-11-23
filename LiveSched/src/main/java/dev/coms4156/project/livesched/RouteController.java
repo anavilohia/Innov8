@@ -47,6 +47,7 @@ public class RouteController {
   public ResponseEntity<?> retrieveTasks(@RequestParam(value = CLIENT_ID) String clientId) {
     try {
       List<Task> taskList = LiveSchedApplication.myFileDatabase.getAllTasks(clientId);
+      taskList.forEach(task -> System.out.println("Task ID: " + task.getTaskId() + ", Client ID: " + task.getClientId()));
 
       if (taskList == null || taskList.isEmpty()) {
         return new ResponseEntity<>("Tasks Not Found", HttpStatus.NOT_FOUND);

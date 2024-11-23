@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -265,8 +266,12 @@ public class MyFileDatabase {
    * @return a list containing all Task objects owned by speciied client
    */
   public List<Task> getAllTasks(String clientId) {
+    this.allTasks.forEach(task -> System.out.println("Task ID: " + task.getTaskId() + ", Client ID: " + task.getClientId()));
+    if (clientId == null || clientId.isEmpty()) {
+      return Collections.emptyList();
+    }
     return this.allTasks.stream()
-            .filter(task -> task.getClientId().equals(clientId))
+            .filter(task -> task.getClientId().trim().equals(clientId.trim()))
             .collect(Collectors.toList());
   }
 
@@ -285,8 +290,11 @@ public class MyFileDatabase {
    * @return a list containing all Schedule objects owned by specified client
    */
   public List<Schedule> getAllSchedules(String clientId) {
+    if (clientId == null || clientId.isEmpty()) {
+      return Collections.emptyList();
+    }
     return this.allSchedules.stream()
-            .filter(schedule -> schedule.getClientId().equals(clientId))
+            .filter(schedule -> schedule.getClientId().trim().equals(clientId.trim()))
             .collect(Collectors.toList());
   }
 
