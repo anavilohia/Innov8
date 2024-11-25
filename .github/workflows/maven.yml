@@ -30,19 +30,19 @@ jobs:
         run: |
           mvn checkstyle:checkstyle --file LiveSched/pom.xml
           mkdir -p reports
-          cp target/site/checkstyle.html reports/checkstyle.html
+          cp LiveSched/target/site/checkstyle.html reports/checkstyle.html
         continue-on-error: true
 
       - name: PMD Static Analysis
         run: |
           mvn pmd:check --file LiveSched/pom.xml
-          cp target/pmd.xml reports/pmd.xml
+          cp LiveSched/target/pmd.xml reports/pmd.xml
         continue-on-error: true
 
       - name: JaCoCo Branch Coverage
         run: |
           mvn jacoco:report --file LiveSched/pom.xml
-          cp target/site/jacoco/index.html reports/jacoco.html
+          cp LiveSched/target/site/jacoco/index.html reports/jacoco.html
         continue-on-error: true
 
       - name: Upload Reports
