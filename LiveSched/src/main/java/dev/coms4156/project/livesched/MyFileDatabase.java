@@ -128,7 +128,6 @@ public class MyFileDatabase {
     }
 
     try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filePath))) {
-      final String INVALID_OBJ_TYPE_ERROR = "Invalid object type in file.";
       Object obj = in.readObject();
       if (obj instanceof List<?> listObj) {
 
@@ -441,4 +440,5 @@ public class MyFileDatabase {
    * Logger to print information and exceptions.
    */
   private static final Logger LOGGER = Logger.getLogger(MyFileDatabase.class.getName());
+  private static final String INVALID_OBJ_TYPE_ERROR = "Invalid object type in file.";
 }

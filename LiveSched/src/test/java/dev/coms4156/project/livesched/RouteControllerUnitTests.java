@@ -26,6 +26,7 @@ public class RouteControllerUnitTests {
 
   private RouteController routeController;
   private TestMyFileDatabase testDatabase;
+  final String testClientId = "defaultClientId";
 
   /**
    * Test implementation of MyFileDatabase for unit testing purposes.
@@ -101,7 +102,9 @@ public class RouteControllerUnitTests {
   void setUp() {
     routeController = new RouteController();
     testDatabase = new TestMyFileDatabase();
-    LiveSchedApplication.myFileDatabase = testDatabase;
+    Map<String, MyFileDatabase> testClientDatabases = new HashMap<>();
+    testClientDatabases.put(testClientId, testDatabase);
+    LiveSchedApplication.clientDatabases = testClientDatabases;
 
     testDatabase.clearAll();
 
@@ -136,7 +139,7 @@ public class RouteControllerUnitTests {
    */
   @Test
   void retrieveTasksTest() {
-    ResponseEntity<?> response = routeController.retrieveTasks();
+    ResponseEntity<?> response = routeController.retrieveTasks(testClientId);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     List<Task> responseBody = (List<Task>) response.getBody();
@@ -150,7 +153,7 @@ public class RouteControllerUnitTests {
    */
   @Test
   void retrieveTaskTest() {
-    ResponseEntity<?> response = routeController.retrieveTask("1");
+    ResponseEntity<?> response = routeController.retrieveTask("1", testClientId);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     Task responseBody = (Task) response.getBody();
@@ -162,7 +165,7 @@ public class RouteControllerUnitTests {
    */
   @Test
   void retrieveResourceTypesTest() {
-    ResponseEntity<?> response = routeController.retrieveResourceTypes();
+    ResponseEntity<?> response = routeController.retrieveResourceTypes(testClientId);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     String responseBody = (String) response.getBody();
@@ -188,7 +191,7 @@ public class RouteControllerUnitTests {
     int initialSize = testDatabase.getAllTasks().size();
 
     ResponseEntity<?> response = routeController.addTask("TestTask", priority, startTime,
-        endTime, latitude, longitude);
+        endTime, latitude, longitude, testClientId);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     Task responseBody = (Task) response.getBody();
@@ -209,7 +212,7 @@ public class RouteControllerUnitTests {
     int initialSize = testDatabase.getAllResourceTypes().size();
 
     ResponseEntity<?> response = routeController.addResourceType(typeName, totalUnits, 
-        latitude, longitude);
+        latitude, longitude, testClientId);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals("Attribute was updated successfully.", response.getBody());
@@ -226,7 +229,7 @@ public class RouteControllerUnitTests {
     int quantity = 3;
 
     ResponseEntity<?> response = routeController.modifyResourceType(taskId, 
-        typeName, quantity);
+        typeName, quantity, testClientId);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals("Attribute was updated successfully.", response.getBody());
