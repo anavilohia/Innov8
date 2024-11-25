@@ -170,7 +170,7 @@ public class LiveSchedApplication implements CommandLineRunner {
    * @return The full path for the file
    */
   private String generateClientFilePath(String clientId, String fileName) {
-    return "/tmp/" + clientId + "/" + fileName;
+    return "/tmp/" + clientId + "_" + fileName;
   }
 
   /**
