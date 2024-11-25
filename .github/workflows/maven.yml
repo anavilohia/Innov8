@@ -28,9 +28,9 @@ jobs:
 
       - name: Checkstyle Analysis
         run: |
-          mvn checkstyle:check --file LiveSched/pom.xml
+          mvn checkstyle:checkstyle --file LiveSched/pom.xml
           mkdir -p reports/checkstyle
-          cp LiveSched/target/checkstyle-result.xml reports/checkstyle/checkstyle-result.xml
+          cp -r LiveSched/target/site/* reports/checkstyle/
         continue-on-error: true
 
       - name: PMD Static Analysis
@@ -44,7 +44,7 @@ jobs:
         run: |
           mvn jacoco:report --file LiveSched/pom.xml
           mkdir -p reports/jacoco
-          cp -r LiveSched/target/site/* reports/jacoco/
+          cp -r LiveSched/target/site/jacoco/* reports/jacoco/
         continue-on-error: true
 
       - name: Upload Reports
