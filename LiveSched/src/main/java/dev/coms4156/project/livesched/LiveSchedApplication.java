@@ -38,9 +38,14 @@ public class LiveSchedApplication implements CommandLineRunner {
   @Override
   public void run(String[] args) {
     boolean isSetupMode = false;
+    String clientId = "defaultClientId";
+    clientDatabases = new HashMap<>();
 
     for (String arg : args) {
-      switch (arg) {
+      switch (arg.split("=")[0]) {
+        case "clientId":
+          clientId = arg.substring(arg.indexOf("=") + 1);
+          break;
         case "setup":
           isSetupMode = true;
           break;
@@ -50,21 +55,32 @@ public class LiveSchedApplication implements CommandLineRunner {
           break;
         default:
           System.out.println("Unknown argument: " + arg);
+          break;
       }
     }
 
+    String taskFilePath = generateClientFilePath(clientId, "tasks.txt");
+    String resourceTypeFilePath = generateClientFilePath(clientId, "resourceTypes.txt");
+    String scheduleFilePath = generateClientFilePath(clientId, "schedules.txt");
+
+    String taskObjectName = generateClientObjectName(clientId, "tasks.txt");
+    String resourceObjectName = generateClientObjectName(clientId, "resourceTypes.txt");
+    String scheduleObjectName = generateClientObjectName(clientId, "schedules.txt");
+
     if (isSetupMode) {
-      myFileDatabase = new MyFileDatabase(1,
-          TASK_FILE_PATH, RESOURCE_TYPE_FILE_PATH, SCHEDULE_FILE_PATH,
-          TASK_OBJECT_NAME, RESOURCE_TYPE_OBJECT_NAME, SCHEDULE_OBJECT_NAME);
-      setupDataFile();
-      System.out.println("System setup completed.");
+      MyFileDatabase myFileDatabase = new MyFileDatabase(1,
+          taskFilePath, resourceTypeFilePath, scheduleFilePath,
+          taskObjectName, resourceObjectName, scheduleObjectName);
+      setupDataFile(myFileDatabase);
+      clientDatabases.put(clientId, myFileDatabase);
+      System.out.println("System setup completed for client ID: " + clientId);
       return;
     }
-    myFileDatabase = new MyFileDatabase(0,
-        TASK_FILE_PATH, RESOURCE_TYPE_FILE_PATH, SCHEDULE_FILE_PATH,
-        TASK_OBJECT_NAME, RESOURCE_TYPE_OBJECT_NAME, SCHEDULE_OBJECT_NAME);
-    System.out.println("System start up.");
+    MyFileDatabase myFileDatabase = new MyFileDatabase(0,
+        taskFilePath, resourceTypeFilePath, scheduleFilePath,
+        taskObjectName, resourceObjectName, scheduleObjectName);
+    clientDatabases.put(clientId, myFileDatabase);
+    System.out.println("System start up for client ID: " + clientId);
   }
 
   /**
@@ -72,15 +88,30 @@ public class LiveSchedApplication implements CommandLineRunner {
    *
    * @param testData A {@code MyFileDatabase} object referencing test data.
    */
-  public static void overrideDatabase(MyFileDatabase testData) {
-    myFileDatabase = testData;
+  public static void overrideDatabase(MyFileDatabase testData, String clientId) {
+    clientDatabases.put(clientId, testData);
     saveData = false;
+  }
+
+  /**
+   * Retrieves the database instance associated with the specified client ID.
+   *
+   * @param clientId  A {@code String} the identifier for the client whose database is retrieved
+   *
+   * @return the {@code MyFileDatabase} instance associated with the specified client ID
+   */
+  public static MyFileDatabase getClientFileDatabase(String clientId) {
+    if (clientDatabases.containsKey(clientId)) {
+      return clientDatabases.get(clientId);
+    } else {
+      throw new IllegalArgumentException("Client database not set up.");
+    }
   }
 
   /**
    * Populates the database with some example resources and tasks.
    */
-  public void setupDataFile() {
+  public void setupDataFile(MyFileDatabase myFileDatabase) {
     ResourceType bed = new ResourceType("Bed", 20, 40.84, -73.94);
     ResourceType nurse = new ResourceType("Nurse", 15, 40.84, -73.94);
     ResourceType doctor = new ResourceType("Doctor", 10, 40.84, -73.94);
@@ -132,6 +163,28 @@ public class LiveSchedApplication implements CommandLineRunner {
   }
 
   /**
+   * Generates file paths based on the client ID.
+   *
+   * @param clientId The unique identifier for the client
+   * @param fileName The name of the file
+   * @return The full path for the file
+   */
+  private String generateClientFilePath(String clientId, String fileName) {
+    return "/tmp/" + clientId + "/" + fileName;
+  }
+
+  /**
+   * Generates gcs object name based on the client ID.
+   *
+   * @param clientId The unique identifier for the client
+   * @param fileName The name of the file
+   * @return The full name for the object
+   */
+  private String generateClientObjectName(String clientId, String fileName) {
+    return "gcs_" + clientId + "_" + fileName;
+  }
+
+  /**
    * This contains all the overheading teardown logic, it will
    * mainly be focused on saving all the created user data to a
    * file, so it will be ready for the next setup.
@@ -140,21 +193,24 @@ public class LiveSchedApplication implements CommandLineRunner {
   public void onTermination() {
     System.out.println("Termination");
     if (saveData) {
-      myFileDatabase.saveContentsToFile(1); // Save tasks
-      myFileDatabase.saveContentsToFile(2); // Save resourceTypes
-      myFileDatabase.saveContentsToFile(3); // Save schedule
+      for (Map.Entry<String, MyFileDatabase> entry : clientDatabases.entrySet()) {
+        String clientId = entry.getKey();
+        System.out.println("Saving data for client ID: " + clientId);
+
+        MyFileDatabase database = entry.getValue();
+        database.saveContentsToFile(1); // Save tasks
+        database.saveContentsToFile(2); // Save resourceTypes
+        database.saveContentsToFile(3); // Save schedule
+      }
     }
   }
 
-  public static MyFileDatabase myFileDatabase;
+  public static Map<String, MyFileDatabase> clientDatabases;
   public static boolean useGCS = false; // Default is local mode (Not use Google Cloud Storage)
 
-  private static final String TASK_FILE_PATH = "/tmp/tasks.txt";
-  private static final String RESOURCE_TYPE_FILE_PATH = "/tmp/resourceTypes.txt";
-  private static final String SCHEDULE_FILE_PATH = "/tmp/schedules.txt";
-  private static final String TASK_OBJECT_NAME =  "gcs_tasks.txt";
-  private static final String RESOURCE_TYPE_OBJECT_NAME = "gcs_resourceTypes.txt";
-  private static final String SCHEDULE_OBJECT_NAME = "gcs_schedules.txt";
+  private static final String TASK_FILE_PATH = "tasks.txt";
+  private static final String RESOURCE_TYPE_FILE_PATH = "resourceTypes.txt";
+  private static final String SCHEDULE_FILE_PATH = "schedules.txt";
   private static final String APP_ENGINE_ENV = "standard"; // Constant for environment check
   private static boolean saveData = true;
 
