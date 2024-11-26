@@ -168,11 +168,12 @@ public class RouteControllerUnitTests {
     ResponseEntity<?> response = routeController.retrieveResourceTypes(testClientId);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
-    String responseBody = (String) response.getBody();
-    assertTrue(responseBody.contains("Type1"), 
-        "Response should contain the first resource type");
-    assertTrue(responseBody.contains("Type2"), 
-        "Response should contain the second resource type");
+    List<ResourceType> responseBody = (List<ResourceType>) response.getBody();
+    assertEquals(2, responseBody.size(), "Response should contain 2 resource types");
+    assertEquals("Type1", responseBody.get(0).getTypeName(), 
+        "First resource type should be 'Type1'");
+    assertEquals("Type2", responseBody.get(1).getTypeName(), 
+        "Second resource type should be 'Type2'");
   }
 
   /**
