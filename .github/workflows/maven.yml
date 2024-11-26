@@ -24,4 +24,31 @@ jobs:
           cache: maven
 
       - name: Build and Test with Maven
-        run: mvn -B clean install --file LiveSched/pom.xml
+        run: mvn -B clean test --file LiveSched/pom.xml
+
+      - name: Checkstyle Analysis
+        run: |
+          mvn checkstyle:checkstyle --file LiveSched/pom.xml
+          mkdir -p reports/checkstyle
+          cp -r LiveSched/target/site/* reports/checkstyle/
+        continue-on-error: true
+
+      - name: PMD Static Analysis
+        run: |
+          mvn pmd:check --file LiveSched/pom.xml
+          mkdir -p reports/pmd
+          cp -r LiveSched/target/reports/* reports/pmd/
+        continue-on-error: true
+
+      - name: JaCoCo Branch Coverage
+        run: |
+          mvn jacoco:report --file LiveSched/pom.xml
+          mkdir -p reports/jacoco
+          cp -r LiveSched/target/site/jacoco/* reports/jacoco/
+        continue-on-error: true
+
+      - name: Upload Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: ci-reports
+          path: reports/
