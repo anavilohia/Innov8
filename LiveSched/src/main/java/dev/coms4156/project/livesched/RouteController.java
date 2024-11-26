@@ -22,6 +22,7 @@ public class RouteController {
 
   private static final String TASK_ID = "taskId";
   private static final String CLIENT_ID = "clientId";
+  private static final String TASK_NOT_FOUND = "Task Not Found";
 
   /**
    * Redirects to the homepage.
@@ -76,7 +77,7 @@ public class RouteController {
       Task task = LiveSchedApplication.getClientFileDatabase(clientId).getTaskById(taskId);
 
       if (task == null) {
-        return new ResponseEntity<>("Task Not Found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);
       } else {
         return new ResponseEntity<>(task, HttpStatus.OK);
       }
@@ -112,61 +113,31 @@ public class RouteController {
   }
 
   /**
-   * Returns the details of all schedules in the database.
+   * Returns the details of the master schedule in the database.
    *
-   * @param clientId A {@code String} representing the client that owns the schedules
-   *
-   * @return A {@code ResponseEntity} object containing either a list of all Schedules and
-   *         an HTTP 200 response, or an appropriate message indicating the proper response.
-   */
-  @GetMapping(value = "/retrieveSchedules", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> retrieveSchedules(@RequestParam(value = CLIENT_ID) String clientId) {
-    try {
-      List<Schedule> scheduleList =
-          LiveSchedApplication.getClientFileDatabase(clientId).getAllSchedules();
-
-      if (scheduleList == null || scheduleList.isEmpty()) {
-        return new ResponseEntity<>("Schedules Not Found", HttpStatus.NOT_FOUND);
-      } else {
-        return new ResponseEntity<>(scheduleList, HttpStatus.OK);
-      }
-
-    } catch (Exception e) {
-      return handleException(e);
-    }
-  }
-
-  /**
-   * Returns the details of a specified schedule in the database.
-   *
-   * @param scheduleId     A {@code String} representing the schedule the user wishes
-   *                       to retrieve.
    * @param clientId       A {@code String} representing the client that owns the schedule
    *
-   *
-   * @return A {@code ResponseEntity} object containing either the details of the Task and
+   * @return A {@code ResponseEntity} object containing the master schedule and
    *         an HTTP 200 response or, an appropriate message indicating the proper response.
    */
   @GetMapping(value = "/retrieveSchedule", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> retrieveSchedule(@RequestParam(value = "scheduleId") String scheduleId,
-                                            @RequestParam(value = CLIENT_ID) String clientId) {
+  public ResponseEntity<?> retrieveSchedule(@RequestParam(value = CLIENT_ID) String clientId) {
     try {
-      Schedule schedule =
-          LiveSchedApplication.getClientFileDatabase(clientId).getScheduleById(scheduleId);
+      Schedule masterSchedule =
+          LiveSchedApplication.getClientFileDatabase(clientId).getMasterSchedule();
 
-      if (schedule == null) {
-        return new ResponseEntity<>("Schedule Not Found", HttpStatus.NOT_FOUND);
+      if (masterSchedule == null || masterSchedule.getTaskSchedule().isEmpty()) {
+        return new ResponseEntity<>("No Schedule Found", HttpStatus.NOT_FOUND);
       } else {
-        return new ResponseEntity<>(schedule, HttpStatus.OK);
+        return new ResponseEntity<>(masterSchedule.getTaskSchedule(), HttpStatus.OK);
       }
-
     } catch (Exception e) {
       return handleException(e);
     }
   }
 
   /**
-   * Returns the schedule for user tasks and resources.
+   * Update and returns the schedule for current tasks and resources.
    *
    * @param maxDistance    A {@code double} representing the max distance
    *                       the user wishes between schedule tasks and resources.
@@ -176,8 +147,8 @@ public class RouteController {
    * @return A {@code ResponseEntity} object containing either the details of the Schedule and
    *         an HTTP 200 response or, an appropriate message indicating the proper response.
    */
-  @GetMapping(value = "/createSchedule", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> createSchedule(@RequestParam(value = "maxDistance") double maxDistance,
+  @PatchMapping(value = "/updateSchedule", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> updateSchedule(@RequestParam(value = "maxDistance") double maxDistance,
                                           @RequestParam(value = CLIENT_ID) String clientId) {
     try {
       MyFileDatabase myFileDatabase = LiveSchedApplication.getClientFileDatabase(clientId);
@@ -185,15 +156,17 @@ public class RouteController {
 
       if (taskList == null || taskList.isEmpty()) {
         return new ResponseEntity<>("Tasks Not Found", HttpStatus.NOT_FOUND);
-      } else {
-        String scheduleId =
-            String.valueOf(myFileDatabase.getAllSchedules().size() + 1);
-        Schedule newSchedule = new Schedule(scheduleId, taskList, maxDistance);
-        newSchedule.createSchedule();
-        myFileDatabase.addSchedule(newSchedule);
-        return new ResponseEntity<>(newSchedule, HttpStatus.OK);
       }
 
+      Schedule masterSchedule = myFileDatabase.getMasterSchedule();
+
+      if (masterSchedule == null) {
+        return new ResponseEntity<>("Master Schedule Not Found", HttpStatus.NOT_FOUND);
+      }
+
+      Map<Task, List<Resource>> updatedSchedule =
+          masterSchedule.updateSchedule(taskList, maxDistance);
+      return new ResponseEntity<>(updatedSchedule, HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
     }
@@ -238,11 +211,10 @@ public class RouteController {
   }
 
   /**
-   * Attempts to unschedule a task from a specific schedule in database.
+   * Attempts to unschedule a task from the master schedule in database.
    *
    * @param taskId        A {@code String} representing the id of the task
    *                      to be removed from schedule.
-   * @param scheduleId    A {@code String} representing the id of the schedule to be modified.
    * @param clientId      A {@code String} representing the client owner of the schedule/task.
    *
    * @return A {@code ResponseEntity} object containing the modified Schedule and an HTTP 200
@@ -250,15 +222,23 @@ public class RouteController {
    */
   @PatchMapping(value = "/unscheduleTask", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> unscheduleTask(@RequestParam(value = TASK_ID) String taskId,
-                                          @RequestParam(value = "scheduleId") String scheduleId,
                                           @RequestParam(value = CLIENT_ID) String clientId) {
     try {
       MyFileDatabase myFileDatabase = LiveSchedApplication.getClientFileDatabase(clientId);
-      Schedule schedule = myFileDatabase.getScheduleById(scheduleId);
+      Schedule masterSchedule = myFileDatabase.getMasterSchedule();
       Task task = myFileDatabase.getTaskById(taskId);
-      schedule.unscheduleTask(task);
-      Map<Task, List<Resource>> newSchedule = schedule.getTaskSchedule();
-      return new ResponseEntity<>(newSchedule, HttpStatus.OK);
+
+      if (task == null) {
+        return new ResponseEntity<>(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);
+      }
+      if (masterSchedule == null) {
+        return new ResponseEntity<>("Master Schedule Not Found", HttpStatus.NOT_FOUND);
+      }
+      if (!masterSchedule.getTaskSchedule().containsKey(task)) {
+        return new ResponseEntity<>("Task Not Scheduled Yet", HttpStatus.BAD_REQUEST);
+      }
+      masterSchedule.unscheduleTask(task);
+      return new ResponseEntity<>(masterSchedule.getTaskSchedule(), HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
     }
@@ -282,7 +262,7 @@ public class RouteController {
       Task task;
       task = myFileDatabase.getTaskById(taskId);
       if (task == null) {
-        return new ResponseEntity<>("Task Not Found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);
       } else {
         myFileDatabase.deleteTask(task);
         return new ResponseEntity<>(taskId + " successfully deleted", HttpStatus.OK);
@@ -353,7 +333,7 @@ public class RouteController {
         }
         return new ResponseEntity<>("ResourceType Not Found", HttpStatus.NOT_FOUND);
       }
-      return new ResponseEntity<>("Task Not Found", HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);
     } catch (Exception e) {
       return handleException(e);
     }

@@ -34,7 +34,6 @@ public class ScheduleUnitTests {
   private Location taskLocation;
   private Location resourceLocation;
 
-  private final String testScheduleId = "Schedule ID1";
   private final double maxDistance = 100.0;
   // private final double longitude = -73.96;
 
@@ -64,28 +63,8 @@ public class ScheduleUnitTests {
    */
   @Test
   void constructorTest() {
-    assertDoesNotThrow(() -> new Schedule(testScheduleId, mockTasks, maxDistance),
-        "Schedule constructor should not throw an exception with valid parameters.");
-
-    Exception exception = assertThrows(IllegalArgumentException.class,
-        () -> new Schedule(null, mockTasks, maxDistance),
-        "Schedule constructor should throw an exception if scheduleId is null.");
-    assertEquals("Schedule ID cannot be null or empty.", exception.getMessage());
-
-    exception = assertThrows(IllegalArgumentException.class,
-        () -> new Schedule("  ", mockTasks, maxDistance),
-        "Schedule constructor should throw an exception if scheduleId is empty.");
-    assertEquals("Schedule ID cannot be null or empty.", exception.getMessage());
-
-    exception = assertThrows(IllegalArgumentException.class,
-        () -> new Schedule(testScheduleId, null, maxDistance),
-        "Schedule constructor should throw an exception if tasks is null.");
-    assertEquals("Tasks list cannot be null.", exception.getMessage());
-
-    exception = assertThrows(IllegalArgumentException.class,
-        () -> new Schedule(testScheduleId, mockTasks, -1.0),
-        "Schedule constructor should throw an exception if maxDistance is negative.");
-    assertEquals("Maximum distance cannot be negative.", exception.getMessage());
+    assertDoesNotThrow(() -> new Schedule(),
+        "Schedule constructor should not throw an exception.");
   }
 
   /**
@@ -93,15 +72,14 @@ public class ScheduleUnitTests {
    */
   @Test
   void createScheduleTest() {
-
     when(mockTask1.getResources()).thenReturn(Map.of(mockResourceType, 1));
     when(mockTask1.getLocation()).thenReturn(taskLocation);
     when(mockResourceType.getLocation()).thenReturn(resourceLocation);
     when(mockResourceType.countAvailableUnits(any())).thenReturn(1);
     when(mockResourceType.findAvailableResource(any())).thenReturn(mockResource1);
 
-    Schedule schedule = new Schedule(testScheduleId, mockTasks, maxDistance);
-    Map<Task, List<Resource>> taskSchedule = schedule.createSchedule();
+    Schedule schedule = new Schedule();
+    Map<Task, List<Resource>> taskSchedule = schedule.updateSchedule(mockTasks, maxDistance);
     assertTrue(taskSchedule.containsKey(mockTask1),
         "Created schedule should contain mockTask1");
     assertEquals(1, taskSchedule.get(mockTask1).size(),
@@ -119,25 +97,16 @@ public class ScheduleUnitTests {
     when(mockResourceType.countAvailableUnits(any())).thenReturn(1);
     when(mockResourceType.findAvailableResource(any())).thenReturn(mockResource1);
 
-    Schedule scheduleForInvalidTask = new Schedule(testScheduleId, mockTasks, maxDistance);
+    Schedule scheduleForInvalidTask = new Schedule();
     assertThrows(IllegalArgumentException.class,
-        () -> scheduleForInvalidTask.unscheduleTask(mock(Task.class)),
-        "unscheduleTask method should throw exception when unscheduling invalid task");
+        () -> scheduleForInvalidTask.unscheduleTask(null),
+        "unscheduleTask method should throw exception when unscheduling null task");
 
-    Schedule scheduleForValidTask = new Schedule(testScheduleId, mockTasks, maxDistance);
-    scheduleForValidTask.createSchedule();
+    Schedule scheduleForValidTask = new Schedule();
+    scheduleForValidTask.updateSchedule(mockTasks, maxDistance);
     assertDoesNotThrow(() -> scheduleForValidTask.unscheduleTask(mockTask1),
         "unscheduleTask method should not throw exception when unscheduling valid task");
     verify(mockResource1, times(1)).release();
   }
 
-  /**
-   * Test for getScheduleId method in Schedule class.
-   */
-  @Test
-  void getScheduleIdTest() {
-    Schedule testSchedule = new Schedule(testScheduleId, mockTasks, maxDistance);
-    assertEquals(testScheduleId, testSchedule.getScheduleId(),
-        "getScheduleId should return the correct schedule ID.");
-  }
 }

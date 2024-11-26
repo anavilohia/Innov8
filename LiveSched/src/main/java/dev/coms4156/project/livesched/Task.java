@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents a task that has to be done. 
@@ -202,6 +203,23 @@ public class Task implements Serializable {
    */
   public void updateLocation(double latitude, double longitude) {
     this.location = new Location(latitude, longitude);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    Task task = (Task) obj;
+    return Objects.equals(taskId, task.taskId);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(taskId);
   }
 
   public Map<ResourceType, Integer> getResources() {
