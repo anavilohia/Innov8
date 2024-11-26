@@ -1,62 +1,62 @@
 package dev.coms4156.project.livesched;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 /**
  * Coordinates scheduling given a list of tasks.
  * This class creates a schedule that pairs tasks with resourceTypes and
  * updates their values accordingly
  */
-public class Schedule {
-  private final String scheduleId;
-  private Queue<Task> tasks;
-  private double maxDistance;
-  private Map<Task, List<Resource>> taskSchedule = new LinkedHashMap<>();
+public class Schedule implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 1005L;
+
+  private Map<Task, List<Resource>> taskSchedule;
 
   /**
-   * Constructs a new Schedule object with the given parameters.
-   *
-   * @param scheduleId        the unique ID of the schedule
-   * @param tasks             list of all tasks
-   * @param maxDistance       maximum distance from task to resource
-   * @throws IllegalArgumentException if scheduleId is null or empty, resourceTypes is null,
-   *                                  or maxDistance is negative
+   * Constructs a new Schedule object.
    */
-  public Schedule(String scheduleId, List<Task> tasks, double maxDistance) {
-    if (scheduleId == null || scheduleId.trim().isEmpty()) {
-      throw new IllegalArgumentException("Schedule ID cannot be null or empty.");
-    }
+  public Schedule() {
+    taskSchedule = new LinkedHashMap<>();
+  }
+
+  /**
+   * Updates the schedule by assigning available resources to tasks based
+   * on their requirements and start times.
+   *
+   * @param tasks    The list of tasks to schedule.
+   * @param maxDistance The maximum distance between tasks and resources.
+   * @return a {@code Map<Task, List<Resource>>} where each schedulable task is mapped to
+   *        the list of resources assigned to it, or an empty map if no tasks could be scheduled.
+   * @throws IllegalArgumentException if tasks is null or maxDistance is negative
+   */
+  public Map<Task, List<Resource>> updateSchedule(List<Task> tasks, double maxDistance) {
     if (tasks == null) {
       throw new IllegalArgumentException("Tasks list cannot be null.");
     }
     if (maxDistance < 0) {
       throw new IllegalArgumentException("Maximum distance cannot be negative.");
     }
-    this.scheduleId = scheduleId;
-    this.maxDistance = maxDistance;
 
-    Comparator<Task> comparator = new TaskComparator();
-    this.tasks = new PriorityQueue<Task>(comparator);  // queue of tasks in order of priority
-    this.tasks.addAll(tasks);
-  }
+    // Sort tasks by priority
+    tasks.sort(new TaskComparator());
 
-  /**
-   * Creates a schedule by assigning available resources to tasks based
-   * on their requirements and start times.
-   *
-   * @return a {@code Map<Task, List<Resource>>} where each schedulable task is mapped to
-   *     the list of resources assigned to it,
-   *     or an empty map if no tasks could be scheduled.
-   *
-   */
-  public Map<Task, List<Resource>> createSchedule() {
     for (Task task : tasks) {
+      // Skip tasks that are already scheduled
+      if (taskSchedule.containsKey(task)) {
+        continue;
+      }
+
+      // Skip tasks with no resources required
+      if (task.getResources() == null || task.getResources().isEmpty()) {
+        continue;
+      }
+
       // Store assigned resources for this task
       List<Resource> assignedResources = new ArrayList<>();
       // Track whether we can schedule this task
@@ -102,11 +102,13 @@ public class Schedule {
   }
 
   /**
-   * Completes a task by removing it from allTasks and taskSchedule.
+   * Completes a task by removing it from the taskSchedule.
+   *
+   * @throws IllegalArgumentException if task is null
    */
   public void unscheduleTask(Task task) {
-    if (!tasks.contains(task)) {
-      throw new IllegalArgumentException("Task not found in the tasks list.");
+    if (task == null) {
+      throw new IllegalArgumentException("Task cannot be null.");
     }
     if (taskSchedule.containsKey(task)) {
       List<Resource> assignedResources = taskSchedule.get(task);
@@ -115,11 +117,6 @@ public class Schedule {
       }
       taskSchedule.remove(task);
     }
-    tasks.remove(task);
-  }
-
-  public String getScheduleId() {
-    return scheduleId;
   }
 
   public Map<Task, List<Resource>> getTaskSchedule() {

@@ -51,13 +51,14 @@ public class MyFileDatabase {
     this.scheduleObjectName = scheduleObjectName;
 
     if (flag == 0) {
-      this.allTasks = deSerializeObjectFromFile(taskContentType);
-      this.allResourceTypes = deSerializeObjectFromFile(resourceTypeContentType);
-      this.allSchedules = deSerializeObjectFromFile(scheduleContentType);
+      this.allTasks = (List<Task>) deSerializeObjectFromFile(taskContentType);
+      this.allResourceTypes =
+          (List<ResourceType>) deSerializeObjectFromFile(resourceTypeContentType);
+      this.masterSchedule = (Schedule) deSerializeObjectFromFile(scheduleContentType);
     } else {
       this.allTasks = new ArrayList<>();
       this.allResourceTypes = new ArrayList<>();
-      this.allSchedules = new ArrayList<>();
+      this.masterSchedule = new Schedule();
     }
   }
 
@@ -80,12 +81,12 @@ public class MyFileDatabase {
   }
 
   /**
-   * Sets allSchedules of the database.
+   * Sets masterSchedule of the database.
    *
-   * @param schedules the list of all schedules to be added to database
+   * @param masterSchedule the master schedule to be added to database
    */
-  public void setAllSchedules(List<Schedule> schedules) {
-    this.allSchedules = schedules == null ? new ArrayList<>() : schedules;
+  public void setMasterSchedule(Schedule masterSchedule) {
+    this.masterSchedule = masterSchedule == null ? new Schedule() : masterSchedule;
   }
 
   /**
@@ -93,9 +94,9 @@ public class MyFileDatabase {
    *
    * @param contentType the type of content to deserialize
    *
-   * @return A list of deserialized objects from the file, or an empty list if an error occurs
+   * @return The deserialized objects from the file, or an empty list if an error occurs
    */
-  public final <T> List<T> deSerializeObjectFromFile(int contentType) {
+  public final Object deSerializeObjectFromFile(int contentType) {
     String filePath;
     String gcsObjectName;
     if (contentType == taskContentType) {
@@ -119,7 +120,7 @@ public class MyFileDatabase {
         if (LOGGER.isLoggable(Level.SEVERE)) {
           LOGGER.log(Level.SEVERE, e.getMessage());
         }
-        return new ArrayList<>();
+        return null;
       }
     } else {
       if (LOGGER.isLoggable(Level.INFO)) {
@@ -129,21 +130,14 @@ public class MyFileDatabase {
 
     try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filePath))) {
       Object obj = in.readObject();
-      if (obj instanceof List<?> listObj) {
 
-        List<T> finalList = new ArrayList<>();
-
-        for (Object value : listObj) {
-          if (contentType == taskContentType && !(value instanceof Task)) {
-            throw new IllegalArgumentException(INVALID_OBJ_TYPE_ERROR);
-          } else if (contentType == resourceTypeContentType && !(value instanceof ResourceType)) {
-            throw new IllegalArgumentException(INVALID_OBJ_TYPE_ERROR);
-          } else if (contentType == scheduleContentType && !(value instanceof Schedule)) {
-            throw new IllegalArgumentException(INVALID_OBJ_TYPE_ERROR);
-          }
-          finalList.add((T) value);
-        }
-        return finalList;
+      // Return the appropriate type based on content type
+      if (contentType == taskContentType && obj instanceof List<?> listObj) {
+        return listObj; // Return List<Task>
+      } else if (contentType == resourceTypeContentType && obj instanceof List<?> listObj) {
+        return listObj; // Return List<ResourceType>
+      } else if (contentType == scheduleContentType && obj instanceof Schedule schedule) {
+        return schedule; // Return Schedule
       } else {
         throw new IllegalArgumentException(INVALID_OBJ_TYPE_ERROR);
       }
@@ -151,7 +145,7 @@ public class MyFileDatabase {
       if (LOGGER.isLoggable(Level.SEVERE)) {
         LOGGER.log(Level.SEVERE, e.getMessage());
       }
-      return new ArrayList<>();
+      return null;
     }
   }
 
@@ -206,7 +200,7 @@ public class MyFileDatabase {
       } else if (contentType == resourceTypeContentType) {
         out.writeObject(allResourceTypes);
       } else if (contentType == scheduleContentType) {
-        out.writeObject(allSchedules);
+        out.writeObject(masterSchedule);
       }
 
       if (LOGGER.isLoggable(Level.INFO)) {
@@ -275,12 +269,12 @@ public class MyFileDatabase {
   }
 
   /**
-   * Gets all Schedules from the database.
+   * Gets master schedule from the database.
    *
-   * @return a list containing all Schedule objects
+   * @return a Schedule object containing all schedules
    */
-  public List<Schedule> getAllSchedules() {
-    return this.allSchedules;
+  public Schedule getMasterSchedule() {
+    return this.masterSchedule;
   }
 
   /**
@@ -303,7 +297,6 @@ public class MyFileDatabase {
    *
    */
   public void addTask(Task task) {
-
     this.allTasks.add(task);
   }
 
@@ -332,50 +325,6 @@ public class MyFileDatabase {
 
     this.allResourceTypes.remove(resourceType);
   }
-
-  /**
-   * Gets schedule by Id from the database.
-   *
-   * @return a Schedule object with specified scheduleId
-   */
-  public Schedule getScheduleById(String scheduleId) {
-    List<Schedule> schedules = this.allSchedules;
-    for (Schedule schedule : schedules) {
-      if (schedule.getScheduleId().equals(scheduleId)) {
-        return schedule;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Adds a schedule to the database.
-   *
-   */
-  public void addSchedule(Schedule schedule) {
-
-    this.allSchedules.add(schedule);
-  }
-
-  /**
-   * Deletes a schedule from the database.
-   *
-   */
-  public void deleteSchedule(Schedule schedule) {
-    this.allSchedules.remove(schedule);
-  }
-
-  /**
-   * Returns a string representation of the database.
-   *
-   * @return a string representation of the database
-   */
-  @Override
-  public String toString() {
-    // to be added
-    return "";
-  }
-
 
   private final int taskContentType = 1;
   private final int resourceTypeContentType = 2;
@@ -432,9 +381,9 @@ public class MyFileDatabase {
   private List<ResourceType> allResourceTypes;
 
   /**
-   * The list of all resourceTypes available.
+   * A master schedule containing all schedules.
    */
-  private List<Schedule> allSchedules;
+  private Schedule masterSchedule;
 
   /**
    * Logger to print information and exceptions.

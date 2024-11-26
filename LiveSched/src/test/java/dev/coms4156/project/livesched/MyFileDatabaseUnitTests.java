@@ -41,7 +41,7 @@ class MyFileDatabaseUnitTests {
     assertNotNull(database);
     assertTrue(database.getAllTasks().isEmpty());
     assertTrue(database.getAllResourceTypes().isEmpty());
-    assertTrue(database.getAllSchedules().isEmpty());
+    assertTrue(database.getMasterSchedule().getTaskSchedule().isEmpty());
   }
 
   @Test
@@ -61,11 +61,12 @@ class MyFileDatabaseUnitTests {
   }
 
   @Test
-  void testSetAndGetAllSchedules() {
-    List<Schedule> schedules = new ArrayList<>();
-    schedules.add(createDummySchedule());
-    database.setAllSchedules(schedules);
-    assertEquals(1, database.getAllSchedules().size());
+  void testSetAndGetMasterSchedule() {
+    List<Task> tasks = new ArrayList<>();
+    tasks.add(createDummyTask());
+    Schedule schedule = new Schedule();
+    database.setMasterSchedule(schedule);
+    assertNotNull(database.getMasterSchedule());
   }
 
   @Test
@@ -82,14 +83,9 @@ class MyFileDatabaseUnitTests {
     database.setAllResourceTypes(null);
     assertTrue(database.getAllResourceTypes().isEmpty());
 
-    database.setAllSchedules(null);
-    assertTrue(database.getAllSchedules().isEmpty());
-  }
-
-  @Test
-  void testToString() {
-    // As the toString method is not implemented, we just check it doesn't throw an exception
-    assertDoesNotThrow(() -> database.toString());
+    database.setMasterSchedule(null);
+    assertNotNull(database.getMasterSchedule());
+    assertTrue(database.getMasterSchedule().getTaskSchedule().isEmpty());
   }
 
   private Task createDummyTask() {
@@ -104,7 +100,4 @@ class MyFileDatabaseUnitTests {
     return new ResourceType("DummyResource", 5, 0, 0);
   }
 
-  private Schedule createDummySchedule() {
-    return new Schedule("DummySchedule", new ArrayList<>(), 10);
-  }
 }
