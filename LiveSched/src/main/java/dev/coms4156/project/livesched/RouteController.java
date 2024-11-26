@@ -99,14 +99,11 @@ public class RouteController {
     try {
       List<ResourceType> resourceTypeList;
       resourceTypeList = LiveSchedApplication.getClientFileDatabase(clientId).getAllResourceTypes();
-      String res = "";
-      for (ResourceType resourceType : resourceTypeList) {
-        res = res + resourceType.toString();
-      }
-      if (res.isEmpty()) {
+
+      if (resourceTypeList.isEmpty()) {
         return new ResponseEntity<>("ResourceTypes Not Found", HttpStatus.NOT_FOUND);
       } else {
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return new ResponseEntity<>(resourceTypeList, HttpStatus.OK);
       }
 
     } catch (Exception e) {
