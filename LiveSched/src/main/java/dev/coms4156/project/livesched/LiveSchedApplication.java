@@ -1,6 +1,7 @@
 package dev.coms4156.project.livesched;
 
 import jakarta.annotation.PreDestroy;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,14 +39,10 @@ public class LiveSchedApplication implements CommandLineRunner {
   @Override
   public void run(String[] args) {
     boolean isSetupMode = false;
-    String clientId = "defaultClientId";
     clientDatabases = new HashMap<>();
 
     for (String arg : args) {
       switch (arg.split("=")[0]) {
-        case "clientId":
-          clientId = arg.substring(arg.indexOf("=") + 1);
-          break;
         case "setup":
           isSetupMode = true;
           break;
@@ -59,28 +56,15 @@ public class LiveSchedApplication implements CommandLineRunner {
       }
     }
 
-    String taskFilePath = generateClientFilePath(clientId, "tasks.txt");
-    String resourceTypeFilePath = generateClientFilePath(clientId, "resourceTypes.txt");
-    String scheduleFilePath = generateClientFilePath(clientId, "schedules.txt");
-
-    String taskObjectName = generateClientObjectName(clientId, "tasks.txt");
-    String resourceObjectName = generateClientObjectName(clientId, "resourceTypes.txt");
-    String scheduleObjectName = generateClientObjectName(clientId, "schedules.txt");
+    // Reload existing client databases
+    reloadClientDatabases();
 
     if (isSetupMode) {
-      MyFileDatabase myFileDatabase = new MyFileDatabase(1,
-          taskFilePath, resourceTypeFilePath, scheduleFilePath,
-          taskObjectName, resourceObjectName, scheduleObjectName);
-      setupDataFile(myFileDatabase);
-      clientDatabases.put(clientId, myFileDatabase);
-      System.out.println("System setup completed for client ID: " + clientId);
-      return;
+      setupExampleClientDatabase("demoClientId");
+      System.out.println("Example data setup completed for client ID: demoClientId");
     }
-    MyFileDatabase myFileDatabase = new MyFileDatabase(0,
-        taskFilePath, resourceTypeFilePath, scheduleFilePath,
-        taskObjectName, resourceObjectName, scheduleObjectName);
-    clientDatabases.put(clientId, myFileDatabase);
-    System.out.println("System start up for client ID: " + clientId);
+
+    System.out.println("LiveSched service started");
   }
 
   /**
@@ -93,6 +77,41 @@ public class LiveSchedApplication implements CommandLineRunner {
     saveData = false;
   }
 
+  private void reloadClientDatabases() {
+    File tmpDir = new File("/tmp");
+    if (!tmpDir.exists() || !tmpDir.isDirectory()) {
+      System.out.println("No existing databases found.");
+      return;
+    }
+
+    // Scan tmp directory for files matching the pattern clientId_tasks.txt
+    File[] taskFiles = tmpDir.listFiles((dir, name) -> name.endsWith("_tasks.txt"));
+    if (taskFiles == null || taskFiles.length == 0) {
+      System.out.println("No existing task files found.");
+      return;
+    }
+
+    // Load data for all existing clients
+    for (File taskFile : taskFiles) {
+      String fileName = taskFile.getName();
+      String clientId = fileName.substring(0, fileName.indexOf("_tasks.txt")); // Get clientId
+
+      String taskFilePath = generateClientFilePath(clientId, TASK_FILE_PATH);
+      String resourceTypeFilePath = generateClientFilePath(clientId, RESOURCE_TYPE_FILE_PATH);
+      String scheduleFilePath = generateClientFilePath(clientId, SCHEDULE_FILE_PATH);
+
+      String taskObjectName = generateClientObjectName(clientId, TASK_FILE_PATH);
+      String resourceObjectName = generateClientObjectName(clientId, RESOURCE_TYPE_FILE_PATH);
+      String scheduleObjectName = generateClientObjectName(clientId, SCHEDULE_FILE_PATH);
+
+      MyFileDatabase database = new MyFileDatabase(0, taskFilePath, resourceTypeFilePath,
+          scheduleFilePath, taskObjectName, resourceObjectName, scheduleObjectName);
+
+      clientDatabases.put(clientId, database);
+      System.out.println("Loaded database for client ID: " + clientId);
+    }
+  }
+
   /**
    * Retrieves the database instance associated with the specified client ID.
    *
@@ -100,18 +119,49 @@ public class LiveSchedApplication implements CommandLineRunner {
    *
    * @return the {@code MyFileDatabase} instance associated with the specified client ID
    */
-  public static MyFileDatabase getClientFileDatabase(String clientId) {
-    if (clientDatabases.containsKey(clientId)) {
-      return clientDatabases.get(clientId);
-    } else {
-      throw new IllegalArgumentException("Client database not set up.");
+  public static synchronized MyFileDatabase getClientFileDatabase(String clientId) {
+    if (!clientDatabases.containsKey(clientId)) {
+      System.out.println("Initializing a new database for client ID: " + clientId);
+
+      // Generate file paths and object names for new client
+      String taskFilePath = generateClientFilePath(clientId, TASK_FILE_PATH);
+      String resourceTypeFilePath = generateClientFilePath(clientId, RESOURCE_TYPE_FILE_PATH);
+      String scheduleFilePath = generateClientFilePath(clientId, SCHEDULE_FILE_PATH);
+
+      String taskObjectName = generateClientObjectName(clientId, TASK_FILE_PATH);
+      String resourceObjectName = generateClientObjectName(clientId, RESOURCE_TYPE_FILE_PATH);
+      String scheduleObjectName = generateClientObjectName(clientId, SCHEDULE_FILE_PATH);
+
+      MyFileDatabase myFileDatabase = new MyFileDatabase(1, taskFilePath, resourceTypeFilePath,
+          scheduleFilePath, taskObjectName, resourceObjectName, scheduleObjectName);
+
+      clientDatabases.put(clientId, myFileDatabase);
     }
+
+    return clientDatabases.get(clientId);
+  }
+
+  private void setupExampleClientDatabase(String clientId) {
+    // Generate file paths and object names for demo
+    String taskFilePath = generateClientFilePath(clientId, TASK_FILE_PATH);
+    String resourceTypeFilePath = generateClientFilePath(clientId, RESOURCE_TYPE_FILE_PATH);
+    String scheduleFilePath = generateClientFilePath(clientId, SCHEDULE_FILE_PATH);
+
+    String taskObjectName = generateClientObjectName(clientId, TASK_FILE_PATH);
+    String resourceObjectName = generateClientObjectName(clientId, RESOURCE_TYPE_FILE_PATH);
+    String scheduleObjectName = generateClientObjectName(clientId, SCHEDULE_FILE_PATH);
+
+    MyFileDatabase demoDatabase = new MyFileDatabase(1, taskFilePath, resourceTypeFilePath,
+        scheduleFilePath, taskObjectName, resourceObjectName, scheduleObjectName);
+
+    setupExampleData(demoDatabase); // Load database with example resources and tasks
+    clientDatabases.put(clientId, demoDatabase);
   }
 
   /**
    * Populates the database with some example resources and tasks.
    */
-  public void setupDataFile(MyFileDatabase myFileDatabase) {
+  public void setupExampleData(MyFileDatabase myFileDatabase) {
     ResourceType bed = new ResourceType("Bed", 20, 40.84, -73.94);
     ResourceType nurse = new ResourceType("Nurse", 15, 40.84, -73.94);
     ResourceType doctor = new ResourceType("Doctor", 10, 40.84, -73.94);
@@ -169,7 +219,7 @@ public class LiveSchedApplication implements CommandLineRunner {
    * @param fileName The name of the file
    * @return The full path for the file
    */
-  private String generateClientFilePath(String clientId, String fileName) {
+  private static String generateClientFilePath(String clientId, String fileName) {
     return "/tmp/" + clientId + "_" + fileName;
   }
 
@@ -180,7 +230,7 @@ public class LiveSchedApplication implements CommandLineRunner {
    * @param fileName The name of the file
    * @return The full name for the object
    */
-  private String generateClientObjectName(String clientId, String fileName) {
+  private static String generateClientObjectName(String clientId, String fileName) {
     return "gcs_" + clientId + "_" + fileName;
   }
 

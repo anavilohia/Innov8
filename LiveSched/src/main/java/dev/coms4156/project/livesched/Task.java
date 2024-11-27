@@ -172,29 +172,6 @@ public class Task implements Serializable {
   }
 
   /**
-   * Returns a string representation of the task, including its id, location,
-   * start and end time, priority and the resources needed.
-   *
-   * @return A string representing the task.
-   */
-  public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append("Task ID: ").append(taskId).append("; ")
-            .append("Location: ").append(location.getCoordinates()).append("; ")
-            .append("Start: ").append(startTime.toString()).append("; ")
-            .append("End: ").append(endTime.toString()).append("; ")
-            .append("Priority: ").append(String.valueOf(priority)).append("\n")
-            .append("Resources Needed: \n");
-    for (Map.Entry<ResourceType, Integer> entry : resourceList.entrySet()) {
-      ResourceType key = entry.getKey();
-      Integer value = entry.getValue();
-      result.append(String.valueOf(value)).append(" of the following resource type is needed: \n")
-              .append(key.toString()).append("\n");
-    }
-    return result.toString();
-  }
-
-  /**
    * Updates the location of the task.
    *
    * @param latitude  the new latitude of the task's location

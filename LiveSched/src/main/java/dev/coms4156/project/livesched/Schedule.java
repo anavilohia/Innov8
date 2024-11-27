@@ -43,10 +43,11 @@ public class Schedule implements Serializable {
       throw new IllegalArgumentException("Maximum distance cannot be negative.");
     }
 
-    // Sort tasks by priority
-    tasks.sort(new TaskComparator());
+    // Create a copy of tasks and sort by priority
+    List<Task> copiedTasks = new ArrayList<>(tasks);
+    copiedTasks.sort(new TaskComparator());
 
-    for (Task task : tasks) {
+    for (Task task : copiedTasks) {
       // Skip tasks that are already scheduled
       if (taskSchedule.containsKey(task)) {
         continue;

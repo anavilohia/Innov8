@@ -2,7 +2,9 @@ package dev.coms4156.project.livesched;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -123,14 +125,24 @@ public class RouteController {
   @GetMapping(value = "/retrieveSchedule", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> retrieveSchedule(@RequestParam(value = CLIENT_ID) String clientId) {
     try {
-      Schedule masterSchedule =
-          LiveSchedApplication.getClientFileDatabase(clientId).getMasterSchedule();
+      MyFileDatabase myFileDatabase = LiveSchedApplication.getClientFileDatabase(clientId);
+      Schedule masterSchedule = myFileDatabase.getMasterSchedule();
 
       if (masterSchedule == null || masterSchedule.getTaskSchedule().isEmpty()) {
-        return new ResponseEntity<>("No Schedule Found", HttpStatus.NOT_FOUND);
-      } else {
-        return new ResponseEntity<>(masterSchedule.getTaskSchedule(), HttpStatus.OK);
+        return new ResponseEntity<>("Schedules Not Found", HttpStatus.NOT_FOUND);
       }
+
+      // Convert schedule to have a cleaner JSON structure
+      List<Map<String, Object>> scheduleList = new ArrayList<>();
+      masterSchedule.getTaskSchedule().forEach((task, resources) -> {
+        Map<String, Object> scheduleEntry = new HashMap<>();
+        scheduleEntry.put("task", task);
+        scheduleEntry.put("assignedResources", resources);
+        scheduleList.add(scheduleEntry);
+      });
+
+      return new ResponseEntity<>(scheduleList, HttpStatus.OK);
+
     } catch (Exception e) {
       return handleException(e);
     }
@@ -166,7 +178,29 @@ public class RouteController {
 
       Map<Task, List<Resource>> updatedSchedule =
           masterSchedule.updateSchedule(taskList, maxDistance);
-      return new ResponseEntity<>(updatedSchedule, HttpStatus.OK);
+
+      // Convert schedule to have a cleaner JSON structure
+      List<Map<String, Object>> response = new ArrayList<>();
+      for (Map.Entry<Task, List<Resource>> entry : updatedSchedule.entrySet()) {
+        Map<String, Object> scheduleEntry = new LinkedHashMap<>();
+        scheduleEntry.put("task", Map.of(
+            "taskId", entry.getKey().getTaskId(),
+            "taskName", entry.getKey().getTaskName(),
+            "priority", entry.getKey().getPriority(),
+            "startTime", entry.getKey().getStartTime(),
+            "endTime", entry.getKey().getEndTime(),
+            "location", entry.getKey().getLocation(),
+            "resources", entry.getKey().getResources()
+        ));
+        scheduleEntry.put("assignedResources", entry.getValue().stream().map(resource -> Map.of(
+            "resourceId", resource.getResourceId(),
+            "availableFrom", resource.getAvailableFrom()
+        )).toList());
+
+        response.add(scheduleEntry);
+      }
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
     }
@@ -238,7 +272,7 @@ public class RouteController {
         return new ResponseEntity<>("Task Not Scheduled Yet", HttpStatus.BAD_REQUEST);
       }
       masterSchedule.unscheduleTask(task);
-      return new ResponseEntity<>(masterSchedule.getTaskSchedule(), HttpStatus.OK);
+      return new ResponseEntity<>("Task unscheduled succesfully", HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
     }
