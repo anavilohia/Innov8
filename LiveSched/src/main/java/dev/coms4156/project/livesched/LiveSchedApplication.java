@@ -77,7 +77,7 @@ public class LiveSchedApplication implements CommandLineRunner {
     saveData = false;
   }
 
-  private void reloadClientDatabases() {
+  public void reloadClientDatabases() {
     File tmpDir = new File("/tmp");
     if (!tmpDir.exists() || !tmpDir.isDirectory()) {
       System.out.println("No existing databases found.");
@@ -141,7 +141,7 @@ public class LiveSchedApplication implements CommandLineRunner {
     return clientDatabases.get(clientId);
   }
 
-  private void setupExampleClientDatabase(String clientId) {
+  public void setupExampleClientDatabase(String clientId) {
     // Generate file paths and object names for demo
     String taskFilePath = generateClientFilePath(clientId, TASK_FILE_PATH);
     String resourceTypeFilePath = generateClientFilePath(clientId, RESOURCE_TYPE_FILE_PATH);
@@ -219,7 +219,7 @@ public class LiveSchedApplication implements CommandLineRunner {
    * @param fileName The name of the file
    * @return The full path for the file
    */
-  private static String generateClientFilePath(String clientId, String fileName) {
+  public static String generateClientFilePath(String clientId, String fileName) {
     return "/tmp/" + clientId + "_" + fileName;
   }
 
