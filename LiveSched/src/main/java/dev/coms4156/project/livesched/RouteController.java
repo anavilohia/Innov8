@@ -293,8 +293,7 @@ public class RouteController {
                                       @RequestParam(value = CLIENT_ID) String clientId) {
     try {
       MyFileDatabase myFileDatabase = LiveSchedApplication.getClientFileDatabase(clientId);
-      Task task;
-      task = myFileDatabase.getTaskById(taskId);
+      Task task = myFileDatabase.getTaskById(taskId);
       if (task == null) {
         return new ResponseEntity<>(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);
       } else {
