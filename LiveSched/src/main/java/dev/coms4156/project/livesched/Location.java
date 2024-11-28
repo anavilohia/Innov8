@@ -34,7 +34,10 @@ public class Location implements Serializable {
    * @param longitude the longitude
    * @throws IllegalArgumentException if the latitude or longitude is out of bounds
    */
-  private void validateLatLong(double latitude, double longitude) {
+  private void validateLatLong(Double latitude, Double longitude) {
+    if (latitude.isNaN() || longitude.isNaN()) {
+      throw new IllegalArgumentException("Latitude or longitude cannot be NaN");
+    }
     if (latitude < -90 || latitude > 90) {
       throw new IllegalArgumentException("Latitude must be between -90 and 90.");
     }
