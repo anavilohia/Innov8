@@ -36,6 +36,16 @@ public class LiveSchedApplicationTests {
     liveSchedApplication.setupExampleClientDatabase("demoClientId");
     assertNotNull(LiveSchedApplication.clientDatabases.get("demoClientId"),
             "Example client database should be set up.");
+
+    assertThrows(IllegalArgumentException.class,
+            () -> liveSchedApplication.setupExampleClientDatabase(" "),
+            "Client Id cannot be an empty string");
+    assertThrows(IllegalArgumentException.class,
+            () -> liveSchedApplication.setupExampleClientDatabase(""),
+            "Client Id cannot be an empty string");
+    assertThrows(IllegalArgumentException.class,
+            () -> liveSchedApplication.setupExampleClientDatabase(null),
+            "Client Id cannot be null");
   }
 
   @Test

@@ -142,6 +142,12 @@ public class LiveSchedApplication implements CommandLineRunner {
   }
 
   public void setupExampleClientDatabase(String clientId) {
+    if (clientId == null) {
+      throw new IllegalArgumentException("ClientId is null");
+    }
+    if (clientId.trim().isEmpty()) {
+      throw new IllegalArgumentException("ClientId is empty");
+    }
     // Generate file paths and object names for demo
     String taskFilePath = generateClientFilePath(clientId, TASK_FILE_PATH);
     String resourceTypeFilePath = generateClientFilePath(clientId, RESOURCE_TYPE_FILE_PATH);
@@ -162,6 +168,9 @@ public class LiveSchedApplication implements CommandLineRunner {
    * Populates the database with some example resources and tasks.
    */
   public void setupExampleData(MyFileDatabase myFileDatabase) {
+    if (myFileDatabase == null) {
+      throw new IllegalArgumentException("MyFileDatabase is null");
+    }
     ResourceType bed = new ResourceType("Bed", 20, 40.84, -73.94);
     ResourceType nurse = new ResourceType("Nurse", 15, 40.84, -73.94);
     ResourceType doctor = new ResourceType("Doctor", 10, 40.84, -73.94);

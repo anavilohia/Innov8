@@ -184,6 +184,10 @@ class ResourceTypeUnitTests {
     when(mockResource1.isAvailableAt(testStartTime)).thenReturn(true);
     availableResourceCount = testResourceType.countAvailableUnits(testStartTime);
     assertEquals(1, availableResourceCount, "The available resource count should be 1");
+
+    assertThrows(IllegalArgumentException.class,
+            () -> testResourceType.countAvailableUnits(null),
+            "Time canot be null");
   }
 
   /**
