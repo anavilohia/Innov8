@@ -326,6 +326,17 @@ public class MyFileDatabase {
     this.allResourceTypes.remove(resourceType);
   }
 
+  /**
+   * Gets task file path.
+   */
+  public String getTaskFilePath() {
+    return taskFilePath;
+  }
+
+  public int getTaskContentType() {
+    return taskContentType;
+  }
+
   private final int taskContentType = 1;
   private final int resourceTypeContentType = 2;
   private final int scheduleContentType = 3;

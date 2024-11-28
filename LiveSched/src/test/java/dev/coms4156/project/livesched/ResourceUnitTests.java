@@ -148,7 +148,8 @@ class ResourceUnitTests {
   void toStringTest() {
     StringBuilder expectedResult = new StringBuilder();
     expectedResult.append("Resource ID: ").append(testResourceId).append("; ")
-            .append("Available From: ").append(testResource.getAvailableFrom().toString()).append("\n");
+            .append("Available From: ").append(testResource.getAvailableFrom()
+                    .toString()).append("\n");
 
     assertEquals(expectedResult.toString(), testResource.toString(),
             "String representation of test resource should be " + expectedResult.toString());
