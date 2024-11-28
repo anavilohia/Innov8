@@ -1,6 +1,9 @@
-# COMS 4156: Innov8 Team Project
+# COMS 4156: Innov8 Team Project - Service
 
-This is the GitHub repository for the service portion of the team project for group 'Innov8' associated with COMS 4156 W Advanced Software Engineering at Columbia University.
+This is the GitHub repository for the **service portion** of the team project for group 'Innov8' associated with COMS 4156 W Advanced Software Engineering at Columbia University.
+
+## Viewing the Client App Repository
+Please use the following link to view the repository relevant to the client app: https://github.com/jonghyun-joann-lee/Innov8-Client
 
 ## Team name
 
@@ -235,15 +238,45 @@ The following tools were used in the development and modification of this reposi
 * Postman
   * Used for testing that the API and its endpoints work as intended
   * Ran the application locally in setup mode (please refer to the above build and run guide) to generate example data for testing purposes
-  * API Endpoint Test Results
-  * `/index`
-  * `/retrieveTasks?clientId=demoClientId`
-  * `/retrieveTask?taskId=1&clientId=demoClientId`
-  * `/retrieveResourceTypes`
-  * `/addTask?priority=1&startTime=2024-10-19 09:14&endTime=2024-10-19 10:14&latitude=20&longitude=-10`
-  * `/addResourceType?typeName=Table&totalUnits=10&latitude=30&longitude=-40`
-  * `/modifyResourceType?taskId=ER-1&typeName=Doctor&quantity=1`
-
+  * API Endpoint Test Results for demoClientId
+    * `/index`
+      <img width="1008" alt="image" src="https://github.com/user-attachments/assets/3e7b8a00-9fe4-4e55-800d-6b7ab86e009e">
+    * `/retrieveTasks?clientId=demoClientId`
+      <img width="1010" alt="image" src="https://github.com/user-attachments/assets/bd7d730e-b406-425c-a9b4-6f3665578a77">
+    * `/retrieveTask?taskId=1&clientId=demoClientId`
+      <img width="1006" alt="image" src="https://github.com/user-attachments/assets/e65d324b-284b-44f3-b561-cce08db8c5de">
+    * `/addTask?taskName=checkup&priority=4&startTime=2024-12-17 11:30&endTime=2024-12-17 12:00&latitude=40.83&longitude=-73.91&clientId=demoClientId`
+      <img width="1006" alt="image" src="https://github.com/user-attachments/assets/76719d56-4b0a-4184-90f4-dcdbc31bdbd2">
+      <img width="1007" alt="image" src="https://github.com/user-attachments/assets/23384dc9-929c-470f-98ff-78e2cc7931db">
+    * `/modifyResourceType?taskId=4&typeName=Nurse&quantity=1&clientId=demoClientId`
+      <img width="1007" alt="image" src="https://github.com/user-attachments/assets/03d7fd56-ed0b-4db2-9843-2683ca1ea5cb">
+      <img width="1006" alt="image" src="https://github.com/user-attachments/assets/ef79cc12-ab82-43c3-be71-8799048b3e3b">
+    * `/deleteTask?taskId=4&clientId=demoClientId`
+      <img width="1006" alt="image" src="https://github.com/user-attachments/assets/e178c21e-81f8-44d1-b869-6ab5365112a0">
+      <img width="1006" alt="image" src="https://github.com/user-attachments/assets/baad90ca-523b-4110-b0f3-a57415931718">
+    * `/retrieveResourceTypes?clientId=demoClientId`
+      <img width="999" alt="image" src="https://github.com/user-attachments/assets/4074b6f7-051e-4a55-af69-38de1e1b2310">
+    * `/addResourceType?typeName=SurgeryRoom&totalUnits=10&latitude=40.84&longitude=-73.94&clientId=demoClientId`
+      <img width="1004" alt="image" src="https://github.com/user-attachments/assets/c35f0129-4368-4205-b6e3-5860f4fcff02">
+      <img width="1006" alt="image" src="https://github.com/user-attachments/assets/6e4ebc0e-3a32-4909-8c45-a54b06a3318a">
+    * `/deleteResourceType?typeName=SurgeryRoom&clientId=demoClientId`
+      <img width="1007" alt="image" src="https://github.com/user-attachments/assets/347765df-ec6d-40ea-84b8-2e5a49b86b7d">
+      <img width="1004" alt="image" src="https://github.com/user-attachments/assets/1ba27ba6-592f-42dd-86cc-e3e7318478a2">
+    * `/retrieveSchedule?clientId=demoClientId`
+      <img width="1008" alt="image" src="https://github.com/user-attachments/assets/7468aab0-b879-41ef-88df-f9ff2281a5fb">
+    * `/updateSchedule?maxDistance=10&clientId=demoClientId`
+      <img width="997" alt="image" src="https://github.com/user-attachments/assets/eeb16bd1-1118-4832-b043-1297f4a77f03">
+      <img width="1003" alt="image" src="https://github.com/user-attachments/assets/012e4d77-48cf-4476-b024-6af5bae90983">
+    * `/unscheduleTask?taskId=1&clientId=demoClientId`
+      <img width="1008" alt="image" src="https://github.com/user-attachments/assets/d6d55857-e953-4b52-801c-6c970e8de405">
+      <img width="1003" alt="image" src="https://github.com/user-attachments/assets/6b5d95a9-d5d5-42fa-9e17-34446b73926b">
+  * Note that the database for a different clientId is unaffected by the above API calls. Below are a few results of calling the APIs for another client.
+    * `/retrieveTasks?clientId=otherClientId`
+    * The database for this clientId is empty so you get the Tasks Not Found
+      <img width="1003" alt="image" src="https://github.com/user-attachments/assets/c95e640b-1041-44fc-b611-5aa8bef41f8d">
+    * `/retrieveResourceTypes?clientId=otherClientId`
+    * The database for this clientId is empty so you get the ResourceTypes Not Found
+      <img width="1003" alt="image" src="https://github.com/user-attachments/assets/69e6d72c-f8ce-4269-a270-492a146b8acb">
 ---------------------------------------------
 
 citations.txt is located at root level of this repository, it specifies urls for all resources used as reference in the development of this repository
