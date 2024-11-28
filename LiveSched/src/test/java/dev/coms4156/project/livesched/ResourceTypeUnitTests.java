@@ -38,22 +38,14 @@ class ResourceTypeUnitTests {
    */
   @Test
   void addResourceTest() {
-    assertEquals(testResourceType.getTotalUnits(), testTotalUnits,
-        "Total number of resources should be " + testTotalUnits + " before add");
-
     testResourceType.addResource();
-    int expectedNewTotal = testTotalUnits + 1;
-    assertEquals(testResourceType.getTotalUnits(), expectedNewTotal,
-        "Total number of resources should be " + expectedNewTotal + " after adding one resource");
+    assertEquals(testResourceType.getTotalUnits(), testTotalUnits + 1,
+            "Total number of resources should be 1 after adding one resource");
 
     testResourceType.addResource();
     testResourceType.addResource();
-    testResourceType.addResource();
-    expectedNewTotal = expectedNewTotal + 3;
-    assertEquals(testResourceType.getTotalUnits(), expectedNewTotal,
-        "Total number of resources should be "
-            + expectedNewTotal
-            + " after adding three resources");
+    assertEquals(testResourceType.getTotalUnits(), testTotalUnits + 3,
+            "Total number of resources should be 3 after adding three resources");
   }
 
   /**
@@ -96,6 +88,16 @@ class ResourceTypeUnitTests {
         testResourceType.findAvailableResource(null));
     assertEquals("Start time cannot be null.", exception.getMessage(),
         "The exception message should indicate that start time cannot be null.");
+
+    when(mockResource1.isAvailableAt(testStartTime)).thenReturn(false);
+    when(mockResource2.isAvailableAt(testStartTime)).thenReturn(false);
+    availableResource = testResourceType.findAvailableResource(testStartTime);
+    assertNull(availableResource, "No resources should be available at the given time");
+
+    exception = assertThrows(IllegalArgumentException.class, () ->
+            testResourceType.findAvailableResource(null));
+    assertEquals("Start time cannot be null.", exception.getMessage(),
+            "The exception message should indicate that start time cannot be null.");
   }
 
   /**
@@ -141,6 +143,16 @@ class ResourceTypeUnitTests {
     availableResourceCount = testResourceType.countAvailableUnits(testStartTime);
     assertEquals(3, availableResourceCount,
         "The available resource should be " + 3);
+
+    when(mockResource1.isAvailableAt(testStartTime)).thenReturn(false);
+    when(mockResource2.isAvailableAt(testStartTime)).thenReturn(false);
+    when(mockResource3.isAvailableAt(testStartTime)).thenReturn(false);
+    availableResourceCount = testResourceType.countAvailableUnits(testStartTime);
+    assertEquals(0, availableResourceCount, "The available resource count should be 0");
+
+    when(mockResource1.isAvailableAt(testStartTime)).thenReturn(true);
+    availableResourceCount = testResourceType.countAvailableUnits(testStartTime);
+    assertEquals(1, availableResourceCount, "The available resource count should be 1");
   }
 
   /**
