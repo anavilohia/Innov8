@@ -11,15 +11,14 @@ Innov8
 Anavi Lohia (al3750) \
 Jane Lim (jl6094) \
 Jonghyun Lee (jl6509) \
-Jungyun Kim (jk4661) \
-Nathan Philip Zepeda (npz2000)
+Jungyun Kim (jk4661)
 
-Team member conrtibutions can be found on the JIRA project at this link: 
+Team member conrtibutions can be found on the JIRA project at this link:
 [Innov8 JIRA - List of tasks](https://innov8-columbia.atlassian.net/jira/software/projects/SCRUM/list?atlOrigin=eyJpIjoiZDMwOWM1ZTQyMGQxNGRhNjg1MzUxM2Y0Mzc5YmNlZDEiLCJwIjoiaiJ9)
 
 ## Project
 
-LiveSched: 
+LiveSched:
 
 A versatile scheduling and resource management service tailored to handle the complex needs of diverse industries, including but not limited to healthcare, manufacturing, and logistics. By dynamically adjusting schedules based on real-time data, specifications, and prioritization rules, LiveSched optimizes operations, maximizes resource utilization, and enhances client service delivery.
 
@@ -38,10 +37,10 @@ To build and use this service you must install the following:
 
 ## Building and Running a Local Instance
 
-To set up and run the repository after installation, you can use the following commands inside LiveSched folder. 
+To set up and run the repository after installation, you can use the following commands inside LiveSched folder.
 By default, the service operates in local mode, saving and loading files from local storage.
 If you would like to use Google Cloud Storage (GCS), you can enable GCS operations by passing the `--useGCS` flag as noted below.
-But please note that if you plan to run the service with GCS enabled, you need to install and set up [Google Cloud CLI](https://cloud.google.com/sdk/docs/install-sdk). 
+But please note that if you plan to run the service with GCS enabled, you need to install and set up [Google Cloud CLI](https://cloud.google.com/sdk/docs/install-sdk).
 <br/>
 <br/>
 
@@ -51,10 +50,12 @@ cd LiveSched
 ```
 
 ### Setup
-If you want to set up an example database for the first time or want to reset it, run and terminate after you see the message "System setup completed":
+If you want to optionally set up an example database for the first time or want to reset it, run the following command:
 ```
 mvn spring-boot:run -Dspring-boot.run.arguments="setup"
 ```
+This will set up an example database for client ID: demoClientId.
+
 If you want to enable GCS during setup:
 ```
 mvn spring-boot:run -Dspring-boot.run.arguments="setup --useGCS"
@@ -124,7 +125,7 @@ For the cloud based instance, GCS operations are enabled by default, meaning the
 
 ## Endpoints
 
-This section describes the endpoints that the service provides, as well as their inputs and outputs. 
+This section describes the endpoints that the service provides, as well as their inputs and outputs.
 
 #### GET /index
 * Expected Input Parameters: N/A
@@ -142,7 +143,7 @@ This section describes the endpoints that the service provides, as well as their
 * Upon Failure:
   * HTTP 404 Status Code with "Tasks Not Found" if there are no tasks.
   * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
- 
+
 #### GET /retrieveTask
 * Expected Input Parameters: taskId (String)
 * Expected Output: A JSON object containing the details of the specified task
@@ -171,7 +172,7 @@ This section describes the endpoints that the service provides, as well as their
   * HTTP 200 Status Code with the task's details in the response body.
 * Upon Failure:
   * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
- 
+
 #### PATCH /addResourceType
 * Expected Input Parameters: typeName (String), totalUnits (int), latitude (double), longitude (double)
 * Expected Output: A String confirming the resource type was added successfully. (ResponseEntity\<String\>)
@@ -180,7 +181,7 @@ This section describes the endpoints that the service provides, as well as their
   * HTTP 200 Status Code with "Attribute was updated successfully." in the response body.
 * Upon Failure:
   * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
- 
+
 #### PATCH /modifyResourceType
 * Expected Input Parameters: taskId (String), typeName (String), quantity (int)
 * Expected Output: A String confirming the resource type for the task was modified successfully. (ResponseEntity\<String\>)
@@ -207,14 +208,14 @@ The following tools were used in the development and modification of this reposi
   * Requires a successful build
 * Checkstyle
   * Checks that the code follows style guidelines, generating warnings or errors as needed
-  * Currently, this needs to be manually run using the code specified in above sections, it is not a part of the CI pipeline
+  * This runs as part of the CI pipeline; the most recent report can be found in the Actions tab under the most recent workflow run > Artifacts > ci-reports
   * It can also be run using the "Checkstyle-IDEA" plugin for IntelliJ
   * Most recent checkstyle results \
     <img width="650" alt="Screenshot 2024-10-18 at 10 49 14 PM" src="https://github.com/user-attachments/assets/d78ed7ab-477d-47e3-97a9-e8142f7c9d59">
 
 * PMD
   * Performs static analysis of the Java code, generating errors and warnings as needed
-  * Currently, this needs to be manually run using the code specified in above sections, it is not a part of the CI pipeline
+  * This runs as part of the CI pipeline; the most recent report can be found in the Actions tab under the most recent workflow run > Artifacts > ci-reports
   * The current code includes the following rulesets as specified in pom.xml:
     ```
     <ruleset>/category/java/errorprone.xml</ruleset>
@@ -227,33 +228,23 @@ The following tools were used in the development and modification of this reposi
   * They can also be manually run using the code specified in above sections
 * JaCoCo
   * JaCoCo generates code test coverage reports such as branch analysis
-  * Currently, this needs to be manually run using the code specified in above sections, it is not a part of the CI pipeline
+  * This runs as part of the CI pipeline; the most recent report can be found in the Actions tab under the most recent workflow run > Artifacts > ci-reports
   * Most recent jacoco report with 74% overall branch coverage\
     <img width="1465" alt="Screenshot 2024-10-18 at 10 57 11 PM" src="https://github.com/user-attachments/assets/2d89ce68-00ba-4eec-8ca2-a9a467059aea">
 
 * Postman
   * Used for testing that the API and its endpoints work as intended
+  * Ran the application locally in setup mode (please refer to the above build and run guide) to generate example data for testing purposes
   * API Endpoint Test Results
-   * `/index`
-     <img width="855" alt="Screenshot 2024-10-18 at 9 26 47 PM" src="https://github.com/user-attachments/assets/2fdb2da3-b6bc-431f-8989-6f02e25dfaf8">  
-   * `/retrieveTasks`
-     <img width="1055" alt="Screenshot 2024-10-18 at 9 27 33 PM" src="https://github.com/user-attachments/assets/cf4f1965-fbdd-4d38-a47f-b4751a0c0de5">
-   * `/retrieveTask?taskId=ER-1`
-     <img width="1043" alt="Screenshot 2024-10-18 at 9 29 22 PM" src="https://github.com/user-attachments/assets/2b23b9f3-4ee9-44d7-a4b8-bcb66c326cb5">
-   * `/retrieveResourceTypes`
-     <img width="1044" alt="Screenshot 2024-10-18 at 9 29 46 PM" src="https://github.com/user-attachments/assets/c644667c-77cf-4853-ad7b-7134ad91f370">
-   * `/addTask?priority=1&startTime=2024-10-19 09:14&endTime=2024-10-19 10:14&latitude=20&longitude=-10`
-     <img width="1042" alt="Screenshot 2024-10-18 at 9 40 56 PM" src="https://github.com/user-attachments/assets/9bdd4472-ab8f-4fb3-936d-3099ad1e255b">
-     <img width="1064" alt="Screenshot 2024-10-18 at 10 18 22 PM" src="https://github.com/user-attachments/assets/c8f08166-3bd9-4378-9774-4ac37fb5103c">
-   * `/addResourceType?typeName=Table&totalUnits=10&latitude=30&longitude=-40`
-     <img width="1052" alt="Screenshot 2024-10-18 at 9 42 18 PM" src="https://github.com/user-attachments/assets/c2924406-a2e9-4e06-be73-613bb0eed61f">
-     <img width="1039" alt="Screenshot 2024-10-18 at 10 19 33 PM" src="https://github.com/user-attachments/assets/9c6d4a6f-1c5b-4ccb-968f-368eb18b6044">
-   * `/modifyResourceType?taskId=ER-1&typeName=Doctor&quantity=1`
-     <img width="1051" alt="Screenshot 2024-10-18 at 10 27 42 PM" src="https://github.com/user-attachments/assets/6a4fa3ee-d6dc-4581-871d-2994c550b650">
-     <img width="1052" alt="Screenshot 2024-10-18 at 10 29 13 PM" src="https://github.com/user-attachments/assets/2514d7e1-4ad7-4bd6-9f49-d14a4da0125c">
+  * `/index`
+  * `/retrieveTasks?clientId=demoClientId`
+  * `/retrieveTask?taskId=1&clientId=demoClientId`
+  * `/retrieveResourceTypes`
+  * `/addTask?priority=1&startTime=2024-10-19 09:14&endTime=2024-10-19 10:14&latitude=20&longitude=-10`
+  * `/addResourceType?typeName=Table&totalUnits=10&latitude=30&longitude=-40`
+  * `/modifyResourceType?taskId=ER-1&typeName=Doctor&quantity=1`
 
-
-     
 ---------------------------------------------
 
 citations.txt is located at root level of this repository, it specifies urls for all resources used as reference in the development of this repository
+
