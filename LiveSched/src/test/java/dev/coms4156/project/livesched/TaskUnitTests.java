@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -255,5 +256,17 @@ public class TaskUnitTests {
     assertThrows(IllegalArgumentException.class, () ->
             testTask.updateLocation(latitude, -200.0),
         "Longitude out of bounds should throw an exception.");
+  }
+
+  @Test
+  void hashCodeTest() {
+    int expectedResult = Objects.hash(taskId);
+    assertEquals(expectedResult, testTask.hashCode(), "Hashcode should be " + expectedResult);
+  }
+
+  @Test
+  void getTaskNameTest() {
+    String expectedResult = taskName;
+    assertEquals(expectedResult, testTask.getTaskName(), "Task name should be " + taskName);
   }
 }

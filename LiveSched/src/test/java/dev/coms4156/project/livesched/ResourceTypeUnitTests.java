@@ -204,6 +204,15 @@ class ResourceTypeUnitTests {
         "Resource location should be -90.0, 145.34 after update");
   }
 
+  /**
+   * Test for ResourceType class toString method.
+   */
+  @Test
+  void toStringTest() {
+    String expectedResult = testTypeName;
+    assertEquals(testResourceType.toString(), testTypeName,
+            "String representation of test resource should be " + expectedResult);
+  }
 
 
 
