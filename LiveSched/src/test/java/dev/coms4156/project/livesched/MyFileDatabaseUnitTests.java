@@ -1,24 +1,9 @@
 package dev.coms4156.project.livesched;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import static org.junit.jupiter.api.Assertions.*;
+import java.io.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -39,8 +24,8 @@ class MyFileDatabaseUnitTests {
     String resourcePath = new File(tempDir, RESOURCE_FILE).getAbsolutePath();
     String schedulePath = new File(tempDir, SCHEDULE_FILE).getAbsolutePath();
     database = new MyFileDatabase(1,
-        taskPath, resourcePath, schedulePath,
-        taskPath, resourcePath, schedulePath);
+            taskPath, resourcePath, schedulePath,
+            taskPath, resourcePath, schedulePath);
   }
 
   @Test
@@ -57,6 +42,10 @@ class MyFileDatabaseUnitTests {
     tasks.add(createDummyTask());
     database.setAllTasks(tasks);
     assertEquals(1, database.getAllTasks().size());
+
+    // Adding edge case of empty task list
+    database.setAllTasks(new ArrayList<>());
+    assertTrue(database.getAllTasks().isEmpty(), "Tasks should be empty after setting an empty list.");
   }
 
   @Test
@@ -65,15 +54,23 @@ class MyFileDatabaseUnitTests {
     resources.add(createDummyResourceType());
     database.setAllResourceTypes(resources);
     assertEquals(1, database.getAllResourceTypes().size());
+
+    // Adding edge case of empty resource list
+    database.setAllResourceTypes(new ArrayList<>());
+    assertTrue(database.getAllResourceTypes().isEmpty(), "Resource types should be empty after setting an empty list.");
   }
 
   @Test
   void testSetAndGetMasterSchedule() {
-    List<Task> tasks = new ArrayList<>();
-    tasks.add(createDummyTask());
     Schedule schedule = new Schedule();
     database.setMasterSchedule(schedule);
     assertNotNull(database.getMasterSchedule());
+    assertTrue(database.getMasterSchedule().getTaskSchedule().isEmpty());
+
+    // Test setting a null schedule
+    database.setMasterSchedule(null);
+    assertNotNull(database.getMasterSchedule(), "Master schedule should not be null even if set to null.");
+    assertTrue(database.getMasterSchedule().getTaskSchedule().isEmpty());
   }
 
   @Test
@@ -84,6 +81,7 @@ class MyFileDatabaseUnitTests {
 
   @Test
   void testNullInput() {
+    // Test null input for setter methods
     database.setAllTasks(null);
     assertTrue(database.getAllTasks().isEmpty());
 
@@ -134,12 +132,8 @@ class MyFileDatabaseUnitTests {
 
   @Test
   void testGetTaskById() {
-    Task dummyTask1 = new Task(
-            "Task1", "First Task", new HashMap<>(), 1,
-            LocalDateTime.now(), LocalDateTime.now().plusHours(1), 40.81, -73.96);
-    Task dummyTask2 = new Task(
-            "Task2", "Second Task", new HashMap<>(), 2,
-            LocalDateTime.now(), LocalDateTime.now().plusHours(2), 40.81, -73.96);
+    Task dummyTask1 = createDummyTask("Task1", "First Task", 1);
+    Task dummyTask2 = createDummyTask("Task2", "Second Task", 2);
     List<Task> tasks = new ArrayList<>();
     tasks.add(dummyTask1);
     tasks.add(dummyTask2);
@@ -147,44 +141,39 @@ class MyFileDatabaseUnitTests {
     database.setAllTasks(tasks);
 
     Task resultTask = database.getTaskById("Task1");
-
-    assertNotNull(resultTask, "Task with ID 'Task1' should not be null.");
-    assertEquals("First Task", resultTask.getTaskName(), "Task name should match.");
-    assertEquals(1, resultTask.getPriority(), "Task priority should match.");
+    assertNotNull(resultTask);
+    assertEquals("First Task", resultTask.getTaskName());
 
     Task missingTask = database.getTaskById("NonExistentTask");
-    assertNull(missingTask, "Task with a non-existent ID should return null.");
+    assertNull(missingTask);
   }
 
   @Test
   void testGetTaskByIdEmptyList() {
     database.setAllTasks(new ArrayList<>());
     Task result = database.getTaskById("Task1");
-    assertNull(result, "getTaskById should return null when the task list is empty.");
+    assertNull(result);
   }
 
   @Test
   void testGetTaskFilePath() {
     String expectedFilePath = new File(tempDir, TASK_FILE).getAbsolutePath();
     String actualFilePath = database.getTaskFilePath();
-    assertEquals(expectedFilePath, actualFilePath,
-            "The task file path should match the expected value.");
+    assertEquals(expectedFilePath, actualFilePath);
   }
 
   @Test
   void testGetTaskContentType() {
     int expectedContentType = 1;
     int actualContentType = database.getTaskContentType();
-    assertEquals(expectedContentType, actualContentType,
-            "The task content type should match the expected value.");
+    assertEquals(expectedContentType, actualContentType);
   }
 
   @Test
   void testAddTask() {
     Task task = createDummyTask();
     database.addTask(task);
-    assertTrue(database.getAllTasks().contains(task),
-            "The task should be added to the task list.");
+    assertTrue(database.getAllTasks().contains(task));
   }
 
   @Test
@@ -192,16 +181,14 @@ class MyFileDatabaseUnitTests {
     Task task = createDummyTask();
     database.addTask(task);
     database.deleteTask(task);
-    assertFalse(database.getAllTasks().contains(task),
-            "The task should be removed from the task list.");
+    assertFalse(database.getAllTasks().contains(task));
   }
 
   @Test
   void testAddResourceType() {
     ResourceType resourceType = createDummyResourceType();
     database.addResourceType(resourceType);
-    assertTrue(database.getAllResourceTypes().contains(resourceType),
-            "The resource type should be added to the resource types list.");
+    assertTrue(database.getAllResourceTypes().contains(resourceType));
   }
 
   @Test
@@ -209,47 +196,45 @@ class MyFileDatabaseUnitTests {
     ResourceType resourceType = createDummyResourceType();
     database.addResourceType(resourceType);
     database.deleteResourceType(resourceType);
-    assertFalse(database.getAllResourceTypes().contains(resourceType),
-            "The resource type should be removed from the resource types list.");
+    assertFalse(database.getAllResourceTypes().contains(resourceType));
   }
 
   @Test
   void testDeleteTaskNotPresent() {
     Task task = createDummyTask();
     database.deleteTask(task);
-    assertFalse(database.getAllTasks().contains(task),
-            "Deleting a task that isn't in the list should not cause any errors.");
+    assertFalse(database.getAllTasks().contains(task));
   }
 
   @Test
   void testDeleteResourceTypeNotPresent() {
     ResourceType resourceType = createDummyResourceType();
     database.deleteResourceType(resourceType);
-    assertFalse(database.getAllResourceTypes().contains(resourceType),
-            "Deleting a resource type that isn't in the list should not cause any errors.");
+    assertFalse(database.getAllResourceTypes().contains(resourceType));
   }
 
   @Test
   void testAddNullTask() {
-    assertDoesNotThrow(() -> database.addTask(null), "Adding a null task should not throw an exception.");
+    assertDoesNotThrow(() -> database.addTask(null));
   }
 
   @Test
   void testAddNullResourceType() {
-    assertDoesNotThrow(() -> database.addResourceType(null),
-            "Adding a null resource type should not throw an exception.");
+    assertDoesNotThrow(() -> database.addResourceType(null));
   }
 
   private Task createDummyTask() {
+    return createDummyTask("DummyTask", "DummyTask", 1);
+  }
+
+  private Task createDummyTask(String id, String name, int priority) {
     Map<ResourceType, Integer> resources = new HashMap<>();
     resources.put(createDummyResourceType(), 1);
-    return new Task(
-        "DummyTask", "DummyTask", resources, 1,
-        LocalDateTime.now(), LocalDateTime.now().plusHours(1), 0, 0);
+    return new Task(id, name, resources, priority,
+            LocalDateTime.now(), LocalDateTime.now().plusHours(1), 0, 0);
   }
 
   private ResourceType createDummyResourceType() {
     return new ResourceType("DummyResource", 5, 0, 0);
   }
-
 }

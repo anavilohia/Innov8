@@ -47,6 +47,13 @@ class ResourceUnitTests {
         "Resource should be available at assigned task's end time");
   }
 
+  @Test
+  void isAvailableAtEdgeTest() {
+    testResource.assignUntil(testDateTime);
+    assertTrue(testResource.isAvailableAt(testDateTime),
+            "Resource should be available exactly at assigned time.");
+  }
+
   /**
    * Test for Resource class assignUntil method.
    */

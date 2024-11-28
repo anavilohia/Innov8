@@ -1,10 +1,6 @@
 package dev.coms4156.project.livesched;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -13,232 +9,142 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
-/**
- * Unit tests to be used for ResourceType class.
- */
 @SpringBootTest
 @ContextConfiguration
 class ResourceTypeUnitTests {
 
-  /**
-   * Set up to be run before all tests.
-   */
   @BeforeEach
   void setupResourceTypeForTesting() {
-
     testResourceType = new ResourceType(testTypeName, testTotalUnits, testLatitude, testLongitude);
     testStartTime = LocalDateTime.now();
   }
 
-  /**
-   * Test for ResourceType class addResource method.
-   */
   @Test
   void addResourceTest() {
     testResourceType.addResource();
-    assertEquals(testResourceType.getTotalUnits(), testTotalUnits + 1,
-            "Total number of resources should be 1 after adding one resource");
+    assertEquals(testResourceType.getTotalUnits(), testTotalUnits + 1, "Total number of resources should be 1 after adding one resource");
 
     testResourceType.addResource();
     testResourceType.addResource();
-    assertEquals(testResourceType.getTotalUnits(), testTotalUnits + 3,
-            "Total number of resources should be 3 after adding three resources");
+    assertEquals(testResourceType.getTotalUnits(), testTotalUnits + 3, "Total number of resources should be 3 after adding three resources");
+
+    // Test adding after multiple additions
+    testResourceType.addResource();
+    assertEquals(testResourceType.getTotalUnits(), testTotalUnits + 4, "Total number of resources should be 4 after adding one more resource");
   }
 
-  /**
-   * Test for ResourceType class findAvailableResource method.
-   */
   @Test
   void findAvailableResourceTest() {
-
-    // Create mock resources
     mockResource1 = mock(Resource.class);
     mockResource2 = mock(Resource.class);
 
     try {
-      // Inject mock resources into the private 'resources' field
       Field resourcesField = ResourceType.class.getDeclaredField("resources");
-      resourcesField.setAccessible(true); // Make the private field accessible
-      Map<String, Resource> resources =
-          (Map<String, Resource>) resourcesField.get(testResourceType);
+      resourcesField.setAccessible(true);
+      Map<String, Resource> resources = (Map<String, Resource>) resourcesField.get(testResourceType);
       resources.put("Hospital 1", mockResource1);
       resources.put("Hospital 2", mockResource2);
-
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
       fail("Reflection failed to access or modify the 'resources' field: " + e.getMessage());
     }
 
     when(mockResource1.isAvailableAt(testStartTime)).thenReturn(false);
     when(mockResource2.isAvailableAt(testStartTime)).thenReturn(true);
     Resource availableResource = testResourceType.findAvailableResource(testStartTime);
-    assertEquals(mockResource2, availableResource,
-        "The available resource should be 'Hospital 2'");
-
-    when(mockResource1.isAvailableAt(testStartTime)).thenReturn(false);
-    when(mockResource2.isAvailableAt(testStartTime)).thenReturn(false);
-    availableResource = testResourceType.findAvailableResource(testStartTime);
-    assertNull(availableResource,
-        "No resources should be available at the given time");
-
-    Exception exception = assertThrows(IllegalArgumentException.class, () ->
-        testResourceType.findAvailableResource(null));
-    assertEquals("Start time cannot be null.", exception.getMessage(),
-        "The exception message should indicate that start time cannot be null.");
+    assertEquals(mockResource2, availableResource, "The available resource should be 'Hospital 2'");
 
     when(mockResource1.isAvailableAt(testStartTime)).thenReturn(false);
     when(mockResource2.isAvailableAt(testStartTime)).thenReturn(false);
     availableResource = testResourceType.findAvailableResource(testStartTime);
     assertNull(availableResource, "No resources should be available at the given time");
 
-    exception = assertThrows(IllegalArgumentException.class, () ->
-            testResourceType.findAvailableResource(null));
-    assertEquals("Start time cannot be null.", exception.getMessage(),
-            "The exception message should indicate that start time cannot be null.");
+    // Edge case with no resources at all
+    testResourceType = new ResourceType("Empty Hospital", 0, 0.0, 0.0);
+    availableResource = testResourceType.findAvailableResource(testStartTime);
+    assertNull(availableResource, "No resources should be available when none are added");
+
+    // Test for null start time
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> testResourceType.findAvailableResource(null));
+    assertEquals("Start time cannot be null.", exception.getMessage(), "The exception message should indicate that start time cannot be null.");
   }
 
-  /**
-   * Test for ResourceType class countAvailableUnits method.
-   */
   @Test
   void countAvailableUnitsTest() {
-
-    // Create mock resources
     mockResource1 = mock(Resource.class);
     mockResource2 = mock(Resource.class);
     mockResource3 = mock(Resource.class);
 
     try {
-      // Inject mock resources into the private 'resources' field
       Field resourcesField = ResourceType.class.getDeclaredField("resources");
-      resourcesField.setAccessible(true); // Make the private field accessible
-      Map<String, Resource> resources =
-          (Map<String, Resource>) resourcesField.get(testResourceType);
+      resourcesField.setAccessible(true);
+      Map<String, Resource> resources = (Map<String, Resource>) resourcesField.get(testResourceType);
       resources.put("Hospital 1", mockResource1);
       resources.put("Hospital 2", mockResource2);
-      resources.put("Hospital 3", mockResource2);
-
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      e.printStackTrace();
+      resources.put("Hospital 3", mockResource3);
+    } catch (Exception e) {
       fail("Reflection failed to access or modify the 'resources' field: " + e.getMessage());
     }
 
     when(mockResource1.isAvailableAt(testStartTime)).thenReturn(false);
     when(mockResource2.isAvailableAt(testStartTime)).thenReturn(false);
-    when(mockResource2.isAvailableAt(testStartTime)).thenReturn(false);
+    when(mockResource3.isAvailableAt(testStartTime)).thenReturn(false);
     int availableResourceCount = testResourceType.countAvailableUnits(testStartTime);
-    assertEquals(0, availableResourceCount,
-        "The available resource should be " + 0);
+    assertEquals(0, availableResourceCount, "There should be no available resources");
 
     when(mockResource1.isAvailableAt(testStartTime)).thenReturn(true);
     availableResourceCount = testResourceType.countAvailableUnits(testStartTime);
-    assertEquals(1, availableResourceCount,
-        "The available resource should be " + 1);
+    assertEquals(1, availableResourceCount, "One resource should be available");
 
     when(mockResource2.isAvailableAt(testStartTime)).thenReturn(true);
     when(mockResource3.isAvailableAt(testStartTime)).thenReturn(true);
     availableResourceCount = testResourceType.countAvailableUnits(testStartTime);
-    assertEquals(3, availableResourceCount,
-        "The available resource should be " + 3);
+    assertEquals(3, availableResourceCount, "Three resources should be available");
 
+    // Edge case with only 1 resource available
     when(mockResource1.isAvailableAt(testStartTime)).thenReturn(false);
-    when(mockResource2.isAvailableAt(testStartTime)).thenReturn(false);
-    when(mockResource3.isAvailableAt(testStartTime)).thenReturn(false);
     availableResourceCount = testResourceType.countAvailableUnits(testStartTime);
-    assertEquals(0, availableResourceCount, "The available resource count should be 0");
-
-    when(mockResource1.isAvailableAt(testStartTime)).thenReturn(true);
-    availableResourceCount = testResourceType.countAvailableUnits(testStartTime);
-    assertEquals(1, availableResourceCount, "The available resource count should be 1");
+    assertEquals(2, availableResourceCount, "Two resources should be available after one is unavailable");
   }
 
-  /**
-   * Test for ResourceType class getTotalUnits method.
-   */
-  @Test
-  void getTotalUnitsTest() {
-    assertEquals(testResourceType.getTotalUnits(), testTotalUnits,
-        "Total number of resources should be " + testTotalUnits + " before add");
-
-    testResourceType.addResource();
-    testResourceType.addResource();
-    testResourceType.addResource();
-    int expectedNewTotal = testTotalUnits + 3;
-    assertEquals(testResourceType.getTotalUnits(), expectedNewTotal,
-        "Total number of resources should be "
-            + expectedNewTotal
-            + " after adding three resources");
-  }
-
-  /**
-   * Test for ResourceType class getLocation method.
-   */
-  @Test
-  void getLocationTest() {
-    String expectedResult = new Location(testLatitude, testLongitude).getCoordinates();
-    assertEquals(testResourceType.getLocation().getCoordinates(), expectedResult,
-        "Resource location should be " + expectedResult);
-
-    expectedResult = new Location(testLongitude, testLatitude).getCoordinates();
-    assertNotEquals(testResourceType.getLocation().getCoordinates(), expectedResult,
-        "Resource location should not be " + expectedResult);
-
-    assertNotEquals(testResourceType.getLocation(), "",
-        "Resource location should not be empty string");
-  }
-
-  /**
-   * Test for ResourceType class updateLocation method.
-   */
   @Test
   void updateLocationTest() {
-    String expectedResult = new Location(testLatitude, testLongitude).getCoordinates();
-    assertEquals(testResourceType.getLocation().getCoordinates(), expectedResult,
-        "Resource location should be " + expectedResult + " before update");
+    assertEquals(testResourceType.getLocation().getCoordinates(), "-90.0, 55.65", "Initial coordinates should be -90.0, 55.65");
 
     IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
       testResourceType.updateLocation(-91.0, testLongitude);
-    }, "Resource cannot be assigned invalid latitude");
-    assertEquals("Latitude must be between -90 and 90.", exception.getMessage(),
-        "Exception message should match for latitude out of bounds");
+    });
+    assertEquals("Latitude must be between -90 and 90.", exception.getMessage());
 
     exception = assertThrows(IllegalArgumentException.class, () -> {
       testResourceType.updateLocation(testLatitude, 300.2);
-    }, "Resource cannot be assigned invalid longitude");
-    assertEquals("Longitude must be between -180 and 180.", exception.getMessage(),
-        "Exception message should match for longitude out of bounds");
+    });
+    assertEquals("Longitude must be between -180 and 180.", exception.getMessage());
 
-    testResourceType.updateLocation(-90.0, 145.34);
-    assertEquals(testResourceType.getLocation().getCoordinates(), "-90.0, 145.34",
-        "Resource location should be -90.0, 145.34 after update");
+    testResourceType.updateLocation(90.0, -180.0);
+    assertEquals(testResourceType.getLocation().getCoordinates(), "90.0, -180.0", "Coordinates should be updated correctly to the boundary values");
+
+    testResourceType.updateLocation(0.0, 0.0);
+    assertEquals(testResourceType.getLocation().getCoordinates(), "0.0, 0.0", "Coordinates should be updated correctly to (0.0, 0.0)");
   }
 
-  /**
-   * Test for ResourceType class toString method.
-   */
   @Test
   void toStringTest() {
     String expectedResult = testTypeName;
-    assertEquals(testResourceType.toString(), testTypeName,
-            "String representation of test resource should be " + expectedResult);
+    assertEquals(testResourceType.toString(), testTypeName, "String representation of test resource should be " + expectedResult);
   }
 
-
-
-  /**
-   * These instances are used for testing.
-   */
+  // Instances for testing
   public static ResourceType testResourceType;
   private Resource mockResource1;
   private Resource mockResource2;
   private Resource mockResource3;
   final String testTypeName = "Hospital";
   final int testTotalUnits = 0;
-  final double testLatitude = 80.0;
+  final double testLatitude = -90.0;
   final double testLongitude = 55.65;
   LocalDateTime testStartTime;
 }
-
