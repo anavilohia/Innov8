@@ -13,6 +13,9 @@ public class TaskComparator implements Comparator<Task>, Serializable {
 
   @Override
   public int compare(Task x, Task y) {
+    if (x == null || y == null) {
+      throw new IllegalArgumentException("Tasks cannot be null");
+    }
     if (x.getPriority() < y.getPriority()) {
       return -1;
     }

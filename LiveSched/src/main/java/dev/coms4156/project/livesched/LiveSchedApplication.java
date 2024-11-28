@@ -220,6 +220,12 @@ public class LiveSchedApplication implements CommandLineRunner {
    * @return The full path for the file
    */
   public static String generateClientFilePath(String clientId, String fileName) {
+    if (clientId == null || fileName == null) {
+      throw new IllegalArgumentException("clientId and fileName cannot be null");
+    }
+    if (clientId.trim().isEmpty() || fileName.trim().isEmpty()) {
+      throw new IllegalArgumentException("clientId and fileName cannot be empty");
+    }
     return "/tmp/" + clientId + "_" + fileName;
   }
 

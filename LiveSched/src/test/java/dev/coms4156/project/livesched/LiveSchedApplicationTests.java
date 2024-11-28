@@ -26,14 +26,16 @@ public class LiveSchedApplicationTests {
     MyFileDatabase mockDatabase = mock(MyFileDatabase.class);
     String clientId = "testClientId";
     LiveSchedApplication.overrideDatabase(mockDatabase, clientId);
-    assertEquals(mockDatabase, LiveSchedApplication.getClientFileDatabase(clientId), "Database should be overridden.");
+    assertEquals(mockDatabase, LiveSchedApplication.getClientFileDatabase(clientId),
+            "Database should be overridden.");
   }
 
   @Test
   public void testSetupExampleClientDatabase() {
     MyFileDatabase mockDatabase = mock(MyFileDatabase.class);
     liveSchedApplication.setupExampleClientDatabase("demoClientId");
-    assertNotNull(LiveSchedApplication.clientDatabases.get("demoClientId"), "Example client database should be set up.");
+    assertNotNull(LiveSchedApplication.clientDatabases.get("demoClientId"),
+            "Example client database should be set up.");
   }
 
   @Test
@@ -49,6 +51,26 @@ public class LiveSchedApplicationTests {
     String clientId = "client1";
     String filePath = liveSchedApplication.generateClientFilePath(clientId, "tasks.txt");
 
-    assertEquals("/tmp/client1_tasks.txt", filePath, "The generated file path should match the expected format.");
+    assertEquals("/tmp/client1_tasks.txt", filePath,
+            "The generated file path should match the expected format.");
+
+    assertThrows(IllegalArgumentException.class,
+            () -> liveSchedApplication.generateClientFilePath(" ", "tasks.txt"),
+            "Client Id cannot be an empty string");
+    assertThrows(IllegalArgumentException.class,
+            () -> liveSchedApplication.generateClientFilePath("", "tasks.txt"),
+            "Client Id cannot be an empty string");
+    assertThrows(IllegalArgumentException.class,
+            () -> liveSchedApplication.generateClientFilePath(null, "tasks.txt"),
+            "Client Id cannot be null");
+    assertThrows(IllegalArgumentException.class,
+            () -> liveSchedApplication.generateClientFilePath(clientId, " "),
+            "FileName cannot be an empty string");
+    assertThrows(IllegalArgumentException.class,
+            () -> liveSchedApplication.generateClientFilePath(clientId, ""),
+            "FileName cannot be an empty string");
+    assertThrows(IllegalArgumentException.class,
+            () -> liveSchedApplication.generateClientFilePath(clientId, null),
+            "FileName cannot be null");
   }
 }

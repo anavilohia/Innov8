@@ -1,6 +1,7 @@
 package dev.coms4156.project.livesched;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,6 +32,36 @@ class ResourceTypeUnitTests {
 
     testResourceType = new ResourceType(testTypeName, testTotalUnits, testLatitude, testLongitude);
     testStartTime = LocalDateTime.now();
+  }
+
+  /**
+   * Test for ResourceType class constructor.
+   */
+  @Test
+  void constructorTest() {
+    assertThrows(IllegalArgumentException.class,
+            () -> new ResourceType("", 1, 30, 30),
+            "Resource name cannot be an empty string");
+    assertThrows(IllegalArgumentException.class,
+            () -> new ResourceType(" ", 1, 30, 30),
+            "Resource name cannot be an empty string");
+    assertThrows(IllegalArgumentException.class,
+            () -> new ResourceType(null, 1, 30, 30),
+            "Resource name cannot be null");
+    assertThrows(IllegalArgumentException.class,
+            () -> new ResourceType("Resource", -1, 30, 30),
+            "Number of units cannot be negative");
+    assertThrows(IllegalArgumentException.class,
+            () -> new ResourceType("Resource", 1, -200, 30),
+            "Latitude cannot be less than -90");
+    assertThrows(IllegalArgumentException.class,
+            () -> new ResourceType("Resource", 1, 200, 30),
+            "Latitude cannot be greater than 90");
+    assertThrows(IllegalArgumentException.class,
+            () -> new ResourceType("Resource", 1, 30, -200),
+            "Latitude cannot be less than -180");
+    assertDoesNotThrow(() -> new ResourceType("Resource", 1, 30, 30),
+            "Valid inputs");
   }
 
   /**
