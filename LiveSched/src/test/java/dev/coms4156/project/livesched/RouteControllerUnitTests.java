@@ -238,10 +238,12 @@ public class RouteControllerUnitTests {
         int actualResourceSize = ((List<?>) scheduleEntry.get("assignedResources")).size();
 
         String expectedTask = scheduleList.get(index).get("task").toString();
-        int expectedResourceSize = ((List<?>) scheduleList.get(index).get("assignedResources")).size();
+        int expectedResourceSize = ((List<?>) scheduleList.get(index)
+                .get("assignedResources")).size();
 
         assertEquals(expectedTask, actualTask, "Task IDs should match at index " + index);
-        assertEquals(expectedResourceSize, actualResourceSize, "Resource size should match at index " + index);
+        assertEquals(expectedResourceSize, actualResourceSize,
+                "Resource size should match at index " + index);
         index++;
       }
     }
@@ -261,11 +263,13 @@ public class RouteControllerUnitTests {
         scheduleList.add(scheduleEntry);
       });
 
-      assertEquals(HttpStatus.OK, response.getStatusCode(), "Response status should be OK (200)");
+      assertEquals(HttpStatus.OK, response.getStatusCode(),
+              "Response status should be OK (200)");
 
       @SuppressWarnings("unchecked")
       List<Map<String, Object>> responseBody = (List<Map<String, Object>>) response.getBody();
-      assertEquals(scheduleList.size(), responseBody.size(), "Schedule should contain the same number of tasks");
+      assertEquals(scheduleList.size(), responseBody.size(),
+              "Schedule should contain the same number of tasks");
 
       int index = 0;
       for (Map<String, Object> scheduleEntry : responseBody) {
@@ -276,10 +280,12 @@ public class RouteControllerUnitTests {
 
         Task expectedTask = (Task) scheduleList.get(index).get("task");
         String expectedTaskId = expectedTask.getTaskId();
-        int expectedResourceSize = ((List<?>) scheduleList.get(index).get("assignedResources")).size();
+        int expectedResourceSize = ((List<?>) scheduleList.get(index)
+                .get("assignedResources")).size();
 
         assertEquals(expectedTaskId, actualTaskId, "Task IDs should match at index " + index);
-        assertEquals(expectedResourceSize, actualResourceSize, "Resource size should match at index " + index);
+        assertEquals(expectedResourceSize, actualResourceSize,
+                "Resource size should match at index " + index);
         index++;
       }
     }
@@ -292,7 +298,8 @@ public class RouteControllerUnitTests {
       ResponseEntity<?> response = routeController.unscheduleTask("1", testClientId);
 
       assertEquals(HttpStatus.OK, response.getStatusCode(), "Response status should be OK (200)");
-      assertEquals("Task unscheduled succesfully", response.getBody(), "Message should say Task unscheduled succesfully");
+      assertEquals("Task unscheduled succesfully", response.getBody(),
+              "Message should say Task unscheduled succesfully");
     }
 
     /**
@@ -303,8 +310,9 @@ public class RouteControllerUnitTests {
       int initialSize = testDatabase.getAllTasks().size();
       ResponseEntity<?> response = routeController.deleteTask("1", testClientId);
       assertEquals(HttpStatus.OK, response.getStatusCode());
-      assertEquals("1 successfully deleted", response.getBody(), "Deleted task ID should match '1'");
-//      assertEquals(initialSize - 1, testDatabase.getAllTasks().size());
+      assertEquals("1 successfully deleted", response.getBody(),
+              "Deleted task ID should match '1'");
+      // assertEquals(initialSize - 1, testDatabase.getAllTasks().size());
     }
 
     /**
@@ -391,7 +399,7 @@ public class RouteControllerUnitTests {
 
       assertEquals(HttpStatus.OK, response.getStatusCode());
       assertEquals(typeName + " successfully deleted", response.getBody());
-//      assertEquals(initialSize - 1, testDatabase.getAllResourceTypes().size());
+      // assertEquals(initialSize - 1, testDatabase.getAllResourceTypes().size());
     }
   }
 
@@ -422,7 +430,8 @@ public class RouteControllerUnitTests {
       ResponseEntity<?> response = routeController.retrieveTasks(testClientId);
 
       assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-      assertEquals("Tasks Not Found", response.getBody(), "Error message should be Tasks Not Found");
+      assertEquals("Tasks Not Found", response.getBody(),
+              "Error message should be Tasks Not Found");
     }
 
     /**
@@ -444,7 +453,8 @@ public class RouteControllerUnitTests {
       ResponseEntity<?> response = routeController.updateSchedule(80, testClientId);
 
       assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-      assertEquals("Tasks Not Found", response.getBody(), "Error message should be Tasks Not Found");
+      assertEquals("Tasks Not Found", response.getBody(),
+              "Error message should be Tasks Not Found");
     }
 
     /**
@@ -504,7 +514,8 @@ public class RouteControllerUnitTests {
       ResponseEntity<?> response = routeController.retrieveResourceTypes(testClientId);
 
       assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-      assertEquals("ResourceTypes Not Found", response.getBody(), "Error message should be ResourceTypes Not Found");
+      assertEquals("ResourceTypes Not Found", response.getBody(),
+              "Error message should be ResourceTypes Not Found");
     }
 
     /**
@@ -520,7 +531,8 @@ public class RouteControllerUnitTests {
               typeName, quantity, testClientId);
 
       assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-      assertEquals("ResourceType Not Found", response.getBody(), "Error message should be ResourceTypes Not Found");
+      assertEquals("ResourceType Not Found", response.getBody(),
+              "Error message should be ResourceTypes Not Found");
     }
 
     /**
@@ -533,7 +545,8 @@ public class RouteControllerUnitTests {
       ResponseEntity<?> response = routeController.deleteResourceType(typeName, testClientId);
 
       assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-      assertEquals("ResourceType Not Found", response.getBody(), "Error message should be ResourceTypes Not Found");
+      assertEquals("ResourceType Not Found", response.getBody(),
+              "Error message should be ResourceTypes Not Found");
     }
   }
 
@@ -572,7 +585,8 @@ public class RouteControllerUnitTests {
       ResponseEntity<?> response = routeController.retrieveSchedule(testClientId);
 
       assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-      assertEquals("Schedules Not Found", response.getBody(), "Error message should be Schedules Not Found");
+      assertEquals("Schedules Not Found", response.getBody(),
+              "Error message should be Schedules Not Found");
     }
 
     /**
@@ -583,7 +597,8 @@ public class RouteControllerUnitTests {
       ResponseEntity<?> response = routeController.updateSchedule(80, testClientId);
 
       assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-      assertEquals("Master Schedule Not Found", response.getBody(), "Error message should be Master Schedule Not Found");
+      assertEquals("Master Schedule Not Found", response.getBody(),
+              "Error message should be Master Schedule Not Found");
     }
 
     /**
@@ -594,7 +609,8 @@ public class RouteControllerUnitTests {
       ResponseEntity<?> response = routeController.unscheduleTask("1", testClientId);
 
       assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-      assertEquals("Master Schedule Not Found", response.getBody(), "Error message should be Master Schedule Not Found");
+      assertEquals("Master Schedule Not Found", response.getBody(),
+              "Error message should be Master Schedule Not Found");
     }
   }
 
@@ -635,7 +651,8 @@ public class RouteControllerUnitTests {
       ResponseEntity<?> response = routeController.unscheduleTask("1", testClientId);
 
       assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-      assertEquals("Task Not Scheduled Yet", response.getBody(), "Error message should be Task Not Scheduled Yet");
+      assertEquals("Task Not Scheduled Yet", response.getBody(),
+              "Error message should be Task Not Scheduled Yet");
     }
 
     /**
