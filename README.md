@@ -11,8 +11,7 @@ Innov8
 Anavi Lohia (al3750) \
 Jane Lim (jl6094) \
 Jonghyun Lee (jl6509) \
-Jungyun Kim (jk4661) \
-Nathan Philip Zepeda (npz2000)
+Jungyun Kim (jk4661) 
 
 Team member conrtibutions can be found on the JIRA project at this link: 
 [Innov8 JIRA - List of tasks](https://innov8-columbia.atlassian.net/jira/software/projects/SCRUM/list?atlOrigin=eyJpIjoiZDMwOWM1ZTQyMGQxNGRhNjg1MzUxM2Y0Mzc5YmNlZDEiLCJwIjoiaiJ9)
