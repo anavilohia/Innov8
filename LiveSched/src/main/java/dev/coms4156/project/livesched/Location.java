@@ -2,6 +2,7 @@ package dev.coms4156.project.livesched;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Represents a location using a geographic coordinate system.
@@ -70,6 +71,24 @@ public class Location implements Serializable {
 
   public double getLongitude() {
     return longitude;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    Location location = (Location) obj;
+    return Double.compare(location.latitude, latitude) == 0 &&
+        Double.compare(location.longitude, longitude) == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(latitude, longitude);
   }
 
 }

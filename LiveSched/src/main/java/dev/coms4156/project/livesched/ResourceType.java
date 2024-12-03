@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents a specific type or group of resources.
@@ -118,15 +119,6 @@ public class ResourceType implements Serializable {
    * @return A string representing the resource type.
    */
   public String toString() {
-    //    StringBuilder result = new StringBuilder();
-    //    result.append("Resource Type: ").append(typeName).append("; ")
-    //            .append("Location: ").append(location.getCoordinates()).append("\n")
-    //            .append("Available Resources: \n");
-    //    for (Map.Entry<String, Resource> entry : resources.entrySet()) {
-    //      Resource value = entry.getValue();
-    //      result.append(value.toString());
-    //    }
-    //    return result.toString();
     return typeName;
   }
 
@@ -140,4 +132,22 @@ public class ResourceType implements Serializable {
   public void updateLocation(double latitude, double longitude) {
     this.location = new Location(latitude, longitude);
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    ResourceType that = (ResourceType) obj;
+    return typeName.equals(that.typeName) && location.equals(that.location);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(typeName, location);
+  }
+
 }
