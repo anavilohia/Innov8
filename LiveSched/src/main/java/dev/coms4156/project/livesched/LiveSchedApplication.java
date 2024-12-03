@@ -77,7 +77,7 @@ public class LiveSchedApplication implements CommandLineRunner {
     saveData = false;
   }
 
-  private void reloadClientDatabases() {
+  public void reloadClientDatabases() {
     File tmpDir = new File("/tmp");
     if (!tmpDir.exists() || !tmpDir.isDirectory()) {
       System.out.println("No existing databases found.");
@@ -141,7 +141,13 @@ public class LiveSchedApplication implements CommandLineRunner {
     return clientDatabases.get(clientId);
   }
 
-  private void setupExampleClientDatabase(String clientId) {
+  public void setupExampleClientDatabase(String clientId) {
+    if (clientId == null) {
+      throw new IllegalArgumentException("ClientId is null");
+    }
+    if (clientId.trim().isEmpty()) {
+      throw new IllegalArgumentException("ClientId is empty");
+    }
     // Generate file paths and object names for demo
     String taskFilePath = generateClientFilePath(clientId, TASK_FILE_PATH);
     String resourceTypeFilePath = generateClientFilePath(clientId, RESOURCE_TYPE_FILE_PATH);
@@ -162,6 +168,9 @@ public class LiveSchedApplication implements CommandLineRunner {
    * Populates the database with some example resources and tasks.
    */
   public void setupExampleData(MyFileDatabase myFileDatabase) {
+    if (myFileDatabase == null) {
+      throw new IllegalArgumentException("MyFileDatabase is null");
+    }
     ResourceType bed = new ResourceType("Bed", 20, 40.84, -73.94);
     ResourceType nurse = new ResourceType("Nurse", 15, 40.84, -73.94);
     ResourceType doctor = new ResourceType("Doctor", 10, 40.84, -73.94);
@@ -219,7 +228,13 @@ public class LiveSchedApplication implements CommandLineRunner {
    * @param fileName The name of the file
    * @return The full path for the file
    */
-  private static String generateClientFilePath(String clientId, String fileName) {
+  public static String generateClientFilePath(String clientId, String fileName) {
+    if (clientId == null || fileName == null) {
+      throw new IllegalArgumentException("clientId and fileName cannot be null");
+    }
+    if (clientId.trim().isEmpty() || fileName.trim().isEmpty()) {
+      throw new IllegalArgumentException("clientId and fileName cannot be empty");
+    }
     return "/tmp/" + clientId + "_" + fileName;
   }
 

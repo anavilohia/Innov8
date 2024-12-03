@@ -2,12 +2,14 @@ package dev.coms4156.project.livesched;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -86,27 +88,127 @@ public class ScheduleUnitTests {
         "Created schedule should contain 1 resource for mockTask1");
   }
 
-  /**
-   * Test for unscheduleTask method in Schedule class.
-   */
   @Test
-  void unscheduleTaskTest() {
+  void unscheduleTaskWithNullTaskThrowsException() {
+    Schedule schedule = new Schedule();
+
+    assertThrows(IllegalArgumentException.class,
+            () -> schedule.unscheduleTask(null),
+            "unscheduleTask should throw IllegalArgumentException when task is null.");
+  }
+
+  @Test
+  void unscheduleTaskDoesNothingIfTaskNotScheduled() {
+    Schedule schedule = new Schedule();
+
+    // Task is not in the schedule
+    schedule.unscheduleTask(mockTask1);
+
+    // Verify no interactions with any resource since the task was not scheduled
+    verifyNoInteractions(mockResource1, mockResource2);
+    assertTrue(schedule.getTaskSchedule().isEmpty(),
+            "unscheduleTask should not modify schedule if task is not present.");
+  }
+
+  @Test
+  void unscheduleTaskReleasesResourcesAndRemovesTask() {
+    Schedule schedule = new Schedule();
+
+    // Simulate the task being scheduled with assigned resources
+    List<Resource> assignedResources = List.of(mockResource1, mockResource2);
+    schedule.getTaskSchedule().put(mockTask1, assignedResources);
+
+    schedule.unscheduleTask(mockTask1);
+
+    // Verify resources were released
+    verify(mockResource1, times(1)).release();
+    verify(mockResource2, times(1)).release();
+
+    // Verify the task was removed from the schedule
+    assertFalse(schedule.getTaskSchedule().containsKey(mockTask1),
+            "unscheduleTask should remove the task from the schedule.");
+  }
+
+  @Test
+  void updateScheduleNullTaskListThrowsException() {
+    Schedule schedule = new Schedule();
+    assertThrows(IllegalArgumentException.class,
+            () -> schedule.updateSchedule(null, maxDistance),
+            "updateSchedule should throw IllegalArgumentException for null task list.");
+  }
+
+  @Test
+  void updateScheduleNegativeMaxDistanceThrowsException() {
+    Schedule schedule = new Schedule();
+    assertThrows(IllegalArgumentException.class,
+            () -> schedule.updateSchedule(mockTasks, -10.0),
+            "updateSchedule should throw IllegalArgumentException for negative maxDistance.");
+  }
+
+  @Test
+  void updateScheduleEmptyTaskListReturnsEmptySchedule() {
+    Schedule schedule = new Schedule();
+    Map<Task, List<Resource>> taskSchedule = schedule.updateSchedule(new ArrayList<>(), maxDistance);
+    assertTrue(taskSchedule.isEmpty(), "updateSchedule should return an empty map for an empty task list.");
+  }
+
+  @Test
+  void updateScheduleTaskWithNoResourcesIsSkipped() {
+    when(mockTask1.getResources()).thenReturn(null);
+
+    Schedule schedule = new Schedule();
+    Map<Task, List<Resource>> taskSchedule = schedule.updateSchedule(mockTasks, maxDistance);
+
+    assertFalse(taskSchedule.containsKey(mockTask1),
+            "updateSchedule should skip tasks with no required resources.");
+  }
+
+  @Test
+  void updateScheduleTaskWithUnsatisfiableRequirementsIsSkipped() {
+    when(mockTask1.getResources()).thenReturn(Map.of(mockResourceType, 2));
+    when(mockResourceType.countAvailableUnits(any())).thenReturn(1); // Not enough units available
+    when(mockResourceType.getLocation()).thenReturn(resourceLocation);
+
+    Schedule schedule = new Schedule();
+    Map<Task, List<Resource>> taskSchedule = schedule.updateSchedule(mockTasks, maxDistance);
+
+    assertFalse(taskSchedule.containsKey(mockTask1),
+            "updateSchedule should skip tasks that can't be scheduled due to resource constraints.");
+  }
+
+  @Test
+  void updateScheduleSchedulesValidTasks() {
     when(mockTask1.getResources()).thenReturn(Map.of(mockResourceType, 1));
     when(mockTask1.getLocation()).thenReturn(taskLocation);
     when(mockResourceType.getLocation()).thenReturn(resourceLocation);
     when(mockResourceType.countAvailableUnits(any())).thenReturn(1);
     when(mockResourceType.findAvailableResource(any())).thenReturn(mockResource1);
 
-    Schedule scheduleForInvalidTask = new Schedule();
-    assertThrows(IllegalArgumentException.class,
-        () -> scheduleForInvalidTask.unscheduleTask(null),
-        "unscheduleTask method should throw exception when unscheduling null task");
+    Schedule schedule = new Schedule();
+    Map<Task, List<Resource>> taskSchedule = schedule.updateSchedule(mockTasks, maxDistance);
 
-    Schedule scheduleForValidTask = new Schedule();
-    scheduleForValidTask.updateSchedule(mockTasks, maxDistance);
-    assertDoesNotThrow(() -> scheduleForValidTask.unscheduleTask(mockTask1),
-        "unscheduleTask method should not throw exception when unscheduling valid task");
-    verify(mockResource1, times(1)).release();
+    assertTrue(taskSchedule.containsKey(mockTask1),
+            "updateSchedule should schedule valid tasks.");
+    assertEquals(1, taskSchedule.get(mockTask1).size(),
+            "Scheduled task should have 1 assigned resource.");
+    verify(mockResource1, times(1)).assignUntil(any());
   }
 
+  @Test
+  void updateScheduleReleasesResourcesOnFailure() {
+    when(mockTask1.getResources()).thenReturn(Map.of(mockResourceType, 2));
+    when(mockTask1.getLocation()).thenReturn(taskLocation);
+    when(mockResourceType.getLocation()).thenReturn(resourceLocation);
+    when(mockResourceType.countAvailableUnits(any())).thenReturn(2);
+    when(mockResourceType.findAvailableResource(any()))
+            .thenReturn(mockResource1)
+            .thenReturn(null); // Second resource can't be assigned
+
+    Schedule schedule = new Schedule();
+    Map<Task, List<Resource>> taskSchedule = schedule.updateSchedule(mockTasks, maxDistance);
+
+    assertFalse(taskSchedule.containsKey(mockTask1),
+            "updateSchedule should skip tasks that fail to schedule.");
+    verify(mockResource1, times(1)).release(); // Resource should be released
+  }
 }

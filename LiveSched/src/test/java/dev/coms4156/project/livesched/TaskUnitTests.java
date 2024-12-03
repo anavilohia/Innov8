@@ -63,6 +63,22 @@ public class TaskUnitTests {
         "Task constructor should throw an exception if task ID is empty.");
 
     assertThrows(IllegalArgumentException.class, () ->
+            new Task("", taskName, resourceList, 3, startTime, endTime, latitude, longitude),
+            "Task constructor should throw an exception if task ID is empty.");
+
+    assertThrows(IllegalArgumentException.class, () ->
+                    new Task(taskId, null, resourceList, 3, startTime, endTime, latitude, longitude),
+            "Task constructor should throw an exception if task name is null.");
+
+    assertThrows(IllegalArgumentException.class, () ->
+                    new Task(taskId, " ", resourceList, 3, startTime, endTime, latitude, longitude),
+            "Task constructor should throw an exception if task name is empty.");
+
+    assertThrows(IllegalArgumentException.class, () ->
+                    new Task(taskId, "", resourceList, 3, startTime, endTime, latitude, longitude),
+            "Task constructor should throw an exception if task name is empty.");
+
+    assertThrows(IllegalArgumentException.class, () ->
             new Task(taskId, taskName, null, 3, startTime, endTime, latitude, longitude),
         "Task constructor should throw an exception if resourceList is null.");
 
@@ -100,6 +116,19 @@ public class TaskUnitTests {
     assertThrows(IllegalArgumentException.class, () ->
             new Task(taskId, taskName, resourceList, 3, startTime, startTime, latitude, longitude),
         "Task constructor should throw an exception if endTime is the same as startTime.");
+
+    assertThrows(IllegalArgumentException.class, () ->
+                    new Task(taskId, taskName, resourceList, 3, startTime, startTime, -100, longitude),
+            "Task constructor should throw an exception if latitude is less than -90.");
+    assertThrows(IllegalArgumentException.class, () ->
+                    new Task(taskId, taskName, resourceList, 3, startTime, startTime, 100, longitude),
+            "Task constructor should throw an exception if latitude is greater than 90.");
+    assertThrows(IllegalArgumentException.class, () ->
+                    new Task(taskId, taskName, resourceList, 3, startTime, startTime, latitude, -200),
+            "Task constructor should throw an exception if latitude is less than -180.");
+    assertThrows(IllegalArgumentException.class, () ->
+                    new Task(taskId, taskName, resourceList, 3, startTime, startTime, latitude, 200),
+            "Task constructor should throw an exception if latitude is greater than 180.");
   }
 
   /**

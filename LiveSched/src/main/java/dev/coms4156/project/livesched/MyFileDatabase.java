@@ -50,6 +50,21 @@ public class MyFileDatabase {
     this.resourceTypeObjectName = resourceTypeObjectName;
     this.scheduleObjectName = scheduleObjectName;
 
+    if (taskFilePath == null || resourceTypeFilePath == null || scheduleFilePath == null) {
+      throw new IllegalArgumentException("File path cannot be null");
+    }
+    if (taskObjectName == null || resourceTypeObjectName == null || scheduleObjectName == null) {
+      throw new IllegalArgumentException("Object name cannot be null");
+    }
+    if (taskFilePath.trim().isEmpty() || resourceTypeFilePath.trim().isEmpty()
+            || scheduleFilePath.trim().isEmpty()) {
+      throw new IllegalArgumentException("File path cannot be empty");
+    }
+    if (taskObjectName.trim().isEmpty() || resourceTypeObjectName.trim().isEmpty()
+            || scheduleObjectName.trim().isEmpty()) {
+      throw new IllegalArgumentException("Object name cannot be null");
+    }
+
     if (flag == 0) {
       this.allTasks = (List<Task>) deSerializeObjectFromFile(taskContentType);
       this.allResourceTypes =

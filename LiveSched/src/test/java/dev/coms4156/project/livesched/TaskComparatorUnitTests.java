@@ -47,4 +47,17 @@ class TaskComparatorUnitTests {
     expectedResult = -1;
     assertEquals(expectedResult, actualResult, "Result should be -1");
   }
+  
+  @Test
+  void compareInvalidTasksTest() {
+    assertThrows(IllegalArgumentException.class,
+            () -> testTaskComparator.compare(null, testTask2),
+            "Tasks should be non-null.");
+    assertThrows(IllegalArgumentException.class,
+            () -> testTaskComparator.compare(testTask1, null),
+            "Tasks should be non-null.");
+    assertThrows(IllegalArgumentException.class,
+            () -> testTaskComparator.compare(null, null),
+            "Tasks should be non-null.");
+  }
 }

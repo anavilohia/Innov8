@@ -45,10 +45,115 @@ class MyFileDatabaseUnitTests {
 
   @Test
   void testConstructor() {
+    String taskPath = new File(tempDir, TASK_FILE).getAbsolutePath();
+    String resourcePath = new File(tempDir, RESOURCE_FILE).getAbsolutePath();
+    String schedulePath = new File(tempDir, SCHEDULE_FILE).getAbsolutePath();
+
     assertNotNull(database);
     assertTrue(database.getAllTasks().isEmpty());
     assertTrue(database.getAllResourceTypes().isEmpty());
     assertTrue(database.getMasterSchedule().getTaskSchedule().isEmpty());
+
+    // tests for exception
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    "", resourcePath, schedulePath,
+                    taskPath, resourcePath, schedulePath),
+            "Path cannot be empty");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, "", schedulePath,
+                    taskPath, resourcePath, schedulePath),
+            "Path cannot be empty");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, "",
+                    taskPath, resourcePath, schedulePath),
+            "Path cannot be empty");
+
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    " ", resourcePath, schedulePath,
+                    taskPath, resourcePath, schedulePath),
+            "Path cannot be empty");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, " ", schedulePath,
+                    taskPath, resourcePath, schedulePath),
+            "Path cannot be empty");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, " ",
+                    taskPath, resourcePath, schedulePath),
+            "Path cannot be empty");
+
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    null, resourcePath, schedulePath,
+                    taskPath, resourcePath, schedulePath),
+            "Path cannot be null");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, null, schedulePath,
+                    taskPath, resourcePath, schedulePath),
+            "Path cannot be null");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, null,
+                    taskPath, resourcePath, schedulePath),
+            "Path cannot be null");
+
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, schedulePath,
+                    "", resourcePath, schedulePath),
+            "Object name cannot be empty");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, schedulePath,
+                    taskPath, "", schedulePath),
+            "Object name cannot be empty");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, schedulePath,
+                    taskPath, resourcePath, ""),
+            "Object name cannot be empty");
+
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, schedulePath,
+                    " ", resourcePath, schedulePath),
+            "Object name cannot be empty");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, schedulePath,
+                    taskPath, " ", schedulePath),
+            "Object name cannot be empty");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, schedulePath,
+                    taskPath, resourcePath, " "),
+            "Object name cannot be empty");
+
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, schedulePath,
+                    null, resourcePath, schedulePath),
+            "Object name cannot be null");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, schedulePath,
+                    taskPath, null, schedulePath),
+            "Object name cannot be null");
+    assertThrows(IllegalArgumentException.class,
+            () -> new MyFileDatabase(1,
+                    taskPath, resourcePath, schedulePath,
+                    taskPath, resourcePath, null),
+            "Object name cannot be null");
+
+    assertDoesNotThrow(() -> new MyFileDatabase(1,
+                    taskPath, resourcePath, schedulePath,
+                    taskPath, resourcePath, schedulePath));
   }
 
   @Test

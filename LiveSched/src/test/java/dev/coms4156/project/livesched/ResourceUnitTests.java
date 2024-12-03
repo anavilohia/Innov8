@@ -1,5 +1,6 @@
 package dev.coms4156.project.livesched;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -26,6 +27,20 @@ class ResourceUnitTests {
   void setupResourceForTesting() {
     testResource = new Resource(testResourceId);
     testDateTime = LocalDateTime.now().plusHours(3);
+  }
+
+  /**
+   * Test for Resource class constructor.
+   */
+  @Test
+  void constructorTest() {
+    assertThrows(IllegalArgumentException.class, () -> new Resource(null),
+            "Resource Id cannot be null");
+    assertThrows(IllegalArgumentException.class, () -> new Resource(""),
+            "Resource Id cannot be an empty string");
+    assertThrows(IllegalArgumentException.class, () -> new Resource(" "),
+            "Resource Id must contain some string content");
+    assertDoesNotThrow(() -> new Resource(testResourceId));
   }
 
   /**
