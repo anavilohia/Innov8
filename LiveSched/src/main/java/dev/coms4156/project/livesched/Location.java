@@ -82,8 +82,8 @@ public class Location implements Serializable {
       return false;
     }
     Location location = (Location) obj;
-    return Double.compare(location.latitude, latitude) == 0 &&
-        Double.compare(location.longitude, longitude) == 0;
+    return Double.compare(location.latitude, latitude) == 0
+        && Double.compare(location.longitude, longitude) == 0;
   }
 
   @Override

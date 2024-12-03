@@ -394,7 +394,7 @@ public class RouteController {
         if (resourceType.getTypeName().equals(typeName)) {
           for (Task task : tasks) {
             if (task.getResources().containsKey(resourceType)) {
-              return new ResponseEntity<>("Cannot delete a resourceType currently in need",
+              return new ResponseEntity<>("Cannot delete a resourceType currently in use",
                   HttpStatus.BAD_REQUEST);
             }
           }
