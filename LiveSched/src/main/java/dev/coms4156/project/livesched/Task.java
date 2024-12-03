@@ -151,20 +151,12 @@ public class Task implements Serializable {
       throw new IllegalArgumentException("Quantity cannot be negative.");
     }
 
-    // Find an existing ResourceType with the same typeName
-    ResourceType existingType = null;
-    for (ResourceType type : resourceList.keySet()) {
-      if (type.getTypeName().equals(resourceType.getTypeName())) {
-        existingType = type;
-        break;
-      }
-    }
-
-    if (existingType != null) {
+    // Check if the resourceType already exists
+    if (resourceList.containsKey(resourceType)) {
       if (quantity == 0) {
-        resourceList.remove(existingType); // Remove existing ResourceType from the list
+        resourceList.remove(resourceType); // Remove existing ResourceType from the list
       } else {
-        resourceList.replace(existingType, quantity); // Update quantity of existing ResourceType
+        resourceList.replace(resourceType, quantity); // Update quantity of existing ResourceType
       }
     } else {
       resourceList.put(resourceType, quantity); // Add new ResourceType and its quantity

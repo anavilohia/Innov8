@@ -327,9 +327,18 @@ public class MyFileDatabase {
    * Adds a resource type to the database.
    *
    */
-  public void addResourceType(ResourceType resourceType) {
-
-    this.allResourceTypes.add(resourceType);
+  public void addResourceType(ResourceType newResourceType) {
+    for (ResourceType existingResource : this.allResourceTypes) {
+      if (existingResource.equals(newResourceType)) {
+        int newUnits = newResourceType.getTotalUnits();
+        for (int resource = 0; resource < newUnits; resource++) {
+          existingResource.addResource();
+        }
+        return;
+      }
+    }
+    // If no match is found, add the new resource type
+    this.allResourceTypes.add(newResourceType);
   }
 
   /**
