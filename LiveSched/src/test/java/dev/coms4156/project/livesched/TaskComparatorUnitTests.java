@@ -47,7 +47,7 @@ class TaskComparatorUnitTests {
     expectedResult = -1;
     assertEquals(expectedResult, actualResult, "Result should be -1");
   }
-
+  
   @Test
   void compareInvalidTasksTest() {
     assertThrows(IllegalArgumentException.class,
