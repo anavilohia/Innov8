@@ -665,7 +665,7 @@ public class RouteControllerUnitTests {
       ResponseEntity<?> response = routeController.deleteResourceType(typeName, testClientId);
 
       assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-      assertEquals("Cannot delete a resourceType currently in use", response.getBody());
+      assertEquals("Cannot delete a resourceType currently in need", response.getBody());
     }
   }
 }
