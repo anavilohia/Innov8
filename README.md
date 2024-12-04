@@ -232,8 +232,8 @@ The following tools were used in the development and modification of this reposi
 * JaCoCo
   * JaCoCo generates code test coverage reports such as branch analysis
   * This runs as part of the CI pipeline; the most recent report can be found in the Actions tab under the most recent workflow run > Artifacts > ci-reports
-  * Most recent jacoco report with 74% overall branch coverage\
-    <img width="1465" alt="Screenshot 2024-10-18 at 10 57 11 PM" src="https://github.com/user-attachments/assets/2d89ce68-00ba-4eec-8ca2-a9a467059aea">
+  * Most recent jacoco report with 85% overall branch coverage\
+   ![Screenshot 2024-11-28 at 2 27 35 AM](https://github.com/user-attachments/assets/e1913248-0588-46cc-af3c-844b1471804c)
 
 * Postman
   * Used for testing that the API and its endpoints work as intended
