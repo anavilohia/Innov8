@@ -233,7 +233,6 @@ The following tools were used in the development and modification of this reposi
   * This runs as part of the CI pipeline; the most recent report can be found in the Actions tab under the most recent workflow run > Artifacts > ci-reports
   * Most recent jacoco report with 86% overall branch coverage
     <img width="1457" alt="image" src="https://github.com/user-attachments/assets/12c55acf-e826-4fc2-8310-42d123b7825d">
-
 * Postman
   * Used for testing that the API and its endpoints work as intended
   * Ran the application locally in setup mode (please refer to the above build and run guide) to generate example data for testing purposes
