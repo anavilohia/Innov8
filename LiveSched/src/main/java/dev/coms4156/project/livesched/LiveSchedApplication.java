@@ -90,7 +90,6 @@ public class LiveSchedApplication implements CommandLineRunner {
    */
   public void reloadClientDatabasesCloud() {
     try {
-      Storage storage = StorageOptions.getDefaultInstance().getService();
       // List objects in the bucket
       Page<Blob> blobs = storage.list("innov8-livesched-bucket",
           Storage.BlobListOption.prefix("gcs_"),
@@ -144,7 +143,7 @@ public class LiveSchedApplication implements CommandLineRunner {
     }
 
     // Scan tmp directory for files matching the pattern clientId_tasks.txt
-    File[] taskFiles = tmpDir.listFiles((dir, name) -> name.endsWith("_tasks.txt"));
+    File[] taskFiles = tmpDir.listFiles((dir, name) -> name.endsWith(TASK_FILE_PATH));
     if (taskFiles == null || taskFiles.length == 0) {
       System.out.println("No existing task files found.");
       return;
@@ -339,6 +338,7 @@ public class LiveSchedApplication implements CommandLineRunner {
   public static Map<String, MyFileDatabase> clientDatabases;
   public static boolean useGCS = false; // Default is local mode (Not use Google Cloud Storage)
 
+  private final Storage storage = StorageOptions.getDefaultInstance().getService();
   private static final String TASK_FILE_PATH = "tasks.txt";
   private static final String RESOURCE_TYPE_FILE_PATH = "resourceTypes.txt";
   private static final String SCHEDULE_FILE_PATH = "schedules.txt";

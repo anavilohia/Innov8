@@ -1,10 +1,12 @@
 package dev.coms4156.project.livesched;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,7 +31,6 @@ class ResourceTypeUnitTests {
    */
   @BeforeEach
   void setupResourceTypeForTesting() {
-
     testResourceType = new ResourceType(testTypeName, testTotalUnits, testLatitude, testLongitude);
     testStartTime = LocalDateTime.now();
   }
@@ -261,7 +262,35 @@ class ResourceTypeUnitTests {
             "String representation of test resource should be " + expectedResult);
   }
 
+  /**
+   * Test for equals method in ResourceType class.
+   */
+  @Test
+  void equalsTest() {
+    assertTrue(testResourceType.equals(testResourceType),
+        "An object must be equal to itself.");
 
+    assertFalse(testResourceType.equals(null),
+        "A ResourceType object must not be equal to null.");
+
+    assertFalse(testResourceType.equals("Some String"),
+        "A ResourceType object must not be equal to an object of a different class.");
+
+    ResourceType differentTypeNameResource =
+        new ResourceType("Bed", testTotalUnits, testLatitude, testLongitude);
+    assertFalse(testResourceType.equals(differentTypeNameResource),
+        "Two ResourceType objects with different typeNames must not be equal.");
+
+    ResourceType differentLocationResource =
+        new ResourceType(testTypeName, testTotalUnits, testLatitude + 1.0, testLongitude);
+    assertFalse(testResourceType.equals(differentLocationResource),
+        "Two ResourceType objects with different locations must not be equal.");
+
+    ResourceType sameResourceType =
+        new ResourceType(testTypeName, testTotalUnits, testLatitude, testLongitude);
+    assertTrue(testResourceType.equals(sameResourceType),
+        "Two ResourceType objects with the same attributes must be equal.");
+  }
 
   /**
    * These instances are used for testing.

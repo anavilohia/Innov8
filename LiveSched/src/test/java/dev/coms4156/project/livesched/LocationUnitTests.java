@@ -1,6 +1,10 @@
 package dev.coms4156.project.livesched;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,10 +47,12 @@ public class LocationUnitTests {
     assertThrows(IllegalArgumentException.class, () -> new Location(Double.NaN, validLongitude),
             "Latitude NaN should throw an exception.");
 
-    assertThrows(IllegalArgumentException.class, () -> new Location(Double.POSITIVE_INFINITY, validLongitude),
+    assertThrows(IllegalArgumentException.class, () ->
+            new Location(Double.POSITIVE_INFINITY, validLongitude),
             "Latitude positive infinity should throw an exception.");
 
-    assertThrows(IllegalArgumentException.class, () -> new Location(Double.NEGATIVE_INFINITY, validLongitude),
+    assertThrows(IllegalArgumentException.class, () ->
+            new Location(Double.NEGATIVE_INFINITY, validLongitude),
             "Latitude negative infinity should throw an exception.");
   }
 
@@ -64,10 +70,12 @@ public class LocationUnitTests {
     assertThrows(IllegalArgumentException.class, () -> new Location(validLatitude, Double.NaN),
             "Longitude NaN should throw an exception.");
 
-    assertThrows(IllegalArgumentException.class, () -> new Location(validLatitude, Double.POSITIVE_INFINITY),
+    assertThrows(IllegalArgumentException.class, () ->
+            new Location(validLatitude, Double.POSITIVE_INFINITY),
             "Longitude positive infinity should throw an exception.");
 
-    assertThrows(IllegalArgumentException.class, () -> new Location(validLatitude, Double.NEGATIVE_INFINITY),
+    assertThrows(IllegalArgumentException.class, () ->
+            new Location(validLatitude, Double.NEGATIVE_INFINITY),
             "Longitude negative infinity should throw an exception.");
   }
 
@@ -111,4 +119,35 @@ public class LocationUnitTests {
     assertEquals(-74.0060, location.getLongitude(), 0.0001,
             "getLongitude should return the longitude value set during initialization.");
   }
+
+  /**
+   * Test for equals method in Location class.
+   */
+  @Test
+  void equalsTest() {
+    Location location = new Location(validLatitude, validLongitude);
+    assertTrue(location.equals(location), "A location must be equal to itself.");
+
+    assertFalse(location.equals(null), "A location must not be equal to null.");
+
+    assertFalse(location.equals("Some String"),
+        "A location must not be equal to an object of a different class.");
+
+    Location sameCoordinates = new Location(validLatitude, validLongitude);
+    assertTrue(location.equals(sameCoordinates),
+        "Two locations with the same latitude and longitude should be equal.");
+
+    Location differentLatitude = new Location(validLatitude + 1.0, validLongitude);
+    assertFalse(location.equals(differentLatitude),
+        "Two locations with different latitudes must not be equal.");
+
+    Location differentLongitude = new Location(validLatitude, validLongitude + 1.0);
+    assertFalse(location.equals(differentLongitude),
+        "Two locations with different longitudes must not be equal.");
+
+    Location completelyDifferent = new Location(validLatitude + 1.0, validLongitude + 1.0);
+    assertFalse(location.equals(completelyDifferent),
+        "Two locations with completely different coordinates must not be equal.");
+  }
+
 }

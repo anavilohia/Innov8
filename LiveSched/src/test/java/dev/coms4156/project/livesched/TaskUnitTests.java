@@ -67,15 +67,15 @@ public class TaskUnitTests {
             "Task constructor should throw an exception if task ID is empty.");
 
     assertThrows(IllegalArgumentException.class, () ->
-                    new Task(taskId, null, resourceList, 3, startTime, endTime, latitude, longitude),
+            new Task(taskId, null, resourceList, 3, startTime, endTime, latitude, longitude),
             "Task constructor should throw an exception if task name is null.");
 
     assertThrows(IllegalArgumentException.class, () ->
-                    new Task(taskId, " ", resourceList, 3, startTime, endTime, latitude, longitude),
+            new Task(taskId, " ", resourceList, 3, startTime, endTime, latitude, longitude),
             "Task constructor should throw an exception if task name is empty.");
 
     assertThrows(IllegalArgumentException.class, () ->
-                    new Task(taskId, "", resourceList, 3, startTime, endTime, latitude, longitude),
+            new Task(taskId, "", resourceList, 3, startTime, endTime, latitude, longitude),
             "Task constructor should throw an exception if task name is empty.");
 
     assertThrows(IllegalArgumentException.class, () ->
@@ -118,16 +118,16 @@ public class TaskUnitTests {
         "Task constructor should throw an exception if endTime is the same as startTime.");
 
     assertThrows(IllegalArgumentException.class, () ->
-                    new Task(taskId, taskName, resourceList, 3, startTime, startTime, -100, longitude),
+            new Task(taskId, taskName, resourceList, 3, startTime, startTime, -100, longitude),
             "Task constructor should throw an exception if latitude is less than -90.");
     assertThrows(IllegalArgumentException.class, () ->
-                    new Task(taskId, taskName, resourceList, 3, startTime, startTime, 100, longitude),
+            new Task(taskId, taskName, resourceList, 3, startTime, startTime, 100, longitude),
             "Task constructor should throw an exception if latitude is greater than 90.");
     assertThrows(IllegalArgumentException.class, () ->
-                    new Task(taskId, taskName, resourceList, 3, startTime, startTime, latitude, -200),
+            new Task(taskId, taskName, resourceList, 3, startTime, startTime, latitude, -200),
             "Task constructor should throw an exception if latitude is less than -180.");
     assertThrows(IllegalArgumentException.class, () ->
-                    new Task(taskId, taskName, resourceList, 3, startTime, startTime, latitude, 200),
+            new Task(taskId, taskName, resourceList, 3, startTime, startTime, latitude, 200),
             "Task constructor should throw an exception if latitude is greater than 180.");
   }
 
@@ -285,6 +285,31 @@ public class TaskUnitTests {
     assertThrows(IllegalArgumentException.class, () ->
             testTask.updateLocation(latitude, -200.0),
         "Longitude out of bounds should throw an exception.");
+  }
+
+  /**
+   * Test for equals method in Task class.
+   */
+  @Test
+  void equalsTest() {
+    assertTrue(testTask.equals(testTask),
+        "A task must be equal to itself.");
+
+    assertFalse(testTask.equals(null),
+        "A task must not be equal to null.");
+
+    assertFalse(testTask.equals("Some String"),
+        "A task must not be equal to an object of a different class.");
+
+    Task sameTaskId = new Task(taskId, "DifferentName", resourceList, 3,
+        startTime, endTime, latitude, longitude);
+    assertTrue(testTask.equals(sameTaskId),
+        "Two tasks with the same taskId should be equal regardless of other attributes.");
+
+    Task differentTaskId = new Task("2", taskName, resourceList, 3,
+        startTime, endTime, latitude, longitude);
+    assertFalse(testTask.equals(differentTaskId),
+        "Two tasks with different taskIds must not be equal.");
   }
 
   @Test
