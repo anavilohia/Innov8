@@ -12,9 +12,9 @@ Innov8
 
 ## Team members
 
-Anavi Lohia (al3750)
-Jane Lim (jl6094)
-Jonghyun Lee (jl6509)
+Anavi Lohia (al3750) \
+Jane Lim (jl6094) \
+Jonghyun Lee (jl6509) \
 Jungyun Kim (jk4661)
 
 Team member conrtibutions can be found on the JIRA project at this link:
