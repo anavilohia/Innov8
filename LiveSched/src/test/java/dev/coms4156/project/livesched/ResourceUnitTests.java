@@ -87,6 +87,18 @@ class ResourceUnitTests {
     }, "Resource cannot be assigned past time");
     assertEquals("Task end time cannot be in the past.", exception.getMessage(),
         "Exception message should match for past task end time.");
+
+    exception = assertThrows(IllegalArgumentException.class, () -> {
+      testResource.assignUntil(LocalDateTime.now());
+    }, "Resource cannot be assigned until a task end time that is exactly now.");
+    assertEquals("Task end time cannot be exactly now.", exception.getMessage(),
+        "Exception message should match for task end time being exactly now.");
+
+    LocalDateTime futureTime = LocalDateTime.now().plusMinutes(1);
+    assertDoesNotThrow(() -> testResource.assignUntil(futureTime),
+        "Resource should be assignable to a task with an end time slightly in the future.");
+    assertEquals(testResource.getAvailableFrom(), futureTime,
+        "Resource availableFrom time should match the future task end time.");
   }
 
   /**

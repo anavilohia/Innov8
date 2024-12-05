@@ -9,10 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,6 +21,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+/**
+ * Unit tests for the MyFileDatabase class.
+ */
 class MyFileDatabaseUnitTests {
 
   private MyFileDatabase database;
@@ -45,9 +46,9 @@ class MyFileDatabaseUnitTests {
 
   @Test
   void testConstructor() {
-    String taskPath = new File(tempDir, TASK_FILE).getAbsolutePath();
-    String resourcePath = new File(tempDir, RESOURCE_FILE).getAbsolutePath();
-    String schedulePath = new File(tempDir, SCHEDULE_FILE).getAbsolutePath();
+    final String taskPath = new File(tempDir, TASK_FILE).getAbsolutePath();
+    final String resourcePath = new File(tempDir, RESOURCE_FILE).getAbsolutePath();
+    final String schedulePath = new File(tempDir, SCHEDULE_FILE).getAbsolutePath();
 
     assertNotNull(database);
     assertTrue(database.getAllTasks().isEmpty());
@@ -310,6 +311,23 @@ class MyFileDatabaseUnitTests {
   }
 
   @Test
+  void testAddExistingResourceType() {
+    ResourceType existingResourceType = createDummyResourceType();
+    database.addResourceType(existingResourceType);
+
+    ResourceType duplicateResourceType = new ResourceType(
+        existingResourceType.getTypeName(), 3, 0, 0);
+
+    database.addResourceType(duplicateResourceType);
+
+    assertEquals(1, database.getAllResourceTypes().size(),
+        "Only one instance of the existing resource type should remain.");
+
+    assertEquals(8, existingResourceType.getTotalUnits(),
+        "The total units of the existing resource type should be updated.");
+  }
+
+  @Test
   void testDeleteResourceType() {
     ResourceType resourceType = createDummyResourceType();
     database.addResourceType(resourceType);
@@ -336,7 +354,8 @@ class MyFileDatabaseUnitTests {
 
   @Test
   void testAddNullTask() {
-    assertDoesNotThrow(() -> database.addTask(null), "Adding a null task should not throw an exception.");
+    assertDoesNotThrow(() -> database.addTask(null),
+        "Adding a null task should not throw an exception.");
   }
 
   @Test

@@ -148,8 +148,10 @@ public class ScheduleUnitTests {
   @Test
   void updateScheduleEmptyTaskListReturnsEmptySchedule() {
     Schedule schedule = new Schedule();
-    Map<Task, List<Resource>> taskSchedule = schedule.updateSchedule(new ArrayList<>(), maxDistance);
-    assertTrue(taskSchedule.isEmpty(), "updateSchedule should return an empty map for an empty task list.");
+    Map<Task, List<Resource>> taskSchedule =
+        schedule.updateSchedule(new ArrayList<>(), maxDistance);
+    assertTrue(taskSchedule.isEmpty(),
+        "updateSchedule should return an empty map for an empty task list.");
   }
 
   @Test
@@ -173,7 +175,7 @@ public class ScheduleUnitTests {
     Map<Task, List<Resource>> taskSchedule = schedule.updateSchedule(mockTasks, maxDistance);
 
     assertFalse(taskSchedule.containsKey(mockTask1),
-            "updateSchedule should skip tasks that can't be scheduled due to resource constraints.");
+            "updateSchedule should skip tasks that can't be scheduled.");
   }
 
   @Test

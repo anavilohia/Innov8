@@ -3,6 +3,7 @@ package dev.coms4156.project.livesched;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Represents a resource that can be assigned to a task.
@@ -52,13 +53,20 @@ public class Resource implements Serializable {
    * @throws IllegalArgumentException if {@code taskEndTime} is null, in the past, or exactly now
    */
   public void assignUntil(LocalDateTime taskEndTime) {
+    // Capture current time and truncate to minutes for comparison
+    final LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+
     if (taskEndTime == null) {
       throw new IllegalArgumentException("Task end time cannot be null.");
     }
-    if (taskEndTime.isBefore(LocalDateTime.now())) {
+
+    // Truncate taskEndTime to minutes as well, for the same precision during comparison
+    LocalDateTime truncatedTaskEndTime = taskEndTime.truncatedTo(ChronoUnit.MINUTES);
+
+    if (truncatedTaskEndTime.isBefore(now)) {
       throw new IllegalArgumentException("Task end time cannot be in the past.");
     }
-    if (taskEndTime.equals(LocalDateTime.now())) {
+    if (truncatedTaskEndTime.equals(now)) {
       throw new IllegalArgumentException("Task end time cannot be exactly now.");
     }
     setAvailableFrom(taskEndTime);

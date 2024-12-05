@@ -1,5 +1,9 @@
 package dev.coms4156.project.livesched;
 
+import com.google.api.gax.paging.Page;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import jakarta.annotation.PreDestroy;
 import java.io.File;
 import java.time.LocalDateTime;
@@ -57,7 +61,11 @@ public class LiveSchedApplication implements CommandLineRunner {
     }
 
     // Reload existing client databases
-    reloadClientDatabases();
+    if (useGCS) {
+      reloadClientDatabasesCloud();
+    } else {
+      reloadClientDatabasesLocal();
+    }
 
     if (isSetupMode) {
       setupExampleClientDatabase("demoClientId");
@@ -77,7 +85,57 @@ public class LiveSchedApplication implements CommandLineRunner {
     saveData = false;
   }
 
-  public void reloadClientDatabases() {
+  /**
+   * Reloads client databases from Google Cloud Storage (GCS).
+   */
+  public void reloadClientDatabasesCloud() {
+    try {
+      // List objects in the bucket
+      Page<Blob> blobs = storage.list("innov8-livesched-bucket",
+          Storage.BlobListOption.prefix("gcs_"),
+          Storage.BlobListOption.currentDirectory());
+
+      // Loop through all objects to find matching files
+      Map<String, String> clientFiles = new HashMap<>();
+      for (Blob blob : blobs.iterateAll()) {
+        String name = blob.getName();
+        if (name.contains("_tasks.txt")) {
+          String clientId = name.substring(4, name.indexOf("_tasks.txt"));
+          clientFiles.put(clientId, "tasks");
+        } else if (name.contains("_resourceTypes.txt")) {
+          String clientId = name.substring(4, name.indexOf("_resourceTypes.txt"));
+          clientFiles.put(clientId, "resourceTypes");
+        } else if (name.contains("_schedules.txt")) {
+          String clientId = name.substring(4, name.indexOf("_schedules.txt"));
+          clientFiles.put(clientId, "schedules");
+        }
+      }
+
+      // Load data for all existing clients
+      for (String clientId : clientFiles.keySet()) {
+        String taskFilePath = generateClientFilePath(clientId, TASK_FILE_PATH);
+        String resourceTypeFilePath = generateClientFilePath(clientId, RESOURCE_TYPE_FILE_PATH);
+        String scheduleFilePath = generateClientFilePath(clientId, SCHEDULE_FILE_PATH);
+
+        String taskObjectName = generateClientObjectName(clientId, TASK_FILE_PATH);
+        String resourceObjectName = generateClientObjectName(clientId, RESOURCE_TYPE_FILE_PATH);
+        String scheduleObjectName = generateClientObjectName(clientId, SCHEDULE_FILE_PATH);
+
+        MyFileDatabase database = new MyFileDatabase(0, taskFilePath, resourceTypeFilePath,
+            scheduleFilePath, taskObjectName, resourceObjectName, scheduleObjectName);
+
+        clientDatabases.put(clientId, database);
+        System.out.println("Loaded database for client ID (GCS): " + clientId);
+      }
+    } catch (Exception e) {
+      System.out.println("Error accessing GCS bucket: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Reloads client databases from local file system.
+   */
+  public void reloadClientDatabasesLocal() {
     File tmpDir = new File("/tmp");
     if (!tmpDir.exists() || !tmpDir.isDirectory()) {
       System.out.println("No existing databases found.");
@@ -85,7 +143,7 @@ public class LiveSchedApplication implements CommandLineRunner {
     }
 
     // Scan tmp directory for files matching the pattern clientId_tasks.txt
-    File[] taskFiles = tmpDir.listFiles((dir, name) -> name.endsWith("_tasks.txt"));
+    File[] taskFiles = tmpDir.listFiles((dir, name) -> name.endsWith(TASK_FILE_PATH));
     if (taskFiles == null || taskFiles.length == 0) {
       System.out.println("No existing task files found.");
       return;
@@ -108,7 +166,7 @@ public class LiveSchedApplication implements CommandLineRunner {
           scheduleFilePath, taskObjectName, resourceObjectName, scheduleObjectName);
 
       clientDatabases.put(clientId, database);
-      System.out.println("Loaded database for client ID: " + clientId);
+      System.out.println("Loaded database for client ID (Local): " + clientId);
     }
   }
 
@@ -141,6 +199,11 @@ public class LiveSchedApplication implements CommandLineRunner {
     return clientDatabases.get(clientId);
   }
 
+  /**
+   * Creates an example database for demo purposes.
+   *
+   * @param clientId  The client ID to create an example database for
+   */
   public void setupExampleClientDatabase(String clientId) {
     if (clientId == null) {
       throw new IllegalArgumentException("ClientId is null");
@@ -166,6 +229,8 @@ public class LiveSchedApplication implements CommandLineRunner {
 
   /**
    * Populates the database with some example resources and tasks.
+   *
+   * @param myFileDatabase The database to generate example data for
    */
   public void setupExampleData(MyFileDatabase myFileDatabase) {
     if (myFileDatabase == null) {
@@ -189,7 +254,7 @@ public class LiveSchedApplication implements CommandLineRunner {
 
     Task emergency = new Task(
         "1", "ER", emergencyResources, 1,
-        LocalDateTime.now(), LocalDateTime.now().plusHours(3),
+        LocalDateTime.of(2024, 12, 17, 10, 00), LocalDateTime.of(2024, 12, 17, 13, 00),
         40.81, -73.96);
 
     List<Task> allTasks = new ArrayList<>();
@@ -201,7 +266,7 @@ public class LiveSchedApplication implements CommandLineRunner {
 
     Task checkup = new Task(
         "2", "checkup", checkupResources, 3,
-        LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(2).plusMinutes(30),
+        LocalDateTime.of(2024, 12, 19, 10, 00), LocalDateTime.of(2024, 12, 19, 10, 30),
         40.81, -73.96);
 
     allTasks.add(checkup);
@@ -212,7 +277,7 @@ public class LiveSchedApplication implements CommandLineRunner {
 
     Task patientTransport = new Task(
         "3", "transport", transportResources, 2,
-        LocalDateTime.now().plusMinutes(15), LocalDateTime.now().plusMinutes(45),
+        LocalDateTime.of(2024, 12, 17, 10, 15), LocalDateTime.of(2024, 12, 17, 10, 45),
         40.83, -73.91);
 
     allTasks.add(patientTransport);
@@ -273,6 +338,7 @@ public class LiveSchedApplication implements CommandLineRunner {
   public static Map<String, MyFileDatabase> clientDatabases;
   public static boolean useGCS = false; // Default is local mode (Not use Google Cloud Storage)
 
+  private final Storage storage = StorageOptions.getDefaultInstance().getService();
   private static final String TASK_FILE_PATH = "tasks.txt";
   private static final String RESOURCE_TYPE_FILE_PATH = "resourceTypes.txt";
   private static final String SCHEDULE_FILE_PATH = "schedules.txt";

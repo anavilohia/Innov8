@@ -1,0 +1,5 @@
+entrypoint: java -jar target/LiveSched-0.0.1-SNAPSHOT.jar
+runtime: java17
+instance_class: F1
+env_variables:
+  TZ: "America/New_York"
