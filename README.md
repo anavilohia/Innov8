@@ -297,6 +297,7 @@ The following tools were used in the development and modification of this reposi
 
   * Enabled via the "Actions" tab on GitHub, it runs automatically for every pull request and commit to 'main' branch
   * It runs a Maven build to make sure the code builds on branch 'main'
+  * Link to CI reports: https://github.com/anavilohia/Innov8/actions/workflows/maven.yml
 * GitHub Branch Protection Rules
 
   * Requires at least one review approval for every pull request into 'main' branch
@@ -304,14 +305,14 @@ The following tools were used in the development and modification of this reposi
 * Checkstyle
 
   * Checks that the code follows style guidelines, generating warnings or errors as needed
-  * This runs as part of the CI pipeline; the most recent report can be found in the Actions tab under the most recent workflow run > Artifacts > ci-reports
+  * This runs as part of the CI pipeline; the most recent report can be found by clicking the above CI reports link and clicking the most recent workflow run > Artifacts > ci-reports (this is also included in the reports folder in the root of the repo)
   * It can also be run using the "Checkstyle-IDEA" plugin for IntelliJ
   * Most recent checkstyle results (Dec 4, 2024)
     <img width="647" alt="image" src="https://github.com/user-attachments/assets/68215630-c372-432f-966f-b8bb20b9e6f3">
 * PMD
 
   * Performs static analysis of the Java code, generating errors and warnings as needed
-  * This runs as part of the CI pipeline; the most recent report can be found in the Actions tab under the most recent workflow run > Artifacts > ci-reports
+  * This runs as part of the CI pipeline; the most recent report can be found by clicking the above CI reports link and clicking the most recent workflow run > Artifacts > ci-reports (this is also included in the reports folder in the root of the repo)
   * The current code includes the following rulesets as specified in pom.xml:
     ```
     <ruleset>/category/java/errorprone.xml</ruleset>
@@ -322,11 +323,11 @@ The following tools were used in the development and modification of this reposi
 * JUnit
 
   * JUnit tests get run automatically as part of the CI pipeline
-  * They can also be manually run using the code specified in above sections
+  * They can also be manually run using the code specified in the above sections
 * JaCoCo
 
   * JaCoCo generates code test coverage reports such as branch analysis
-  * This runs as part of the CI pipeline; the most recent report can be found in the Actions tab under the most recent workflow run > Artifacts > ci-reports
+  * This runs as part of the CI pipeline; the most recent report can be found by clicking the above CI reports link and clicking the most recent workflow run > Artifacts > ci-reports (this is also included in the reports folder in the root of the repo)
   * Most recent jacoco report with 86% overall branch coverage
     <img width="1457" alt="image" src="https://github.com/user-attachments/assets/12c55acf-e826-4fc2-8310-42d123b7825d">
 * Postman
