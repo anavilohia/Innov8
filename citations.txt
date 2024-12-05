@@ -10,3 +10,4 @@
 - https://stackoverflow.com/questions/27969797/how-to-make-java-method-that-accepts-any-object-as-parameter
 - https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-java
 - https://cloud.google.com/storage/docs/downloading-objects
+- https://cloud.google.com/storage/docs/samples/storage-list-files-with-prefix

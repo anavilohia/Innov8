@@ -394,7 +394,7 @@ public class RouteController {
         if (resourceType.getTypeName().equals(typeName)) {
           for (Task task : tasks) {
             if (task.getResources().containsKey(resourceType)) {
-              return new ResponseEntity<>("Cannot delete a resourceType currently in use",
+              return new ResponseEntity<>("Cannot delete a resourceType currently in need",
                   HttpStatus.BAD_REQUEST);
             }
           }
@@ -410,7 +410,6 @@ public class RouteController {
 
   private ResponseEntity<?> handleException(Exception e) {
     System.out.println(e.toString());
-    return new ResponseEntity<>("An Error has occurred: " + e.toString(),
-        HttpStatus.INTERNAL_SERVER_ERROR);
+    return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

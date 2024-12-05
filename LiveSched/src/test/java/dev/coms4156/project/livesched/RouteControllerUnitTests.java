@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -184,6 +183,64 @@ public class RouteControllerUnitTests {
     }
 
     /**
+     * Tests retrieveTasks method when taskList is null.
+     */
+    @Test
+    void retrieveTasksWhenTaskListIsNullTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        MyFileDatabase mockedDatabase = mock(MyFileDatabase.class);
+        when(mockedDatabase.getAllTasks()).thenReturn(null);
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenReturn(mockedDatabase);
+
+        ResponseEntity<?> response = routeController.retrieveTasks(testClientId);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(),
+            "Response status should be 404 (Not Found)");
+        assertEquals("Tasks Not Found", response.getBody(),
+            "Response body should contain 'Tasks Not Found'");
+      }
+    }
+
+    /**
+     * Tests retrieveTasks method when taskList is empty.
+     */
+    @Test
+    void retrieveTasksWhenTaskListIsEmptyTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        MyFileDatabase mockedDatabase = mock(MyFileDatabase.class);
+        when(mockedDatabase.getAllTasks()).thenReturn(new ArrayList<>());
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenReturn(mockedDatabase);
+
+        ResponseEntity<?> response = routeController.retrieveTasks(testClientId);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(),
+            "Response status should be 404 (Not Found)");
+        assertEquals("Tasks Not Found", response.getBody(),
+            "Response body should contain 'Tasks Not Found'");
+      }
+    }
+
+    /**
+     * Tests exception handling in the retrieveTasks method of RouteController.
+     */
+    @Test
+    void retrieveTasksExceptionTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenThrow(new RuntimeException("Simulated database error"));
+
+        ResponseEntity<?> response = routeController.retrieveTasks(testClientId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+            "Response status should be 500 (Internal Server Error)");
+        assertEquals("Simulated database error", response.getBody(),
+            "Response body should contain the simulated error message");
+      }
+    }
+
+    /**
      * Tests the retrieveTask method of RouteController.
      */
     @Test
@@ -193,6 +250,24 @@ public class RouteControllerUnitTests {
       assertEquals(HttpStatus.OK, response.getStatusCode());
       Task responseBody = (Task) response.getBody();
       assertEquals("1", responseBody.getTaskId(), "Task ID should match '1'");
+    }
+
+    /**
+     * Tests exception handling in the retrieveTask method of RouteController.
+     */
+    @Test
+    void retrieveTaskExceptionTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenThrow(new RuntimeException("Simulated database error"));
+
+        ResponseEntity<?> response = routeController.retrieveTask("1", testClientId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+            "Response status should be 500 (Internal Server Error)");
+        assertEquals("Simulated database error", response.getBody(),
+            "Response body should contain the simulated error message");
+      }
     }
 
     /**
@@ -209,6 +284,24 @@ public class RouteControllerUnitTests {
               "First resource type should be 'Type1'");
       assertEquals("Type2", responseBody.get(1).getTypeName(),
               "Second resource type should be 'Type2'");
+    }
+
+    /**
+     * Tests exception handling in the retrieveResourceTypes method of RouteController.
+     */
+    @Test
+    void retrieveResourceTypesExceptionTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenThrow(new RuntimeException("Simulated database error"));
+
+        ResponseEntity<?> response = routeController.retrieveResourceTypes(testClientId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+            "Response status should be 500 (Internal Server Error)");
+        assertEquals("Simulated database error", response.getBody(),
+            "Response body should contain the simulated error message");
+      }
     }
 
     /**
@@ -245,6 +338,66 @@ public class RouteControllerUnitTests {
         assertEquals(expectedResourceSize, actualResourceSize,
                 "Resource size should match at index " + index);
         index++;
+      }
+    }
+
+    /**
+     * Tests retrieveSchedule method when masterSchedule is null.
+     */
+    @Test
+    void retrieveScheduleWhenMasterScheduleIsNullTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        MyFileDatabase mockedDatabase = mock(MyFileDatabase.class);
+        when(mockedDatabase.getMasterSchedule()).thenReturn(null);
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenReturn(mockedDatabase);
+
+        ResponseEntity<?> response = routeController.retrieveSchedule(testClientId);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(),
+            "Response status should be 404 (Not Found)");
+        assertEquals("Schedules Not Found", response.getBody(),
+            "Response body should contain 'Schedules Not Found'");
+      }
+    }
+
+    /**
+     * Tests retrieveSchedule method when taskSchedule is empty.
+     */
+    @Test
+    void retrieveScheduleWhenTaskScheduleIsEmptyTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        MyFileDatabase mockedDatabase = mock(MyFileDatabase.class);
+        Schedule mockedSchedule = mock(Schedule.class);
+        when(mockedSchedule.getTaskSchedule()).thenReturn(new HashMap<>());
+        when(mockedDatabase.getMasterSchedule()).thenReturn(mockedSchedule);
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenReturn(mockedDatabase);
+
+        ResponseEntity<?> response = routeController.retrieveSchedule(testClientId);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(),
+            "Response status should be 404 (Not Found)");
+        assertEquals("Schedules Not Found", response.getBody(),
+            "Response body should contain 'Schedules Not Found'");
+      }
+    }
+
+    /**
+     * Tests exception handling in the retrieveSchedule method of RouteController.
+     */
+    @Test
+    void retrieveScheduleExceptionTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenThrow(new RuntimeException("Simulated database error"));
+
+        ResponseEntity<?> response = routeController.retrieveSchedule(testClientId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+            "Response status should be 500 (Internal Server Error)");
+        assertEquals("Simulated database error", response.getBody(),
+            "Response body should contain the simulated error message");
       }
     }
 
@@ -291,6 +444,64 @@ public class RouteControllerUnitTests {
     }
 
     /**
+     * Tests updateSchedule method when taskList is null.
+     */
+    @Test
+    void updateScheduleWhenTaskListIsNullTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        MyFileDatabase mockedDatabase = mock(MyFileDatabase.class);
+        when(mockedDatabase.getAllTasks()).thenReturn(null);
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenReturn(mockedDatabase);
+
+        ResponseEntity<?> response = routeController.updateSchedule(100, testClientId);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(),
+            "Response status should be 404 (Not Found)");
+        assertEquals("Tasks Not Found", response.getBody(),
+            "Response body should contain 'Tasks Not Found'");
+      }
+    }
+
+    /**
+     * Tests updateSchedule method when taskList is empty.
+     */
+    @Test
+    void updateScheduleWhenTaskListIsEmptyTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        MyFileDatabase mockedDatabase = mock(MyFileDatabase.class);
+        when(mockedDatabase.getAllTasks()).thenReturn(new ArrayList<>());
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenReturn(mockedDatabase);
+
+        ResponseEntity<?> response = routeController.updateSchedule(100, testClientId);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(),
+            "Response status should be 404 (Not Found)");
+        assertEquals("Tasks Not Found", response.getBody(),
+            "Response body should contain 'Tasks Not Found'");
+      }
+    }
+
+    /**
+     * Tests exception handling in the updateSchedule method of RouteController.
+     */
+    @Test
+    void updateScheduleExceptionTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenThrow(new RuntimeException("Simulated database error"));
+
+        ResponseEntity<?> response = routeController.updateSchedule(80, testClientId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+            "Response status should be 500 (Internal Server Error)");
+        assertEquals("Simulated database error", response.getBody(),
+            "Response body should contain the simulated error message");
+      }
+    }
+
+    /**
      * Tests the unscheduleTask method of RouteController.
      */
     @Test
@@ -300,6 +511,24 @@ public class RouteControllerUnitTests {
       assertEquals(HttpStatus.OK, response.getStatusCode(), "Response status should be OK (200)");
       assertEquals("Task unscheduled succesfully", response.getBody(),
               "Message should say Task unscheduled succesfully");
+    }
+
+    /**
+     * Tests exception handling in the unscheduleTask method of RouteController.
+     */
+    @Test
+    void unscheduleTaskExceptionTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenThrow(new RuntimeException("Simulated database error"));
+
+        ResponseEntity<?> response = routeController.unscheduleTask("1", testClientId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+            "Response status should be 500 (Internal Server Error)");
+        assertEquals("Simulated database error", response.getBody(),
+            "Response body should contain the simulated error message");
+      }
     }
 
     /**
@@ -313,6 +542,24 @@ public class RouteControllerUnitTests {
       assertEquals("1 successfully deleted", response.getBody(),
               "Deleted task ID should match '1'");
       // assertEquals(initialSize - 1, testDatabase.getAllTasks().size());
+    }
+
+    /**
+     * Tests exception handling in the deleteTask method of RouteController.
+     */
+    @Test
+    void deleteTaskExceptionTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenThrow(new RuntimeException("Simulated database error"));
+
+        ResponseEntity<?> response = routeController.deleteTask("1", testClientId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+            "Response status should be 500 (Internal Server Error)");
+        assertEquals("Simulated database error", response.getBody(),
+            "Response body should contain the simulated error message");
+      }
     }
 
     /**
@@ -340,6 +587,26 @@ public class RouteControllerUnitTests {
     }
 
     /**
+     * Tests exception handling in the addTask method of RouteController.
+     */
+    @Test
+    void addTaskExceptionTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenThrow(new RuntimeException("Simulated database error"));
+
+        ResponseEntity<?> response = routeController.addTask(
+            "TestTask", 3, "2024-12-05 10:00", "2024-12-05 11:00",
+            40.7128, -74.0060, testClientId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+            "Response status should be 500 (Internal Server Error)");
+        assertEquals("Simulated database error", response.getBody(),
+            "Response body should contain the simulated error message");
+      }
+    }
+
+    /**
      * Tests the addResourceType method of RouteController.
      */
     @Test
@@ -357,6 +624,25 @@ public class RouteControllerUnitTests {
       assertEquals(HttpStatus.OK, response.getStatusCode());
       assertEquals("Attribute was updated successfully.", response.getBody());
       assertEquals(initialSize + 1, testDatabase.getAllResourceTypes().size());
+    }
+
+    /**
+     * Tests exception handling in the addResourceType method of RouteController.
+     */
+    @Test
+    void addResourceTypeExceptionTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenThrow(new RuntimeException("Simulated database error"));
+
+        ResponseEntity<?> response = routeController.addResourceType(
+            "Type1", 5, 40.7128, -74.0060, testClientId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+            "Response status should be 500 (Internal Server Error)");
+        assertEquals("Simulated database error", response.getBody(),
+            "Response body should contain the simulated error message");
+      }
     }
 
     /**
@@ -384,6 +670,25 @@ public class RouteControllerUnitTests {
     }
 
     /**
+     * Tests exception handling in the modifyResourceType method of RouteController.
+     */
+    @Test
+    void modifyResourceTypeExceptionTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenThrow(new RuntimeException("Simulated database error"));
+
+        ResponseEntity<?> response = routeController.modifyResourceType(
+            "1", "Type1", 3, testClientId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+            "Response status should be 500 (Internal Server Error)");
+        assertEquals("Simulated database error", response.getBody(),
+            "Response body should contain the simulated error message");
+      }
+    }
+
+    /**
      * Tests the deleteResourceType method of RouteController.
      */
     @Test
@@ -400,6 +705,24 @@ public class RouteControllerUnitTests {
       assertEquals(HttpStatus.OK, response.getStatusCode());
       assertEquals(typeName + " successfully deleted", response.getBody());
       // assertEquals(initialSize - 1, testDatabase.getAllResourceTypes().size());
+    }
+
+    /**
+     * Tests exception handling in the deleteResourceType method of RouteController.
+     */
+    @Test
+    void deleteResourceTypeExceptionTest() {
+      try (var mockedApplication = mockStatic(LiveSchedApplication.class)) {
+        mockedApplication.when(() -> LiveSchedApplication.getClientFileDatabase(testClientId))
+            .thenThrow(new RuntimeException("Simulated database error"));
+
+        ResponseEntity<?> response = routeController.deleteResourceType("Type1", testClientId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
+            "Response status should be 500 (Internal Server Error)");
+        assertEquals("Simulated database error", response.getBody(),
+            "Response body should contain the simulated error message");
+      }
     }
   }
 
@@ -475,6 +798,18 @@ public class RouteControllerUnitTests {
     void deleteTaskTest() {
       int initialSize = testDatabase.getAllTasks().size();
       ResponseEntity<?> response = routeController.deleteTask("3", testClientId);
+      assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+      assertEquals(TASK_NOT_FOUND, response.getBody(), "Error message should be Task Not Found");
+    }
+
+    /**
+     * Tests the modifyResourceType method of RouteController.
+     */
+    @Test
+    void modifyResourceTypeTest() {
+      ResponseEntity<?> response = routeController.modifyResourceType(
+          "999", "Type1", 3, testClientId);
+
       assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
       assertEquals(TASK_NOT_FOUND, response.getBody(), "Error message should be Task Not Found");
     }
@@ -665,7 +1000,7 @@ public class RouteControllerUnitTests {
       ResponseEntity<?> response = routeController.deleteResourceType(typeName, testClientId);
 
       assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-      assertEquals("Cannot delete a resourceType currently in use", response.getBody());
+      assertEquals("Cannot delete a resourceType currently in need", response.getBody());
     }
   }
 }
