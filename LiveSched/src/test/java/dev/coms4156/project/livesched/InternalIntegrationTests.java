@@ -75,6 +75,8 @@ public class InternalIntegrationTests {
     assertEquals(task.getTaskId(), scheduleEntry.getKey().getTaskId(), "Task ID should match");
     assertEquals(3, scheduleEntry.getValue().size(),
         "Total three resources should be assigned");
+
+    LiveSchedApplication.restoreDatabase("testClient");
   }
 
 }

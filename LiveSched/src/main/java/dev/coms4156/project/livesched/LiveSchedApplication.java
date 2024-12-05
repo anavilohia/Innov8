@@ -76,13 +76,24 @@ public class LiveSchedApplication implements CommandLineRunner {
   }
 
   /**
-   * Overrides the database reference, used when testing.
+   * Overrides the client databases, used when testing.
    *
-   * @param testData A {@code MyFileDatabase} object referencing test data.
+   * @param testData  A {@code MyFileDatabase} object referencing test data.
+   * @param clientId  A {@code String} object referencing the client ID.
    */
   public static void overrideDatabase(MyFileDatabase testData, String clientId) {
     clientDatabases.put(clientId, testData);
     saveData = false;
+  }
+
+  /**
+   * Restores the client databases, used when testing.
+   *
+   * @param clientId  A {@code String} object referencing the client ID.
+   */
+  public static void restoreDatabase(String clientId) {
+    clientDatabases.remove(clientId);
+    saveData = true;
   }
 
   /**
