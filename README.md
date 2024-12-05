@@ -195,19 +195,6 @@ This section describes the endpoints that the service provides, as well as their
   * HTTP 404 Status Code with "Schedules Not Found" if there are no schedules.
   * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
 
-### PATCH /updateSchedule
-
-* Expected Input Parameters:
-  * maxDistance (double)
-  * clientId (String)
-* Expected Output: A JSON array containing the updated schedule details
-* Description: Updates and returns the schedule for current tasks and resources.
-* Upon Success: HTTP 200 Status Code with the updated schedule in the response body.
-* Upon Failure:
-  * HTTP 404 Status Code with "Tasks Not Found" if there are no tasks.
-  * HTTP 404 Status Code with "Master Schedule Not Found" if there is no master schedule.
-  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
-
 ### PATCH /addTask
 
 * Expected Input Parameters:
@@ -222,20 +209,6 @@ This section describes the endpoints that the service provides, as well as their
 * Description: Adds a new task to the database.
 * Upon Success: HTTP 200 Status Code with the task's details in the response body.
 * Upon Failure: HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
-
-### PATCH /unscheduleTask
-
-* Expected Input Parameters:
-  * taskId (String)
-  * clientId (String)
-* Expected Output: A success message string
-* Description: Removes a task from the master schedule.
-* Upon Success: HTTP 200 Status Code with "Task unscheduled successfully" in the response body.
-* Upon Failure:
-  * HTTP 404 Status Code with "Task Not Found" if the task doesn't exist.
-  * HTTP 404 Status Code with "Master Schedule Not Found" if there is no master schedule.
-  * HTTP 400 Status Code with "Task Not Scheduled Yet" if the task isn't in the schedule.
-  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
 
 ### DELETE /deleteTask
 
@@ -288,6 +261,33 @@ This section describes the endpoints that the service provides, as well as their
 * Upon Failure:
   * HTTP 404 Status Code with "ResourceType Not Found" if the resource type doesn't exist.
   * HTTP 400 Status Code with "Cannot delete a resourceType currently in use" if the resource type is being used by tasks.
+  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
+
+### PATCH /updateSchedule
+
+* Expected Input Parameters:
+  * maxDistance (double)
+  * clientId (String)
+* Expected Output: A JSON array containing the updated schedule details
+* Description: Updates and returns the schedule for current tasks and resources.
+* Upon Success: HTTP 200 Status Code with the updated schedule in the response body.
+* Upon Failure:
+  * HTTP 404 Status Code with "Tasks Not Found" if there are no tasks.
+  * HTTP 404 Status Code with "Master Schedule Not Found" if there is no master schedule.
+  * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
+
+### PATCH /unscheduleTask
+
+* Expected Input Parameters:
+  * taskId (String)
+  * clientId (String)
+* Expected Output: A success message string
+* Description: Removes a task from the master schedule.
+* Upon Success: HTTP 200 Status Code with "Task unscheduled successfully" in the response body.
+* Upon Failure:
+  * HTTP 404 Status Code with "Task Not Found" if the task doesn't exist.
+  * HTTP 404 Status Code with "Master Schedule Not Found" if there is no master schedule.
+  * HTTP 400 Status Code with "Task Not Scheduled Yet" if the task isn't in the schedule.
   * HTTP 500 Status Code with "An Error has occurred" if an unexpected error occurs.
 
 ## Tools used
