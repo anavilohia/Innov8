@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Schedule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LiveSched</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project.livesched</a> &gt; <span class="el_source">Schedule.java</span></div><h1>Schedule.java</h1><pre class="source lang-java linenums">package dev.coms4156.project.livesched;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Coordinates scheduling given a list of tasks.
+ * This class creates a schedule that pairs tasks with resourceTypes and
+ * updates their values accordingly
+ */
+public class Schedule implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 1005L;
+
+  private Map&lt;Task, List&lt;Resource&gt;&gt; taskSchedule;
+
+  /**
+   * Constructs a new Schedule object.
+   */
+<span class="fc" id="L24">  public Schedule() {</span>
+<span class="fc" id="L25">    taskSchedule = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L26">  }</span>
+
+  /**
+   * Updates the schedule by assigning available resources to tasks based
+   * on their requirements and start times.
+   *
+   * @param tasks    The list of tasks to schedule.
+   * @param maxDistance The maximum distance between tasks and resources.
+   * @return a {@code Map&lt;Task, List&lt;Resource&gt;&gt;} where each schedulable task is mapped to
+   *        the list of resources assigned to it, or an empty map if no tasks could be scheduled.
+   * @throws IllegalArgumentException if tasks is null or maxDistance is negative
+   */
+  public Map&lt;Task, List&lt;Resource&gt;&gt; updateSchedule(List&lt;Task&gt; tasks, double maxDistance) {
+<span class="fc bfc" id="L39" title="All 2 branches covered.">    if (tasks == null) {</span>
+<span class="fc" id="L40">      throw new IllegalArgumentException(&quot;Tasks list cannot be null.&quot;);</span>
+    }
+<span class="fc bfc" id="L42" title="All 2 branches covered.">    if (maxDistance &lt; 0) {</span>
+<span class="fc" id="L43">      throw new IllegalArgumentException(&quot;Maximum distance cannot be negative.&quot;);</span>
+    }
+
+    // Create a copy of tasks and sort by priority
+<span class="fc" id="L47">    List&lt;Task&gt; copiedTasks = new ArrayList&lt;&gt;(tasks);</span>
+<span class="fc" id="L48">    copiedTasks.sort(new TaskComparator());</span>
+
+<span class="fc bfc" id="L50" title="All 2 branches covered.">    for (Task task : copiedTasks) {</span>
+      // Skip tasks that are already scheduled
+<span class="fc bfc" id="L52" title="All 2 branches covered.">      if (taskSchedule.containsKey(task)) {</span>
+<span class="fc" id="L53">        continue;</span>
+      }
+
+      // Skip tasks with no resources required
+<span class="fc bfc" id="L57" title="All 4 branches covered.">      if (task.getResources() == null || task.getResources().isEmpty()) {</span>
+<span class="fc" id="L58">        continue;</span>
+      }
+
+      // Store assigned resources for this task
+<span class="fc" id="L62">      List&lt;Resource&gt; assignedResources = new ArrayList&lt;&gt;();</span>
+      // Track whether we can schedule this task
+<span class="fc" id="L64">      boolean canSchedule = true;</span>
+
+      // Iterate over the required resource types for the task
+<span class="fc bfc" id="L67" title="All 2 branches covered.">      for (Map.Entry&lt;ResourceType, Integer&gt; entry : task.getResources().entrySet()) {</span>
+<span class="fc" id="L68">        ResourceType resourceType = entry.getKey();</span>
+<span class="fc" id="L69">        int requiredUnits = entry.getValue();</span>
+
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (requiredUnits &gt; resourceType.countAvailableUnits(task.getStartTime())) {</span>
+<span class="fc" id="L72">          canSchedule = false;</span>
+<span class="fc" id="L73">          break;</span>
+        }
+
+<span class="fc" id="L76">        List&lt;Resource&gt; availableResources = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        for (int i = 0; i &lt; requiredUnits; i++) {</span>
+<span class="fc" id="L79">          Resource resource = resourceType.findAvailableResource(task.getStartTime());</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">          if (resource != null</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">              &amp;&amp; resourceType.getLocation().getDistance(task.getLocation()) &lt;= maxDistance) {</span>
+<span class="fc" id="L82">            availableResources.add(resource);</span>
+<span class="fc" id="L83">            resource.assignUntil(task.getEndTime());</span>
+          } else {
+<span class="fc" id="L85">            canSchedule = false;</span>
+<span class="fc" id="L86">            break;</span>
+          }
+        }
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        if (!canSchedule) {</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">          for (Resource resource : availableResources) {</span>
+<span class="fc" id="L91">            resource.release();  // Free up the resources since task cannot be scheduled right now</span>
+<span class="fc" id="L92">          }</span>
+<span class="fc" id="L93">          break;</span>
+        }
+<span class="fc" id="L95">        assignedResources.addAll(availableResources);</span>
+<span class="fc" id="L96">      }</span>
+      // all resourceTypes available in required quantities
+<span class="fc bfc" id="L98" title="All 2 branches covered.">      if (canSchedule) {</span>
+<span class="fc" id="L99">        taskSchedule.put(task, assignedResources);</span>
+      }
+<span class="fc" id="L101">    }</span>
+<span class="fc" id="L102">    return taskSchedule;</span>
+  }
+
+  /**
+   * Completes a task by removing it from the taskSchedule.
+   *
+   * @throws IllegalArgumentException if task is null
+   */
+  public void unscheduleTask(Task task) {
+<span class="fc bfc" id="L111" title="All 2 branches covered.">    if (task == null) {</span>
+<span class="fc" id="L112">      throw new IllegalArgumentException(&quot;Task cannot be null.&quot;);</span>
+    }
+<span class="fc bfc" id="L114" title="All 2 branches covered.">    if (taskSchedule.containsKey(task)) {</span>
+<span class="fc" id="L115">      List&lt;Resource&gt; assignedResources = taskSchedule.get(task);</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">      for (Resource resource : assignedResources) {</span>
+<span class="fc" id="L117">        resource.release();</span>
+<span class="fc" id="L118">      }</span>
+<span class="fc" id="L119">      taskSchedule.remove(task);</span>
+    }
+<span class="fc" id="L121">  }</span>
+
+  public Map&lt;Task, List&lt;Resource&gt;&gt; getTaskSchedule() {
+<span class="fc" id="L124">    return taskSchedule;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

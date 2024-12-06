@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TaskComparator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LiveSched</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project.livesched</a> &gt; <span class="el_source">TaskComparator.java</span></div><h1>TaskComparator.java</h1><pre class="source lang-java linenums">package dev.coms4156.project.livesched;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Comparator;
+
+/**
+ * Comparator class for sorting Task by its priority.
+ */
+<span class="fc" id="L10">public class TaskComparator implements Comparator&lt;Task&gt;, Serializable {</span>
+  @Serial
+  private static final long serialVersionUID = 1006L;
+
+  @Override
+  public int compare(Task x, Task y) {
+<span class="fc bfc" id="L16" title="All 4 branches covered.">    if (x == null || y == null) {</span>
+<span class="fc" id="L17">      throw new IllegalArgumentException(&quot;Tasks cannot be null&quot;);</span>
+    }
+<span class="fc bfc" id="L19" title="All 2 branches covered.">    if (x.getPriority() &lt; y.getPriority()) {</span>
+<span class="fc" id="L20">      return -1;</span>
+    }
+<span class="fc bfc" id="L22" title="All 2 branches covered.">    if (x.getPriority() &gt; y.getPriority()) {</span>
+<span class="fc" id="L23">      return 1;</span>
+    }
+<span class="fc" id="L25">    return 0;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

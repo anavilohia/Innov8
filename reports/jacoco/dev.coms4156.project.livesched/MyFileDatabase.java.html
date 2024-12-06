@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MyFileDatabase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LiveSched</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project.livesched</a> &gt; <span class="el_source">MyFileDatabase.java</span></div><h1>MyFileDatabase.java</h1><pre class="source lang-java linenums">package dev.coms4156.project.livesched;
+
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * This class represents a file-based database that stores and manages {@code Task} and
+ * {@code ResourceType} objects. It provides functionality to serialize and deserialize data
+ * from both local files and Google Cloud Storage (GCS), ensuring data persistence.
+ */
+public class MyFileDatabase {
+
+  /**
+   * Constructs a MyFileDatabase object and loads up the data structures with
+   * the contents of the files or initializes them as empty based on the provided flag.
+   *
+   * @param flag     used to distinguish mode of database;
+   *                 0 for loading from files, 1 for initializing an empty database
+   * @param taskFilePath the path to the file containing serialized task entries
+   * @param resourceTypeFilePath the path to the file containing serialized resourceTypes entries
+   * @param scheduleFilePath the path to the file containing serialized schedule entries
+   * @param taskObjectName the name of the task object in GCS
+   * @param resourceTypeObjectName the name of the resource type object in GCS
+   */
+  public MyFileDatabase(int flag,
+                        String taskFilePath,
+                        String resourceTypeFilePath,
+                        String scheduleFilePath,
+                        String taskObjectName,
+                        String resourceTypeObjectName,
+<span class="fc" id="L45">                        String scheduleObjectName) {</span>
+<span class="fc" id="L46">    this.taskFilePath = taskFilePath;</span>
+<span class="fc" id="L47">    this.resourceTypeFilePath = resourceTypeFilePath;</span>
+<span class="fc" id="L48">    this.scheduleFilePath = scheduleFilePath;</span>
+<span class="fc" id="L49">    this.taskObjectName = taskObjectName;</span>
+<span class="fc" id="L50">    this.resourceTypeObjectName = resourceTypeObjectName;</span>
+<span class="fc" id="L51">    this.scheduleObjectName = scheduleObjectName;</span>
+
+<span class="fc bfc" id="L53" title="All 6 branches covered.">    if (taskFilePath == null || resourceTypeFilePath == null || scheduleFilePath == null) {</span>
+<span class="fc" id="L54">      throw new IllegalArgumentException(&quot;File path cannot be null&quot;);</span>
+    }
+<span class="fc bfc" id="L56" title="All 6 branches covered.">    if (taskObjectName == null || resourceTypeObjectName == null || scheduleObjectName == null) {</span>
+<span class="fc" id="L57">      throw new IllegalArgumentException(&quot;Object name cannot be null&quot;);</span>
+    }
+<span class="fc bfc" id="L59" title="All 4 branches covered.">    if (taskFilePath.trim().isEmpty() || resourceTypeFilePath.trim().isEmpty()</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">            || scheduleFilePath.trim().isEmpty()) {</span>
+<span class="fc" id="L61">      throw new IllegalArgumentException(&quot;File path cannot be empty&quot;);</span>
+    }
+<span class="fc bfc" id="L63" title="All 4 branches covered.">    if (taskObjectName.trim().isEmpty() || resourceTypeObjectName.trim().isEmpty()</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            || scheduleObjectName.trim().isEmpty()) {</span>
+<span class="fc" id="L65">      throw new IllegalArgumentException(&quot;Object name cannot be null&quot;);</span>
+    }
+
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    if (flag == 0) {</span>
+<span class="fc" id="L69">      this.allTasks = (List&lt;Task&gt;) deSerializeObjectFromFile(taskContentType);</span>
+<span class="fc" id="L70">      this.allResourceTypes =</span>
+<span class="fc" id="L71">          (List&lt;ResourceType&gt;) deSerializeObjectFromFile(resourceTypeContentType);</span>
+<span class="fc" id="L72">      this.masterSchedule = (Schedule) deSerializeObjectFromFile(scheduleContentType);</span>
+    } else {
+<span class="fc" id="L74">      this.allTasks = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L75">      this.allResourceTypes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L76">      this.masterSchedule = new Schedule();</span>
+    }
+<span class="fc" id="L78">  }</span>
+
+  /**
+   * Sets allTasks of the database.
+   *
+   * @param tasks the list of all tasks to be added to database
+   */
+  public void setAllTasks(List&lt;Task&gt; tasks) {
+<span class="fc bfc" id="L86" title="All 2 branches covered.">    this.allTasks = tasks == null ? new ArrayList&lt;&gt;() : tasks;</span>
+<span class="fc" id="L87">  }</span>
+
+  /**
+   * Sets allResourceTypes of the database.
+   *
+   * @param resourceTypes the list of all resourceTypes to be added to database
+   */
+  public void setAllResourceTypes(List&lt;ResourceType&gt; resourceTypes) {
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    this.allResourceTypes = resourceTypes == null ? new ArrayList&lt;&gt;() : resourceTypes;</span>
+<span class="fc" id="L96">  }</span>
+
+  /**
+   * Sets masterSchedule of the database.
+   *
+   * @param masterSchedule the master schedule to be added to database
+   */
+  public void setMasterSchedule(Schedule masterSchedule) {
+<span class="fc bfc" id="L104" title="All 2 branches covered.">    this.masterSchedule = masterSchedule == null ? new Schedule() : masterSchedule;</span>
+<span class="fc" id="L105">  }</span>
+
+  /**
+   * Deserializes the object from file. Throws exception if data in file is invalid.
+   *
+   * @param contentType the type of content to deserialize
+   *
+   * @return The deserialized objects from the file, or an empty list if an error occurs
+   */
+  public final Object deSerializeObjectFromFile(int contentType) {
+    String filePath;
+    String gcsObjectName;
+<span class="fc bfc" id="L117" title="All 2 branches covered.">    if (contentType == taskContentType) {</span>
+<span class="fc" id="L118">      filePath = taskFilePath;</span>
+<span class="fc" id="L119">      gcsObjectName = taskObjectName;</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">    } else if (contentType == resourceTypeContentType) {</span>
+<span class="fc" id="L121">      filePath = resourceTypeFilePath;</span>
+<span class="fc" id="L122">      gcsObjectName = resourceTypeObjectName;</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">    } else if (contentType == scheduleContentType) {</span>
+<span class="fc" id="L124">      filePath = scheduleFilePath;</span>
+<span class="fc" id="L125">      gcsObjectName = scheduleObjectName;</span>
+    } else {
+<span class="fc" id="L127">      throw new IllegalArgumentException(&quot;Invalid content type in file.&quot;);</span>
+    }
+
+    // Download from GCS if the useGCS flag is enabled
+<span class="fc bfc" id="L131" title="All 2 branches covered.">    if (LiveSchedApplication.useGCS) {</span>
+      try {
+<span class="fc" id="L133">        downloadFileFromCloud(BUCKET_NAME, gcsObjectName, filePath);</span>
+<span class="nc" id="L134">      } catch (IOException e) {</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        if (LOGGER.isLoggable(Level.SEVERE)) {</span>
+<span class="nc" id="L136">          LOGGER.log(Level.SEVERE, e.getMessage());</span>
+        }
+<span class="nc" id="L138">        return null;</span>
+<span class="fc" id="L139">      }</span>
+    } else {
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">      if (LOGGER.isLoggable(Level.INFO)) {</span>
+<span class="fc" id="L142">        LOGGER.info(&quot;GCS is disabled. Using local file: &quot; + filePath);</span>
+      }
+    }
+
+<span class="fc" id="L146">    try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filePath))) {</span>
+<span class="fc" id="L147">      Object obj = in.readObject();</span>
+
+      // Return the appropriate type based on content type
+<span class="fc bfc" id="L150" title="All 4 branches covered.">      if (contentType == taskContentType &amp;&amp; obj instanceof List&lt;?&gt; listObj) {</span>
+<span class="fc" id="L151">        return listObj; // Return List&lt;Task&gt;</span>
+<span class="pc bpc" id="L152" title="1 of 4 branches missed.">      } else if (contentType == resourceTypeContentType &amp;&amp; obj instanceof List&lt;?&gt; listObj) {</span>
+<span class="fc" id="L153">        return listObj; // Return List&lt;ResourceType&gt;</span>
+<span class="pc bpc" id="L154" title="1 of 4 branches missed.">      } else if (contentType == scheduleContentType &amp;&amp; obj instanceof Schedule schedule) {</span>
+<span class="fc" id="L155">        return schedule; // Return Schedule</span>
+      } else {
+<span class="fc" id="L157">        throw new IllegalArgumentException(INVALID_OBJ_TYPE_ERROR);</span>
+      }
+<span class="fc" id="L159">    } catch (IOException | ClassNotFoundException e) {</span>
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">      if (LOGGER.isLoggable(Level.SEVERE)) {</span>
+<span class="fc" id="L161">        LOGGER.log(Level.SEVERE, e.getMessage());</span>
+      }
+<span class="fc" id="L163">      return null;</span>
+    }
+  }
+
+  /**
+   * Downloads a file from Google Cloud Storage to a local destination path.
+   *
+   * @param bucketName the name of the GCS bucket
+   * @param objectName the name of the object in GCS
+   * @param destinationPath the local path where the object will be downloaded
+   * @throws IOException if the object cannot be found or downloaded
+   */
+  private void downloadFileFromCloud(String bucketName, String objectName, String destinationPath)
+      throws IOException {
+<span class="fc" id="L177">    Blob blob = storage.get(BlobId.of(bucketName, objectName));</span>
+
+<span class="pc bpc" id="L179" title="1 of 2 branches missed.">    if (blob != null) {</span>
+<span class="fc" id="L180">      blob.downloadTo(Paths.get(destinationPath));</span>
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">      if (LOGGER.isLoggable(Level.INFO)) {</span>
+<span class="fc" id="L182">        LOGGER.info(&quot;Downloaded file from GCS: &quot; + objectName + &quot; to &quot; + destinationPath);</span>
+      }
+    } else {
+<span class="nc" id="L185">      throw new FileNotFoundException(&quot;The requested object &quot; + objectName</span>
+          + &quot; was not found in bucket &quot; + bucketName);
+    }
+<span class="fc" id="L188">  }</span>
+
+  /**
+   * Saves the contents of the internal data structures to the file. Contents of the file are
+   * overwritten with this operation.
+   *
+   * @param contentType the type of content to be saved to file
+   */
+  public void saveContentsToFile(int contentType) {
+    String filePath;
+    String gcsObjectName;
+<span class="fc bfc" id="L199" title="All 2 branches covered.">    if (contentType == taskContentType) {</span>
+<span class="fc" id="L200">      filePath = taskFilePath;</span>
+<span class="fc" id="L201">      gcsObjectName = taskObjectName;</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">    } else if (contentType == resourceTypeContentType) {</span>
+<span class="fc" id="L203">      filePath = resourceTypeFilePath;</span>
+<span class="fc" id="L204">      gcsObjectName = resourceTypeObjectName;</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">    } else if (contentType == scheduleContentType) {</span>
+<span class="fc" id="L206">      filePath = scheduleFilePath;</span>
+<span class="fc" id="L207">      gcsObjectName = scheduleObjectName;</span>
+    } else {
+<span class="fc" id="L209">      throw new IllegalArgumentException(&quot;Invalid content type in file.&quot;);</span>
+    }
+
+<span class="fc" id="L212">    try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filePath))) {</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">      if (contentType == taskContentType) {</span>
+<span class="fc" id="L214">        out.writeObject(allTasks);</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">      } else if (contentType == resourceTypeContentType) {</span>
+<span class="fc" id="L216">        out.writeObject(allResourceTypes);</span>
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">      } else if (contentType == scheduleContentType) {</span>
+<span class="fc" id="L218">        out.writeObject(masterSchedule);</span>
+      }
+
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">      if (LOGGER.isLoggable(Level.INFO)) {</span>
+<span class="fc" id="L222">        LOGGER.info(&quot;Object serialized successfully in local file: &quot; + filePath);</span>
+      }
+
+      // Upload to GCS only if GCS operations are enabled
+<span class="fc bfc" id="L226" title="All 2 branches covered.">      if (LiveSchedApplication.useGCS) {</span>
+<span class="fc" id="L227">        uploadFileToCloud(BUCKET_NAME, gcsObjectName, filePath);</span>
+      } else {
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">        if (LOGGER.isLoggable(Level.INFO)) {</span>
+<span class="fc" id="L230">          LOGGER.info(&quot;GCS is disabled. Uploading to GCS is skipped.&quot;);</span>
+        }
+      }
+<span class="nc" id="L233">    } catch (IOException e) {</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">      if (LOGGER.isLoggable(Level.SEVERE)) {</span>
+<span class="nc" id="L235">        LOGGER.log(Level.SEVERE, e.getMessage());</span>
+      }
+<span class="fc" id="L237">    }</span>
+<span class="fc" id="L238">  }</span>
+
+  /**
+   * Uploads a local file to Google Cloud Storage.
+   *
+   * @param bucketName the name of the GCS bucket
+   * @param objectName the name to save the object as in GCS
+   * @param filePath   the path of the local file to upload
+   * @throws IOException if the upload fails
+   */
+  private void uploadFileToCloud(String bucketName, String objectName, String filePath)
+      throws IOException {
+<span class="fc" id="L250">    BlobId blobId = BlobId.of(bucketName, objectName);</span>
+<span class="fc" id="L251">    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();</span>
+
+    // Add a precondition to avoid race conditions
+    Storage.BlobWriteOption precondition;
+<span class="pc bpc" id="L255" title="1 of 2 branches missed.">    if (storage.get(bucketName, objectName) == null) {</span>
+<span class="fc" id="L256">      precondition = Storage.BlobWriteOption.doesNotExist();</span>
+    } else {
+<span class="nc" id="L258">      precondition = Storage.BlobWriteOption.generationMatch(</span>
+<span class="nc" id="L259">          storage.get(bucketName, objectName).getGeneration());</span>
+    }
+
+<span class="fc" id="L262">    storage.createFrom(blobInfo, Paths.get(filePath), precondition);</span>
+<span class="pc bpc" id="L263" title="1 of 2 branches missed.">    if (LOGGER.isLoggable(Level.INFO)) {</span>
+<span class="fc" id="L264">      LOGGER.info(&quot;File &quot; + filePath + &quot; uploaded to GCS as &quot; + objectName);</span>
+    }
+<span class="fc" id="L266">  }</span>
+
+  /**
+   * Gets all tasks from the database.
+   *
+   * @return a list containing all Task objects
+   */
+  public List&lt;Task&gt; getAllTasks() {
+<span class="fc" id="L274">    return this.allTasks;</span>
+  }
+
+  /**
+   * Gets all ResourceTypes from the database.
+   *
+   * @return a list containing all ResourceType objects
+   */
+  public List&lt;ResourceType&gt; getAllResourceTypes() {
+<span class="fc" id="L283">    return this.allResourceTypes;</span>
+  }
+
+  /**
+   * Gets master schedule from the database.
+   *
+   * @return a Schedule object containing all schedules
+   */
+  public Schedule getMasterSchedule() {
+<span class="fc" id="L292">    return this.masterSchedule;</span>
+  }
+
+  /**
+   * Gets task by Id from the database.
+   *
+   * @return a Task object with specified taskId
+   */
+  public Task getTaskById(String taskId) {
+<span class="fc" id="L301">    List&lt;Task&gt; tasks = this.allTasks;</span>
+<span class="fc bfc" id="L302" title="All 2 branches covered.">    for (Task task : tasks) {</span>
+<span class="fc bfc" id="L303" title="All 2 branches covered.">      if (task.getTaskId().equals(taskId)) {</span>
+<span class="fc" id="L304">        return task;</span>
+      }
+<span class="fc" id="L306">    }</span>
+<span class="fc" id="L307">    return null;</span>
+  }
+
+  /**
+   * Adds a task to the database.
+   *
+   */
+  public void addTask(Task task) {
+<span class="fc" id="L315">    this.allTasks.add(task);</span>
+<span class="fc" id="L316">  }</span>
+
+  /**
+   * Deletes a task to the database.
+   *
+   */
+  public void deleteTask(Task task) {
+<span class="fc" id="L323">    this.allTasks.remove(task);</span>
+<span class="fc" id="L324">  }</span>
+
+  /**
+   * Adds a resource type to the database.
+   *
+   */
+  public void addResourceType(ResourceType newResourceType) {
+<span class="fc bfc" id="L331" title="All 2 branches covered.">    for (ResourceType existingResource : this.allResourceTypes) {</span>
+<span class="fc bfc" id="L332" title="All 2 branches covered.">      if (existingResource.equals(newResourceType)) {</span>
+<span class="fc" id="L333">        int newUnits = newResourceType.getTotalUnits();</span>
+<span class="fc bfc" id="L334" title="All 2 branches covered.">        for (int resource = 0; resource &lt; newUnits; resource++) {</span>
+<span class="fc" id="L335">          existingResource.addResource();</span>
+        }
+<span class="fc" id="L337">        return;</span>
+      }
+<span class="fc" id="L339">    }</span>
+    // If no match is found, add the new resource type
+<span class="fc" id="L341">    this.allResourceTypes.add(newResourceType);</span>
+<span class="fc" id="L342">  }</span>
+
+  /**
+   * Deletes a resource type to the database.
+   *
+   */
+  public void deleteResourceType(ResourceType resourceType) {
+
+<span class="fc" id="L350">    this.allResourceTypes.remove(resourceType);</span>
+<span class="fc" id="L351">  }</span>
+
+  /**
+   * Gets task file path.
+   */
+  public String getTaskFilePath() {
+<span class="fc" id="L357">    return taskFilePath;</span>
+  }
+
+  public int getTaskContentType() {
+<span class="fc" id="L361">    return taskContentType;</span>
+  }
+
+<span class="fc" id="L364">  private final int taskContentType = 1;</span>
+<span class="fc" id="L365">  private final int resourceTypeContentType = 2;</span>
+<span class="fc" id="L366">  private final int scheduleContentType = 3;</span>
+
+  /**
+   * Google Cloud Storage service instance used to interact with the GCS bucket.
+   */
+<span class="fc" id="L371">  private final Storage storage = StorageOptions.getDefaultInstance().getService();</span>
+
+  /**
+   * The name of the Google Cloud Storage bucket where the serialized files are stored.
+   */
+  private static final String BUCKET_NAME = &quot;innov8-livesched-bucket&quot;;
+
+  /**
+   * The path to the file containing the Task entries.
+   */
+  private final String taskFilePath;
+
+  /**
+   * The path to the file containing the ResourceType entries.
+   */
+  private final String resourceTypeFilePath;
+
+  /**
+   * The path to the file containing the ResourceType entries.
+   */
+  private final String scheduleFilePath;
+
+  /**
+   * The object name under which the Task data is stored in the GCS bucket.
+   */
+  private final String taskObjectName;
+
+  /**
+   * The object name under which the ResourceType data is stored in the GCS bucket.
+   */
+  private final String resourceTypeObjectName;
+
+  /**
+   * The object name under which the ResourceType data is stored in the GCS bucket.
+   */
+  private final String scheduleObjectName;
+
+  /**
+   * The list of tasks to be assigned.
+   */
+  private List&lt;Task&gt; allTasks;
+
+  /**
+   * The list of all resourceTypes available.
+   */
+  private List&lt;ResourceType&gt; allResourceTypes;
+
+  /**
+   * A master schedule containing all schedules.
+   */
+  private Schedule masterSchedule;
+
+  /**
+   * Logger to print information and exceptions.
+   */
+<span class="fc" id="L426">  private static final Logger LOGGER = Logger.getLogger(MyFileDatabase.class.getName());</span>
+  private static final String INVALID_OBJ_TYPE_ERROR = &quot;Invalid object type in file.&quot;;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

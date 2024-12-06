@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ResourceType.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LiveSched</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project.livesched</a> &gt; <span class="el_source">ResourceType.java</span></div><h1>ResourceType.java</h1><pre class="source lang-java linenums">package dev.coms4156.project.livesched;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Represents a specific type or group of resources.
+ * This class stores the resources within the resource type and the location of the resource type.
+ */
+public class ResourceType implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 1002L;
+
+  private String typeName;
+  private Map&lt;String, Resource&gt; resources; // Key = resourceId, Value = resource
+  private Location location;
+
+  /**
+   * Constructs a new ResourceType object with the given parameters.
+   *
+   * @param typeName      the type of resource (e.g., &quot;bed&quot;, &quot;doctor&quot;)
+   * @param totalUnits    the total number of units for this resource type
+   * @param latitude    the latitude of the resource type's default location
+   * @param longitude   the longitude of the resource type's default location
+   * @throws IllegalArgumentException if {@code typeName} is null or empty,
+   *                                  if {@code totalUnits} is negative,
+   *                                  or if the latitude or longitude is out of bounds
+   */
+<span class="fc" id="L33">  public ResourceType(String typeName, int totalUnits, double latitude, double longitude) {</span>
+<span class="fc bfc" id="L34" title="All 4 branches covered.">    if (typeName == null || typeName.trim().isEmpty()) {</span>
+<span class="fc" id="L35">      throw new IllegalArgumentException(&quot;Resource type name cannot be null or empty.&quot;);</span>
+    }
+<span class="fc bfc" id="L37" title="All 2 branches covered.">    if (totalUnits &lt; 0) {</span>
+<span class="fc" id="L38">      throw new IllegalArgumentException(&quot;Number of total units cannot be negative.&quot;);</span>
+    }
+
+<span class="fc" id="L41">    this.typeName = typeName;</span>
+<span class="fc" id="L42">    this.resources = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L43">    this.location = new Location(latitude, longitude);</span>
+
+    // Create initial resources
+<span class="fc bfc" id="L46" title="All 2 branches covered.">    for (int resourceNumber = 1; resourceNumber &lt;= totalUnits; resourceNumber++) {</span>
+<span class="fc" id="L47">      addResource();</span>
+    }
+<span class="fc" id="L49">  }</span>
+
+  /**
+   * Adds a new resource within this resource type.
+   */
+  public final void addResource() {
+<span class="fc" id="L55">    int resourceNumber = getTotalUnits() + 1;</span>
+<span class="fc" id="L56">    String resourceId = typeName + &quot; &quot; + resourceNumber;</span>
+<span class="fc" id="L57">    Resource newResource = new Resource(resourceId);</span>
+<span class="fc" id="L58">    resources.put(resourceId, newResource);</span>
+<span class="fc" id="L59">  }</span>
+
+  /**
+   * Finds an available resource at the specified start time.
+   *
+   * @param startTime the time at which the resource should be available
+   *
+   * @return an available resource, or null if no resources are available
+   * @throws IllegalArgumentException if {@code startTime} is null
+   */
+  public Resource findAvailableResource(LocalDateTime startTime) {
+<span class="fc bfc" id="L70" title="All 2 branches covered.">    if (startTime == null) {</span>
+<span class="fc" id="L71">      throw new IllegalArgumentException(&quot;Start time cannot be null.&quot;);</span>
+    }
+
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    for (Resource resource : resources.values()) {</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">      if (resource.isAvailableAt(startTime)) {</span>
+<span class="fc" id="L76">        return resource;</span>
+      }
+<span class="fc" id="L78">    }</span>
+<span class="fc" id="L79">    return null;</span>
+  }
+
+  public final int getTotalUnits() {
+<span class="fc" id="L83">    return resources.size();</span>
+  }
+
+  public Location getLocation() {
+<span class="fc" id="L87">    return location;</span>
+  }
+
+  public String getTypeName() {
+<span class="fc" id="L91">    return typeName;</span>
+  }
+
+  /**
+   * Counts the number of available resources within this resource type at the specified time.
+   *
+   * @param time the time at which to check availability
+   *
+   * @return the number of available resources at the given time
+   * @throws IllegalArgumentException if the time is null
+   */
+  public int countAvailableUnits(LocalDateTime time) {
+<span class="fc bfc" id="L103" title="All 2 branches covered.">    if (time == null) {</span>
+<span class="fc" id="L104">      throw new IllegalArgumentException(&quot;Time cannot be null.&quot;);</span>
+    }
+
+<span class="fc" id="L107">    int count = 0;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">    for (Resource resource : resources.values()) {</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">      if (resource.isAvailableAt(time)) {</span>
+<span class="fc" id="L110">        count++;</span>
+      }
+<span class="fc" id="L112">    }</span>
+<span class="fc" id="L113">    return count;</span>
+  }
+
+  /**
+   * Returns a string representation of the resource type.
+   *
+   * @return A string representing the resource type.
+   */
+  public String toString() {
+<span class="fc" id="L122">    return typeName;</span>
+  }
+
+  /**
+   * Updates the location of the resource type.
+   *
+   * @param latitude  the new latitude of the resource type's location
+   * @param longitude the new longitude of the resource type's location
+   * @throws IllegalArgumentException if the latitude or longitude is out of bounds
+   */
+  public void updateLocation(double latitude, double longitude) {
+<span class="fc" id="L133">    this.location = new Location(latitude, longitude);</span>
+<span class="fc" id="L134">  }</span>
+
+  @Override
+  public boolean equals(Object obj) {
+<span class="fc bfc" id="L138" title="All 2 branches covered.">    if (this == obj) {</span>
+<span class="fc" id="L139">      return true;</span>
+    }
+<span class="fc bfc" id="L141" title="All 4 branches covered.">    if (obj == null || getClass() != obj.getClass()) {</span>
+<span class="fc" id="L142">      return false;</span>
+    }
+<span class="fc" id="L144">    ResourceType that = (ResourceType) obj;</span>
+<span class="fc bfc" id="L145" title="All 4 branches covered.">    return typeName.equals(that.typeName) &amp;&amp; location.equals(that.location);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="fc" id="L150">    return Objects.hash(typeName, location);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Task.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LiveSched</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project.livesched</a> &gt; <span class="el_source">Task.java</span></div><h1>Task.java</h1><pre class="source lang-java linenums">package dev.coms4156.project.livesched;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Represents a task that has to be done. 
+ * This class stores the id, resources needed, and the location of the task.
+ */
+public class Task implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 1001L;
+
+  private final String taskId;
+  private String taskName;
+  private Map&lt;ResourceType, Integer&gt; resourceList; // Key = ResourceType, Value = Units needed
+  private int priority; // value between 1 and 5
+  private LocalDateTime startTime;
+  private LocalDateTime endTime;
+  private Location location;
+
+  /**
+   * Constructs a new Task object with the given parameters.
+   *
+   * @param taskId        the unique ID of the task
+   * @param taskName      the name of the task
+   * @param resourceList  the map of ResourceTypes and their quantity needed
+   * @param priority      the priority of the task
+   * @param startTime     the time that task starts
+   * @param endTime       the time that task ends
+   * @param latitude      the latitude of the task's location
+   * @param longitude     the longitude of the task's location
+   * @throws IllegalArgumentException if the {@code taskId} is null or empty,
+   *                                  if the {@code taskName} is null or empty,
+   *                                  if {@code resourceList} is null,
+   *                                  if {@code priority} is out of the allowed range,
+   *                                  if {@code startTime} or {@code endTime} is invalid,
+   *                                  or if {@code latitude} or {@code longitude} is out of bounds
+   */
+  public Task(String taskId, String taskName, Map&lt;ResourceType, Integer&gt; resourceList, int priority,
+<span class="fc" id="L45">        LocalDateTime startTime, LocalDateTime endTime, double latitude, double longitude) {</span>
+<span class="fc bfc" id="L46" title="All 4 branches covered.">    if (taskId == null || taskId.trim().isEmpty()) {</span>
+<span class="fc" id="L47">      throw new IllegalArgumentException(&quot;Task ID cannot be null or empty.&quot;);</span>
+    }
+<span class="fc bfc" id="L49" title="All 4 branches covered.">    if (taskName == null || taskName.trim().isEmpty()) {</span>
+<span class="fc" id="L50">      throw new IllegalArgumentException(&quot;Task name cannot be null or empty.&quot;);</span>
+    }
+<span class="fc bfc" id="L52" title="All 2 branches covered.">    if (resourceList == null) {</span>
+<span class="fc" id="L53">      throw new IllegalArgumentException(&quot;Resource list cannot be null.&quot;);</span>
+    }
+<span class="fc" id="L55">    validatePriority(priority);</span>
+<span class="fc" id="L56">    validateStartEndTimes(startTime, endTime);</span>
+
+<span class="fc" id="L58">    this.taskId = taskId;</span>
+<span class="fc" id="L59">    this.taskName = taskName;</span>
+<span class="fc" id="L60">    this.resourceList = resourceList;</span>
+<span class="fc" id="L61">    this.priority = priority;</span>
+<span class="fc" id="L62">    this.startTime = startTime;</span>
+<span class="fc" id="L63">    this.endTime = endTime;</span>
+<span class="fc" id="L64">    this.location = new Location(latitude, longitude);</span>
+<span class="fc" id="L65">  }</span>
+
+  /**
+   * Validates that the priority is within the allowed range.
+   *
+   * @param priority the priority value to be validated
+   * @throws IllegalArgumentException if {@code priority} is not between 1 and 5
+   */
+  private void validatePriority(int priority) {
+<span class="fc bfc" id="L74" title="All 4 branches covered.">    if (priority &lt; 1 || priority &gt; 5) {</span>
+<span class="fc" id="L75">      throw new IllegalArgumentException(&quot;Priority must be an integer between 1 and 5.&quot;);</span>
+    }
+<span class="fc" id="L77">  }</span>
+
+  /**
+   * Validates the start and end times of the task. The times are truncated to minutes before
+   * comparison to prevent potential precision issues with nanoseconds, which is the default
+   * precision for LocalDateTime.
+   *
+   * @param startTime the start time of the task
+   * @param endTime   the end time of the task
+   * @throws IllegalArgumentException if the start time or end time is invalid
+   */
+  private void validateStartEndTimes(LocalDateTime startTime, LocalDateTime endTime) {
+    // Capture current time and truncate to minutes for comparison
+<span class="fc" id="L90">    final LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);</span>
+
+<span class="fc bfc" id="L92" title="All 2 branches covered.">    if (startTime == null) {</span>
+<span class="fc" id="L93">      throw new IllegalArgumentException(&quot;Start time cannot be null.&quot;);</span>
+    }
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (endTime == null) {</span>
+<span class="fc" id="L96">      throw new IllegalArgumentException(&quot;End time cannot be null.&quot;);</span>
+    }
+
+    // Truncate startTime and endTime to minutes as well, for the same precision during comparison
+<span class="fc" id="L100">    startTime = startTime.truncatedTo(ChronoUnit.MINUTES);</span>
+<span class="fc" id="L101">    endTime = endTime.truncatedTo(ChronoUnit.MINUTES);</span>
+
+<span class="fc bfc" id="L103" title="All 2 branches covered.">    if (startTime.isBefore(now)) {</span>
+<span class="fc" id="L104">      throw new IllegalArgumentException(&quot;Start time cannot be in the past.&quot;);</span>
+    }
+<span class="fc bfc" id="L106" title="All 2 branches covered.">    if (endTime.isBefore(now)) {</span>
+<span class="fc" id="L107">      throw new IllegalArgumentException(&quot;End time cannot be in the past.&quot;);</span>
+    }
+<span class="fc bfc" id="L109" title="All 4 branches covered.">    if (endTime.isBefore(startTime) || endTime.isEqual(startTime)) {</span>
+<span class="fc" id="L110">      throw new IllegalArgumentException(&quot;End time cannot be before or same as the start time.&quot;);</span>
+    }
+<span class="fc" id="L112">  }</span>
+
+  /**
+   * Updates the priority of the task.
+   *
+   * @param priority the new priority of the task
+   * @throws IllegalArgumentException if {@code priority} is not between 1 and 5
+   */
+  public void updatePriority(int priority) {
+<span class="fc" id="L121">    validatePriority(priority);</span>
+<span class="fc" id="L122">    this.priority = priority;</span>
+<span class="fc" id="L123">  }</span>
+
+  /**
+   * Updates the start time and/or end time of the task.
+   *
+   * @param startTime the new time that task starts
+   * @param endTime   the new time that task ends
+   * @throws IllegalArgumentException if either {@code startTime} or {@code endTime} is invalid
+   */
+  public void updateStartAndEndTime(LocalDateTime startTime, LocalDateTime endTime) {
+<span class="fc" id="L133">    validateStartEndTimes(startTime, endTime);</span>
+<span class="fc" id="L134">    this.startTime = startTime;</span>
+<span class="fc" id="L135">    this.endTime = endTime;</span>
+<span class="fc" id="L136">  }</span>
+
+  /**
+   * Updates the quantity of, add, or remove a resource needed for the task.
+   *
+   * @param resourceType  the type of resource needed
+   * @param quantity      the quantity of the resource needed
+   * @throws IllegalArgumentException if {@code resourceType} is null 
+   *                                  or {@code quantity} is negative
+   */
+  public void updateResource(ResourceType resourceType, int quantity) {
+<span class="fc bfc" id="L147" title="All 2 branches covered.">    if (resourceType == null) {</span>
+<span class="fc" id="L148">      throw new IllegalArgumentException(&quot;Resource type cannot be null.&quot;);</span>
+    }
+<span class="fc bfc" id="L150" title="All 2 branches covered.">    if (quantity &lt; 0) {</span>
+<span class="fc" id="L151">      throw new IllegalArgumentException(&quot;Quantity cannot be negative.&quot;);</span>
+    }
+
+    // Check if the resourceType already exists
+<span class="fc bfc" id="L155" title="All 2 branches covered.">    if (resourceList.containsKey(resourceType)) {</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">      if (quantity == 0) {</span>
+<span class="fc" id="L157">        resourceList.remove(resourceType); // Remove existing ResourceType from the list</span>
+      } else {
+<span class="fc" id="L159">        resourceList.replace(resourceType, quantity); // Update quantity of existing ResourceType</span>
+      }
+    } else {
+<span class="fc" id="L162">      resourceList.put(resourceType, quantity); // Add new ResourceType and its quantity</span>
+    }
+<span class="fc" id="L164">  }</span>
+
+  /**
+   * Updates the location of the task.
+   *
+   * @param latitude  the new latitude of the task's location
+   * @param longitude the new longitude of the task's location
+   * @throws IllegalArgumentException if {@code latitude} or {@code longitude} are out of bounds
+   */
+  public void updateLocation(double latitude, double longitude) {
+<span class="fc" id="L174">    this.location = new Location(latitude, longitude);</span>
+<span class="fc" id="L175">  }</span>
+
+  @Override
+  public boolean equals(Object obj) {
+<span class="fc bfc" id="L179" title="All 2 branches covered.">    if (this == obj) {</span>
+<span class="fc" id="L180">      return true;</span>
+    }
+<span class="fc bfc" id="L182" title="All 4 branches covered.">    if (obj == null || getClass() != obj.getClass()) {</span>
+<span class="fc" id="L183">      return false;</span>
+    }
+<span class="fc" id="L185">    Task task = (Task) obj;</span>
+<span class="fc" id="L186">    return Objects.equals(taskId, task.taskId);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="fc" id="L191">    return Objects.hash(taskId);</span>
+  }
+
+  public Map&lt;ResourceType, Integer&gt; getResources() {
+<span class="fc" id="L195">    return resourceList;</span>
+  }
+
+  public String getTaskId() {
+<span class="fc" id="L199">    return taskId;</span>
+  }
+
+  public String getTaskName() {
+<span class="fc" id="L203">    return taskName;</span>
+  }
+
+  public Location getLocation() {
+<span class="fc" id="L207">    return location;</span>
+  }
+
+  public int getPriority() {
+<span class="fc" id="L211">    return priority;</span>
+  }
+
+  public LocalDateTime getStartTime() {
+<span class="fc" id="L215">    return startTime;</span>
+  }
+
+  public LocalDateTime getEndTime() {
+<span class="fc" id="L219">    return endTime;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

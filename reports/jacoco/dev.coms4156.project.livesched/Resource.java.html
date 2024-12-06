@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Resource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LiveSched</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project.livesched</a> &gt; <span class="el_source">Resource.java</span></div><h1>Resource.java</h1><pre class="source lang-java linenums">package dev.coms4156.project.livesched;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+/**
+ * Represents a resource that can be assigned to a task.
+ * This class stores the id and availability of the resource.
+ */
+public class Resource implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 1003L;
+
+  private final String resourceId;
+  private LocalDateTime availableFrom;
+
+  /**
+   * Constructs a new Resource object with the given parameters.
+   *
+   * @param resourceId  the unique ID of the resource
+   * @throws IllegalArgumentException if the {@code resourceId} is null or empty,
+   *                                  or if the latitude or longitude is out of bounds
+   */
+<span class="fc" id="L26">  public Resource(String resourceId) {</span>
+<span class="fc bfc" id="L27" title="All 4 branches covered.">    if (resourceId == null || resourceId.trim().isEmpty()) {</span>
+<span class="fc" id="L28">      throw new IllegalArgumentException(&quot;Resource ID cannot be null or empty.&quot;);</span>
+    }
+<span class="fc" id="L30">    this.resourceId = resourceId;</span>
+<span class="fc" id="L31">    this.availableFrom = LocalDateTime.now(); // Initially available now</span>
+<span class="fc" id="L32">  }</span>
+
+  /**
+   * Checks if the resource is available at the given time.
+   *
+   * @param time  the time to check availability for
+   *
+   * @return true if the resource is available, false otherwise
+   * @throws IllegalArgumentException if the {@code time} parameter is null
+   */
+  public boolean isAvailableAt(LocalDateTime time) {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">    if (time == null) {</span>
+<span class="fc" id="L44">      throw new IllegalArgumentException(&quot;Time to check availability for cannot be null.&quot;);</span>
+    }
+<span class="fc bfc" id="L46" title="All 4 branches covered.">    return time.isEqual(availableFrom) || time.isAfter(availableFrom);</span>
+  }
+
+  /**
+   * Assigns the resource to a task until the specified end time.
+   *
+   * @param taskEndTime the time when the task ends
+   * @throws IllegalArgumentException if {@code taskEndTime} is null, in the past, or exactly now
+   */
+  public void assignUntil(LocalDateTime taskEndTime) {
+    // Capture current time and truncate to minutes for comparison
+<span class="fc" id="L57">    final LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);</span>
+
+<span class="fc bfc" id="L59" title="All 2 branches covered.">    if (taskEndTime == null) {</span>
+<span class="fc" id="L60">      throw new IllegalArgumentException(&quot;Task end time cannot be null.&quot;);</span>
+    }
+
+    // Truncate taskEndTime to minutes as well, for the same precision during comparison
+<span class="fc" id="L64">    LocalDateTime truncatedTaskEndTime = taskEndTime.truncatedTo(ChronoUnit.MINUTES);</span>
+
+<span class="fc bfc" id="L66" title="All 2 branches covered.">    if (truncatedTaskEndTime.isBefore(now)) {</span>
+<span class="fc" id="L67">      throw new IllegalArgumentException(&quot;Task end time cannot be in the past.&quot;);</span>
+    }
+<span class="fc bfc" id="L69" title="All 2 branches covered.">    if (truncatedTaskEndTime.equals(now)) {</span>
+<span class="fc" id="L70">      throw new IllegalArgumentException(&quot;Task end time cannot be exactly now.&quot;);</span>
+    }
+<span class="fc" id="L72">    setAvailableFrom(taskEndTime);</span>
+<span class="fc" id="L73">  }</span>
+
+  /**
+   * Releases the resource, making it available immediately.
+   */
+  public void release() {
+<span class="fc" id="L79">    setAvailableFrom(LocalDateTime.now());</span>
+<span class="fc" id="L80">  }</span>
+
+  /**
+   * Gets the ID of the Resource.
+   *
+   * @return A {@code String} of resourceId
+   */
+  public String getResourceId() {
+<span class="fc" id="L88">    return resourceId;</span>
+  }
+
+  public LocalDateTime getAvailableFrom() {
+<span class="fc" id="L92">    return availableFrom;</span>
+  }
+
+  /**
+   * Sets the time from which this resource will be available.
+   *
+   * @param availableFrom the time from which this resource will be available
+   *
+   * @throws IllegalArgumentException if the {@code availableFrom} parameter is null
+   */
+  public void setAvailableFrom(LocalDateTime availableFrom) {
+<span class="fc bfc" id="L103" title="All 2 branches covered.">    if (availableFrom == null) {</span>
+<span class="fc" id="L104">      throw new IllegalArgumentException(&quot;Time available from cannot be null.&quot;);</span>
+    }
+<span class="fc" id="L106">    this.availableFrom = availableFrom;</span>
+<span class="fc" id="L107">  }</span>
+
+  /**
+   * Returns a string representation of the resource,
+   * including its id and start time.
+   *
+   * @return A string representing the task.
+   */
+  public String toString() {
+<span class="fc" id="L116">    StringBuilder result = new StringBuilder();</span>
+<span class="fc" id="L117">    result.append(&quot;Resource ID: &quot;).append(resourceId).append(&quot;; &quot;)</span>
+<span class="fc" id="L118">            .append(&quot;Available From: &quot;).append(availableFrom.toString()).append(&quot;\n&quot;);</span>
+<span class="fc" id="L119">    return result.toString();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
