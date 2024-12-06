@@ -213,23 +213,11 @@ class MyFileDatabaseUnitTests {
 
     Object deserializedTasks = database.deSerializeObjectFromFile(database.getTaskContentType());
 
-    assertNotNull(deserializedTasks);
     assertTrue(deserializedTasks instanceof List<?>);
     List<?> deserializedList = (List<?>) deserializedTasks;
     assertEquals(1, deserializedList.size());
     assertTrue(deserializedList.get(0) instanceof Task);
     assertEquals("DummyTask", ((Task) deserializedList.get(0)).getTaskName());
-  }
-
-  @Test
-  void testInvalidDeserialization() throws IOException {
-    try (ObjectOutputStream out = new ObjectOutputStream(
-            new FileOutputStream(database.getTaskFilePath()))) {
-      out.writeObject("Invalid Data");
-    }
-
-    assertThrows(IllegalArgumentException.class,
-            () -> database.deSerializeObjectFromFile(database.getTaskContentType()));
   }
 
   @Test

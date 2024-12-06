@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "innov8-livesched",
+  "private_key_id": "503ee847946ef34e3a778923036a44e627e1ff3c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCpgqduIE8nnRI0\nw5jMlg/0MiQzkNeKqdSGquA+gVxCJwN0l03mWnKcb31CVtO1ralT06hlmUWj/0zD\n3LDSfIdaQJWBczv2Mbg31x8qTueHtQPkc0BXfwhPlAYArIjMGmggb56eRIjBblhe\no2fKgzF1tJJQSL6kv0Mb6wkJBW7BpP62UT1dV4T7ZnU8Debfb6GkIFI2nK9KO887\nUPl0en2RNpxk3Wf5xBYZX3w/1bPs/uJXHF88j1RWATGANJOVKbXDxc4d5z+GpJZK\nqYs8fPL+n8JXgKAD7ZUajOfXJEhA/LaqSWehWjF04oXX9WyudZZ5HHBa/Mw13LYg\n5q84Z35zAgMBAAECggEAPpTNgqNsBciAFbnW2kVWq4WthtolMXzkyTkh5AG3UXb8\n2BkaOf7PjIC+wnSy4cK1Ho0ogSX2p4bUTQVXxMYT5Jaue6XTD+AoTnld+K073obO\nYpPIP+VW6KZSFwKb2JqxMbRz36OWx68Y8gurAIGyC244jGpm9ATm3lJGOi3mx5er\n3jWulorsu6Xz/ve/Yx4x1NxMA+BotrAaE3izoGsckDRFbYd70rv6g0w08oNDpLcd\nnLuj3YeW82Qkb9Z7zl7WG6yL9PP6/jb8NV5M8yImqEQw47BuiGf7Ce3JsFSJz9ny\n8sq01WJf9lJsbOVYn0RwrIa3kfbwQLWWo5x45U/+SQKBgQDh3UDqU0N2SGtWc+d/\n8QBpkqoeVIvdBpQV6IZcLBro3nqgdywmJu6vNDtn8I3kH8WH4XhSCXhtNd76ocep\n6K9Z8TQ5+cfC/7vK7+2VABe5mAP8NKuLTXbBeRh52DJ2Q4SxQtm4IjG+8rw+GwV2\n03EpsD+Te7m3VUYwujWbMgpomQKBgQDAIIuCfuhqUe3046bBYqTvyCM8tey8VHV8\nKYOaOp3Af36rN6f8IgfUx/EYPkk4+iVhFaLcNycg0jJkydDFE9DlixHGkq3Y7Jvx\noCW57C8IgQY2QjiitbUgCIVmRrLzFkb87TFsYj6gJ+IlBSVwcJUQ5hesYT4+dP8r\nP4Acl4+K6wKBgQCu9wZifz2zU0ZTIlYi9j6ricHe3P+7qGzuy8HJhSETY8T6qVa5\n907Oyld6nQ5NuY77Q95BLrTrZN/mp4xUQrwToJYkkyn8FL8U5efVlMzMKMZtiR+a\nOdfU6EndmWz90C/qYS7nRRXkJYVNVwFUm1b+RFn7lcy4CIbnGFiOcKU/gQKBgC7/\nxyEFKpXXtP5TMlfcaby+mOAhIOhxQMw+25K/BBgzGCmKU+255XCH+NKVahQmHT7C\nrDRyyX+d6/X76LZNQqzkeFS7TQvj1cImCxSQUnEiHwLm8DPdf5F2hCug3+XXbUYy\nQATjg65qE0g7Gg2HfO/FWcUxhKiCtmk9/3j/Gn5BAoGAJc6U+KhW+m93ekctJmwJ\niOztzQTLTy7HuxEAnIPhGfxRyK+zYrOtRg/s3NG7z3AggVpvwUjNu1yM6QnDGowD\nDTrXxiLiwZdangolPAvKSLkBliu9yuQupmcH/WQvrj68yZXKENrkLwsxaoFCrngp\nOc8L1aLADedaBujyY45HRQE=\n-----END PRIVATE KEY-----\n",
+  "client_email": "github-actions@innov8-livesched.iam.gserviceaccount.com",
+  "client_id": "108943000099235092094",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/github-actions%40innov8-livesched.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

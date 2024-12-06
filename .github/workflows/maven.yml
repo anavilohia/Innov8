@@ -32,11 +32,6 @@ jobs:
         run: |
           echo "${{ secrets.GCS_CREDENTIALS }}" | base64 -d > "$HOME/gcp-key.json"
 
-      - name: Debug Google Cloud Credentials
-        run: cat $HOME/gcp-key.json
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp-key.json
-
       - name: Test GCS Authentication
         run: |
           gcloud auth activate-service-account --key-file=$HOME/gcp-key.json

@@ -8,6 +8,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,6 +46,18 @@ public class ExternalIntegrationTests {
     taskObjectName = "gcs_testClient_tasks.txt";
     resourceObjectName = "gcs_testClient_resourceTypes.txt";
     scheduleObjectName = "gcs_testClient_schedules.txt";
+
+    // Set up Google Cloud credentials
+    String keyPath = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+    if (keyPath == null || keyPath.isEmpty()) {
+      keyPath = "innov8-livesched-503ee847946e.json";
+    }
+    File keyFile = new File(keyPath);
+    if (!keyFile.exists()) {
+      throw new FileNotFoundException("Google Cloud credentials file not found at: " + keyPath);
+    }
+    System.setProperty("GOOGLE_APPLICATION_CREDENTIALS", keyPath);
+    System.out.println("Using Google Cloud credentials from: " + keyPath);
   }
 
   @AfterEach
