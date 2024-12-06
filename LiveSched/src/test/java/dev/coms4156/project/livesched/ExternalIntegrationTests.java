@@ -48,10 +48,7 @@ public class ExternalIntegrationTests {
     scheduleObjectName = "gcs_testClient_schedules.txt";
 
     // Set up Google Cloud credentials
-    String keyPath = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
-    if (keyPath == null || keyPath.isEmpty()) {
-      keyPath = "innov8-livesched-503ee847946e.json";
-    }
+    String keyPath = "innov8-livesched-503ee847946e.json";
     File keyFile = new File(keyPath);
     if (!keyFile.exists()) {
       throw new FileNotFoundException("Google Cloud credentials file not found at: " + keyPath);
