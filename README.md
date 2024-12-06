@@ -307,8 +307,8 @@ The following tools were used in the development and modification of this reposi
   * Checks that the code follows style guidelines, generating warnings or errors as needed
   * This runs as part of the CI pipeline; the most recent report can be found by clicking the above CI reports link and clicking the most recent workflow run > Artifacts > ci-reports (this is also included in the reports folder in the root of the repo)
   * It can also be run using the "Checkstyle-IDEA" plugin for IntelliJ
-  * Most recent checkstyle results (Dec 4, 2024)
-    <img width="647" alt="image" src="https://github.com/user-attachments/assets/68215630-c372-432f-966f-b8bb20b9e6f3">
+  * Most recent checkstyle results (Dec 6, 2024)
+    <img width="649" alt="image" src="https://github.com/user-attachments/assets/37967179-e2fe-499d-a23b-340e7a2a0d17">
 * PMD
 
   * Performs static analysis of the Java code, generating errors and warnings as needed
@@ -318,8 +318,8 @@ The following tools were used in the development and modification of this reposi
     <ruleset>/category/java/errorprone.xml</ruleset>
     <ruleset>/rulesets/java/maven-pmd-plugin-default.xml</ruleset>
     ```
-  * Most recent PMD results (Dec 4, 2024)
-    <img width="1197" alt="image" src="https://github.com/user-attachments/assets/c5d08673-21dc-49a3-89a6-967719590056">
+  * Most recent PMD results (Dec 6, 2024)
+    <img width="1253" alt="image" src="https://github.com/user-attachments/assets/db4f8ca7-4468-4ceb-83af-e7cc4d812a7a">
 * JUnit
 
   * JUnit tests get run automatically as part of the CI pipeline
@@ -328,8 +328,8 @@ The following tools were used in the development and modification of this reposi
 
   * JaCoCo generates code test coverage reports such as branch analysis
   * This runs as part of the CI pipeline; the most recent report can be found by clicking the above CI reports link and clicking the most recent workflow run > Artifacts > ci-reports (this is also included in the reports folder in the root of the repo)
-  * Most recent jacoco report with 86% overall branch coverage
-    <img width="1457" alt="image" src="https://github.com/user-attachments/assets/12c55acf-e826-4fc2-8310-42d123b7825d">
+  * Most recent jacoco report with 90% overall branch coverage (Dec 6, 2024)
+    <img width="1459" alt="image" src="https://github.com/user-attachments/assets/ffd6e2c4-ada4-4278-9385-5e1a1820fc96">
 * Postman
   
   * Used for testing that the API and its endpoints work as intended
