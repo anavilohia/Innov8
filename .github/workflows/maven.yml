@@ -23,19 +23,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.GCS_CREDENTIALS }}
-
-      - name: Set up Google Cloud credentials
-        run: |
-          echo "${{ secrets.GCS_CREDENTIALS }}" | base64 -d > "$HOME/gcp-key.json"
-
       - name: Build and Test with Maven
         run: mvn -B clean test --file LiveSched/pom.xml
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp-key.json
 
       - name: Checkstyle Analysis
         run: |
