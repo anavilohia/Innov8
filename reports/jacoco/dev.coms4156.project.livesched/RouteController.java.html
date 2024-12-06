@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RouteController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LiveSched</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project.livesched</a> &gt; <span class="el_source">RouteController.java</span></div><h1>RouteController.java</h1><pre class="source lang-java linenums">package dev.coms4156.project.livesched;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * This class contains all the API routes for the system.
+ */
+@RestController
+<span class="fc" id="L23">public class RouteController {</span>
+
+  private static final String TASK_ID = &quot;taskId&quot;;
+  private static final String CLIENT_ID = &quot;clientId&quot;;
+  private static final String TASK_NOT_FOUND = &quot;Task Not Found&quot;;
+
+  /**
+   * Redirects to the homepage.
+   *
+   * @return A String containing the name of the html file to be loaded.
+   */
+  @GetMapping({&quot;/&quot;, &quot;/index&quot;, &quot;/home&quot;})
+  public String index() {
+<span class="fc" id="L36">    return &quot;Welcome, in order to make an API call direct your browser or Postman to an endpoint &quot;</span>
+            + &quot;\n\n This can be done using the following format: \n\n http:127.0.0&quot;
+            + &quot;.1:8080/endpoint?arg=value&quot;;
+  }
+
+  /**
+   * Returns the details of all tasks in the database.
+   *
+   * @param clientId A {@code String} representing the client for whom to retreive tasks
+   *
+   * @return A {@code ResponseEntity} object containing either a list of all Tasks and
+   *         an HTTP 200 response, or an appropriate message indicating the proper response.
+   */
+  @GetMapping(value = &quot;/retrieveTasks&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; retrieveTasks(@RequestParam(value = CLIENT_ID) String clientId) {
+    try {
+<span class="fc" id="L52">      List&lt;Task&gt; taskList = LiveSchedApplication.getClientFileDatabase(clientId).getAllTasks();</span>
+
+<span class="fc bfc" id="L54" title="All 4 branches covered.">      if (taskList == null || taskList.isEmpty()) {</span>
+<span class="fc" id="L55">        return new ResponseEntity&lt;&gt;(&quot;Tasks Not Found&quot;, HttpStatus.NOT_FOUND);</span>
+      } else {
+<span class="fc" id="L57">        return new ResponseEntity&lt;&gt;(taskList, HttpStatus.OK);</span>
+      }
+
+<span class="fc" id="L60">    } catch (Exception e) {</span>
+<span class="fc" id="L61">      return handleException(e);</span>
+    }
+  }
+
+  /**
+   * Returns the details of a specified task in the database.
+   *
+   * @param taskId     A {@code String} representing the task the user wishes
+   *                   to retrieve.
+   * @param clientId   A {@code String} representing the client for whom to retreive the task
+   *
+   * @return A {@code ResponseEntity} object containing either the details of the Task and
+   *         an HTTP 200 response or, an appropriate message indicating the proper response.
+   */
+  @GetMapping(value = &quot;/retrieveTask&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; retrieveTask(@RequestParam(value = TASK_ID) String taskId,
+                                        @RequestParam(value = CLIENT_ID) String clientId) {
+    try {
+<span class="fc" id="L79">      Task task = LiveSchedApplication.getClientFileDatabase(clientId).getTaskById(taskId);</span>
+
+<span class="fc bfc" id="L81" title="All 2 branches covered.">      if (task == null) {</span>
+<span class="fc" id="L82">        return new ResponseEntity&lt;&gt;(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);</span>
+      } else {
+<span class="fc" id="L84">        return new ResponseEntity&lt;&gt;(task, HttpStatus.OK);</span>
+      }
+
+<span class="fc" id="L87">    } catch (Exception e) {</span>
+<span class="fc" id="L88">      return handleException(e);</span>
+    }
+  }
+
+  /**
+   * Returns the details of all resource types in the database.
+   *
+   * @param clientId A {@code String} representing the client that owns the schedules
+   *
+   * @return A {@code ResponseEntity} object containing either the details of the ResourceTypes and
+   *         an HTTP 200 response or, an appropriate message indicating the proper response.
+   */
+  @GetMapping(value = &quot;/retrieveResourceTypes&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; retrieveResourceTypes(@RequestParam(value = CLIENT_ID) String clientId) {
+    try {
+      List&lt;ResourceType&gt; resourceTypeList;
+<span class="fc" id="L104">      resourceTypeList = LiveSchedApplication.getClientFileDatabase(clientId).getAllResourceTypes();</span>
+
+<span class="fc bfc" id="L106" title="All 2 branches covered.">      if (resourceTypeList.isEmpty()) {</span>
+<span class="fc" id="L107">        return new ResponseEntity&lt;&gt;(&quot;ResourceTypes Not Found&quot;, HttpStatus.NOT_FOUND);</span>
+      } else {
+<span class="fc" id="L109">        return new ResponseEntity&lt;&gt;(resourceTypeList, HttpStatus.OK);</span>
+      }
+
+<span class="fc" id="L112">    } catch (Exception e) {</span>
+<span class="fc" id="L113">      return handleException(e);</span>
+    }
+  }
+
+  /**
+   * Returns the details of the master schedule in the database.
+   *
+   * @param clientId       A {@code String} representing the client that owns the schedule
+   *
+   * @return A {@code ResponseEntity} object containing the master schedule and
+   *         an HTTP 200 response or, an appropriate message indicating the proper response.
+   */
+  @GetMapping(value = &quot;/retrieveSchedule&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; retrieveSchedule(@RequestParam(value = CLIENT_ID) String clientId) {
+    try {
+<span class="fc" id="L128">      MyFileDatabase myFileDatabase = LiveSchedApplication.getClientFileDatabase(clientId);</span>
+<span class="fc" id="L129">      Schedule masterSchedule = myFileDatabase.getMasterSchedule();</span>
+
+<span class="fc bfc" id="L131" title="All 4 branches covered.">      if (masterSchedule == null || masterSchedule.getTaskSchedule().isEmpty()) {</span>
+<span class="fc" id="L132">        return new ResponseEntity&lt;&gt;(&quot;Schedules Not Found&quot;, HttpStatus.NOT_FOUND);</span>
+      }
+
+      // Convert schedule to have a cleaner JSON structure
+<span class="fc" id="L136">      List&lt;Map&lt;String, Object&gt;&gt; scheduleList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L137">      masterSchedule.getTaskSchedule().forEach((task, resources) -&gt; {</span>
+<span class="fc" id="L138">        Map&lt;String, Object&gt; scheduleEntry = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L139">        scheduleEntry.put(&quot;task&quot;, task);</span>
+<span class="fc" id="L140">        scheduleEntry.put(&quot;assignedResources&quot;, resources);</span>
+<span class="fc" id="L141">        scheduleList.add(scheduleEntry);</span>
+<span class="fc" id="L142">      });</span>
+
+<span class="fc" id="L144">      return new ResponseEntity&lt;&gt;(scheduleList, HttpStatus.OK);</span>
+
+<span class="fc" id="L146">    } catch (Exception e) {</span>
+<span class="fc" id="L147">      return handleException(e);</span>
+    }
+  }
+
+  /**
+   * Update and returns the schedule for current tasks and resources.
+   *
+   * @param maxDistance    A {@code double} representing the max distance
+   *                       the user wishes between schedule tasks and resources.
+   * @param clientId      A {@code String} representing the client for whom the schedule
+   *                      will be created.
+   *
+   * @return A {@code ResponseEntity} object containing either the details of the Schedule and
+   *         an HTTP 200 response or, an appropriate message indicating the proper response.
+   */
+  @PatchMapping(value = &quot;/updateSchedule&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; updateSchedule(@RequestParam(value = &quot;maxDistance&quot;) double maxDistance,
+                                          @RequestParam(value = CLIENT_ID) String clientId) {
+    try {
+<span class="fc" id="L166">      MyFileDatabase myFileDatabase = LiveSchedApplication.getClientFileDatabase(clientId);</span>
+<span class="fc" id="L167">      List&lt;Task&gt; taskList = myFileDatabase.getAllTasks();</span>
+
+<span class="fc bfc" id="L169" title="All 4 branches covered.">      if (taskList == null || taskList.isEmpty()) {</span>
+<span class="fc" id="L170">        return new ResponseEntity&lt;&gt;(&quot;Tasks Not Found&quot;, HttpStatus.NOT_FOUND);</span>
+      }
+
+<span class="fc" id="L173">      Schedule masterSchedule = myFileDatabase.getMasterSchedule();</span>
+
+<span class="fc bfc" id="L175" title="All 2 branches covered.">      if (masterSchedule == null) {</span>
+<span class="fc" id="L176">        return new ResponseEntity&lt;&gt;(&quot;Master Schedule Not Found&quot;, HttpStatus.NOT_FOUND);</span>
+      }
+
+<span class="fc" id="L179">      Map&lt;Task, List&lt;Resource&gt;&gt; updatedSchedule =</span>
+<span class="fc" id="L180">          masterSchedule.updateSchedule(taskList, maxDistance);</span>
+
+      // Convert schedule to have a cleaner JSON structure
+<span class="fc" id="L183">      List&lt;Map&lt;String, Object&gt;&gt; response = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">      for (Map.Entry&lt;Task, List&lt;Resource&gt;&gt; entry : updatedSchedule.entrySet()) {</span>
+<span class="fc" id="L185">        Map&lt;String, Object&gt; scheduleEntry = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L186">        scheduleEntry.put(&quot;task&quot;, Map.of(</span>
+<span class="fc" id="L187">            &quot;taskId&quot;, entry.getKey().getTaskId(),</span>
+<span class="fc" id="L188">            &quot;taskName&quot;, entry.getKey().getTaskName(),</span>
+<span class="fc" id="L189">            &quot;priority&quot;, entry.getKey().getPriority(),</span>
+<span class="fc" id="L190">            &quot;startTime&quot;, entry.getKey().getStartTime(),</span>
+<span class="fc" id="L191">            &quot;endTime&quot;, entry.getKey().getEndTime(),</span>
+<span class="fc" id="L192">            &quot;location&quot;, entry.getKey().getLocation(),</span>
+<span class="fc" id="L193">            &quot;resources&quot;, entry.getKey().getResources()</span>
+        ));
+<span class="fc" id="L195">        scheduleEntry.put(&quot;assignedResources&quot;, entry.getValue().stream().map(resource -&gt; Map.of(</span>
+<span class="fc" id="L196">            &quot;resourceId&quot;, resource.getResourceId(),</span>
+<span class="fc" id="L197">            &quot;availableFrom&quot;, resource.getAvailableFrom()</span>
+<span class="fc" id="L198">        )).toList());</span>
+
+<span class="fc" id="L200">        response.add(scheduleEntry);</span>
+<span class="fc" id="L201">      }</span>
+
+<span class="fc" id="L203">      return new ResponseEntity&lt;&gt;(response, HttpStatus.OK);</span>
+<span class="fc" id="L204">    } catch (Exception e) {</span>
+<span class="fc" id="L205">      return handleException(e);</span>
+    }
+  }
+
+  /**
+   * Attempts to add a task to the database.
+   *
+   * @param taskName       A {@code String} representing the name of the new task.
+   * @param priority       A {@code int} representing the priority of the new task.
+   * @param startTime      A {@code String} representing the start time of the new task.
+   * @param endTime        A {@code String} representing the end time of the new task.
+   * @param latitude       A {@code double} representing the latitude of the new task.
+   * @param longitude      A {@code double} representing the longitude of the new task.
+   * @param clientId       A {@code String} representing the client for whom the new task
+   *
+   * @return A {@code ResponseEntity} object containing the created Task object and an HTTP 200
+   *          status code or the proper status code in tune with what has happened.
+   */
+  @PatchMapping(value = &quot;/addTask&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; addTask(@RequestParam(value = &quot;taskName&quot;) String taskName,
+                                   @RequestParam(value = &quot;priority&quot;) int priority,
+                                   @RequestParam(value = &quot;startTime&quot;) String startTime,
+                                   @RequestParam(value = &quot;endTime&quot;) String endTime,
+                                   @RequestParam(value = &quot;latitude&quot;) double latitude,
+                                   @RequestParam(value = &quot;longitude&quot;) double longitude,
+                                   @RequestParam(value = CLIENT_ID) String clientId) {
+    try {
+<span class="fc" id="L232">      MyFileDatabase myFileDatabase = LiveSchedApplication.getClientFileDatabase(clientId);</span>
+<span class="fc" id="L233">      String taskId = String.valueOf(myFileDatabase.getAllTasks().size() + 1);</span>
+<span class="fc" id="L234">      Map&lt;ResourceType, Integer&gt; resourceTypeList = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L235">      DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm&quot;);</span>
+<span class="fc" id="L236">      LocalDateTime startTimeFormatted = LocalDateTime.parse(startTime, formatter);</span>
+<span class="fc" id="L237">      LocalDateTime endTimeFormatted = LocalDateTime.parse(endTime, formatter);</span>
+<span class="fc" id="L238">      Task newTask = new Task(taskId, taskName, resourceTypeList, priority,</span>
+              startTimeFormatted, endTimeFormatted, latitude, longitude);
+<span class="fc" id="L240">      myFileDatabase.addTask(newTask);</span>
+<span class="fc" id="L241">      return new ResponseEntity&lt;&gt;(newTask, HttpStatus.OK);</span>
+<span class="fc" id="L242">    } catch (Exception e) {</span>
+<span class="fc" id="L243">      return handleException(e);</span>
+    }
+  }
+
+  /**
+   * Attempts to unschedule a task from the master schedule in database.
+   *
+   * @param taskId        A {@code String} representing the id of the task
+   *                      to be removed from schedule.
+   * @param clientId      A {@code String} representing the client owner of the schedule/task.
+   *
+   * @return A {@code ResponseEntity} object containing the modified Schedule and an HTTP 200
+   *          status code or the proper status code in tune with what has happened.
+   */
+  @PatchMapping(value = &quot;/unscheduleTask&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; unscheduleTask(@RequestParam(value = TASK_ID) String taskId,
+                                          @RequestParam(value = CLIENT_ID) String clientId) {
+    try {
+<span class="fc" id="L261">      MyFileDatabase myFileDatabase = LiveSchedApplication.getClientFileDatabase(clientId);</span>
+<span class="fc" id="L262">      Schedule masterSchedule = myFileDatabase.getMasterSchedule();</span>
+<span class="fc" id="L263">      Task task = myFileDatabase.getTaskById(taskId);</span>
+
+<span class="fc bfc" id="L265" title="All 2 branches covered.">      if (task == null) {</span>
+<span class="fc" id="L266">        return new ResponseEntity&lt;&gt;(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);</span>
+      }
+<span class="fc bfc" id="L268" title="All 2 branches covered.">      if (masterSchedule == null) {</span>
+<span class="fc" id="L269">        return new ResponseEntity&lt;&gt;(&quot;Master Schedule Not Found&quot;, HttpStatus.NOT_FOUND);</span>
+      }
+<span class="fc bfc" id="L271" title="All 2 branches covered.">      if (!masterSchedule.getTaskSchedule().containsKey(task)) {</span>
+<span class="fc" id="L272">        return new ResponseEntity&lt;&gt;(&quot;Task Not Scheduled Yet&quot;, HttpStatus.BAD_REQUEST);</span>
+      }
+<span class="fc" id="L274">      masterSchedule.unscheduleTask(task);</span>
+<span class="fc" id="L275">      return new ResponseEntity&lt;&gt;(&quot;Task unscheduled succesfully&quot;, HttpStatus.OK);</span>
+<span class="fc" id="L276">    } catch (Exception e) {</span>
+<span class="fc" id="L277">      return handleException(e);</span>
+    }
+  }
+
+  /**
+   * Attempts to delete a task from the database.
+   *
+   * @param taskId           A {@code String} representing the taskId of task to be deleted.
+   * @param clientId         A {@code String} representing the client that owns the task.
+   *
+   * @return               A {@code ResponseEntity} object containing an HTTP 200
+   *                       response with an appropriate message or the proper status
+   *                       code in tune with what has happened.
+   */
+  @DeleteMapping(value = &quot;/deleteTask&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; deleteTask(@RequestParam(value = TASK_ID) String taskId,
+                                      @RequestParam(value = CLIENT_ID) String clientId) {
+    try {
+<span class="fc" id="L295">      MyFileDatabase myFileDatabase = LiveSchedApplication.getClientFileDatabase(clientId);</span>
+<span class="fc" id="L296">      Task task = myFileDatabase.getTaskById(taskId);</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">      if (task == null) {</span>
+<span class="fc" id="L298">        return new ResponseEntity&lt;&gt;(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);</span>
+      } else {
+<span class="fc" id="L300">        myFileDatabase.deleteTask(task);</span>
+<span class="fc" id="L301">        return new ResponseEntity&lt;&gt;(taskId + &quot; successfully deleted&quot;, HttpStatus.OK);</span>
+      }
+<span class="fc" id="L303">    } catch (Exception e) {</span>
+<span class="fc" id="L304">      return handleException(e);</span>
+    }
+  }
+
+  /**
+   * Attempts to add a resource type to the database.
+   *
+   * @param typeName        A {@code String} representing the name of the new resource type.
+   * @param totalUnits      A {@code int} representing the number of units of its resources.
+   * @param latitude        A {@code double} representing the latitude of the new resource type.
+   * @param longitude       A {@code double} representing the longitude of the new resource type.
+   * @param clientId        A {@code String} representing the client that owns the resource type.
+   *
+   * @return               A {@code ResponseEntity} object containing an HTTP 200
+   *                       response with an appropriate message or the proper status
+   *                       code in tune with what has happened.
+   */
+  @PatchMapping(value = &quot;/addResourceType&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; addResourceType(@RequestParam(value = &quot;typeName&quot;) String typeName,
+                                           @RequestParam(value = &quot;totalUnits&quot;) int totalUnits,
+                                           @RequestParam(value = &quot;latitude&quot;) double latitude,
+                                           @RequestParam(value = &quot;longitude&quot;) double longitude,
+                                           @RequestParam(value = CLIENT_ID) String clientId) {
+    try {
+<span class="fc" id="L328">      ResourceType newResourceType = new ResourceType(typeName, totalUnits, latitude, longitude);</span>
+<span class="fc" id="L329">      LiveSchedApplication.getClientFileDatabase(clientId).addResourceType(newResourceType);</span>
+<span class="fc" id="L330">      return new ResponseEntity&lt;&gt;(&quot;Attribute was updated successfully.&quot;, HttpStatus.OK);</span>
+<span class="fc" id="L331">    } catch (Exception e) {</span>
+<span class="fc" id="L332">      return handleException(e);</span>
+    }
+  }
+
+  /**
+   * Attempts to modify resource type for a specified task to the database.
+   *
+   * @param taskId          A {@code String} representing the task
+   *                        the client wants to modify the resource type for.
+   * @param typeName        A {@code String} representing the resource type to modify.
+   * @param quantity        A {@code int} representing quantity of resource types to set.
+   * @param clientId        A {@code String} representing the client that owns the resource type.
+   *
+   * @return               A {@code ResponseEntity} object containing an HTTP 200
+   *                       response with an appropriate message or the proper status
+   *                       code in tune with what has happened.
+   */
+  @PatchMapping(value = &quot;/modifyResourceType&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; modifyResourceType(@RequestParam(value = TASK_ID) String taskId,
+                                              @RequestParam(value = &quot;typeName&quot;) String typeName,
+                                              @RequestParam(value = &quot;quantity&quot;) int quantity,
+                                              @RequestParam(value = CLIENT_ID) String clientId) {
+    try {
+<span class="fc" id="L355">      MyFileDatabase myFileDatabase = LiveSchedApplication.getClientFileDatabase(clientId);</span>
+<span class="fc bfc" id="L356" title="All 2 branches covered.">      boolean doesTaskExist = retrieveTask(taskId, clientId).getStatusCode() == HttpStatus.OK;</span>
+<span class="fc bfc" id="L357" title="All 2 branches covered.">      if (doesTaskExist) {</span>
+        List&lt;ResourceType&gt; resourceTypeList;
+<span class="fc" id="L359">        resourceTypeList = myFileDatabase.getAllResourceTypes();</span>
+<span class="fc" id="L360">        Task task = myFileDatabase.getTaskById(taskId);</span>
+<span class="fc bfc" id="L361" title="All 2 branches covered.">        for (ResourceType resourceType : resourceTypeList) {</span>
+<span class="pc bpc" id="L362" title="1 of 2 branches missed.">          if (resourceType.getTypeName().equals(typeName)) {</span>
+<span class="fc" id="L363">            task.updateResource(resourceType, quantity);</span>
+<span class="fc" id="L364">            return new ResponseEntity&lt;&gt;(&quot;Attribute was updated successfully.&quot;, HttpStatus.OK);</span>
+          }
+<span class="nc" id="L366">        }</span>
+<span class="fc" id="L367">        return new ResponseEntity&lt;&gt;(&quot;ResourceType Not Found&quot;, HttpStatus.NOT_FOUND);</span>
+      }
+<span class="fc" id="L369">      return new ResponseEntity&lt;&gt;(TASK_NOT_FOUND, HttpStatus.NOT_FOUND);</span>
+<span class="fc" id="L370">    } catch (Exception e) {</span>
+<span class="fc" id="L371">      return handleException(e);</span>
+    }
+  }
+
+  /**
+   * Attempts to delete a resourceType from the database.
+   *
+   * @param typeName        A {@code String} representing the resource type to delete.
+   * @param clientId        A {@code String} representing the client that owns the task.
+   *
+   * @return               A {@code ResponseEntity} object containing an HTTP 200
+   *                       response with an appropriate message or the proper status
+   *                       code in tune with what has happened.
+   */
+  @DeleteMapping(value = &quot;/deleteResourceType&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;?&gt; deleteResourceType(@RequestParam(value = &quot;typeName&quot;) String typeName,
+                                              @RequestParam(value = CLIENT_ID) String clientId) {
+    try {
+<span class="fc" id="L389">      MyFileDatabase myFileDatabase = LiveSchedApplication.getClientFileDatabase(clientId);</span>
+<span class="fc" id="L390">      List&lt;Task&gt; tasks = myFileDatabase.getAllTasks();</span>
+<span class="fc" id="L391">      List&lt;ResourceType&gt; resourceTypeList =</span>
+<span class="fc" id="L392">          myFileDatabase.getAllResourceTypes();</span>
+<span class="fc bfc" id="L393" title="All 2 branches covered.">      for (ResourceType resourceType : resourceTypeList) {</span>
+<span class="fc bfc" id="L394" title="All 2 branches covered.">        if (resourceType.getTypeName().equals(typeName)) {</span>
+<span class="fc bfc" id="L395" title="All 2 branches covered.">          for (Task task : tasks) {</span>
+<span class="fc bfc" id="L396" title="All 2 branches covered.">            if (task.getResources().containsKey(resourceType)) {</span>
+<span class="fc" id="L397">              return new ResponseEntity&lt;&gt;(&quot;Cannot delete a resourceType currently in need&quot;,</span>
+                  HttpStatus.BAD_REQUEST);
+            }
+<span class="fc" id="L400">          }</span>
+<span class="fc" id="L401">          myFileDatabase.deleteResourceType(resourceType);</span>
+<span class="fc" id="L402">          return new ResponseEntity&lt;&gt;(typeName + &quot; successfully deleted&quot;, HttpStatus.OK);</span>
+        }
+<span class="fc" id="L404">      }</span>
+<span class="fc" id="L405">      return new ResponseEntity&lt;&gt;(&quot;ResourceType Not Found&quot;, HttpStatus.NOT_FOUND);</span>
+<span class="fc" id="L406">    } catch (Exception e) {</span>
+<span class="fc" id="L407">      return handleException(e);</span>
+    }
+  }
+
+  private ResponseEntity&lt;?&gt; handleException(Exception e) {
+<span class="fc" id="L412">    System.out.println(e.toString());</span>
+<span class="fc" id="L413">    return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

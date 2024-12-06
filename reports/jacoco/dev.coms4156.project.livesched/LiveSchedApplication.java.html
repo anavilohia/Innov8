@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LiveSchedApplication.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LiveSched</a> &gt; <a href="index.source.html" class="el_package">dev.coms4156.project.livesched</a> &gt; <span class="el_source">LiveSchedApplication.java</span></div><h1>LiveSchedApplication.java</h1><pre class="source lang-java linenums">package dev.coms4156.project.livesched;
+
+import com.google.api.gax.paging.Page;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import jakarta.annotation.PreDestroy;
+import java.io.File;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+/**
+ * Class contains all the startup logic for the application.
+ */
+@SpringBootApplication
+<span class="fc" id="L22">public class LiveSchedApplication implements CommandLineRunner {</span>
+
+  /**
+   * The main launcher for the services all it does
+   * is make a call to the overridden run method.
+   *
+   * @param args A {@code String[]} of any potential
+   *             runtime arguments
+   */
+  public static void main(String[] args) {
+<span class="nc" id="L32">    SpringApplication.run(LiveSchedApplication.class, args);</span>
+<span class="nc" id="L33">  }</span>
+
+  /**
+   * This contains all the setup logic, it will mainly be focused
+   * on loading up and creating an instance of the database based
+   * off a saved file or will create a fresh database if the file
+   * is not present.
+   *
+   * @param args A {@code String[]} of any potential runtime args
+   */
+  @Override
+  public void run(String[] args) {
+<span class="fc" id="L45">    boolean isSetupMode = false;</span>
+<span class="fc" id="L46">    clientDatabases = new HashMap&lt;&gt;();</span>
+
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">    for (String arg : args) {</span>
+<span class="nc bnc" id="L49" title="All 3 branches missed.">      switch (arg.split(&quot;=&quot;)[0]) {</span>
+        case &quot;setup&quot;:
+<span class="nc" id="L51">          isSetupMode = true;</span>
+<span class="nc" id="L52">          break;</span>
+        case &quot;--useGCS&quot;:
+<span class="nc" id="L54">          useGCS = true;</span>
+<span class="nc" id="L55">          System.out.println(&quot;GCS operations enabled.&quot;);</span>
+<span class="nc" id="L56">          break;</span>
+        default:
+<span class="nc" id="L58">          System.out.println(&quot;Unknown argument: &quot; + arg);</span>
+          break;
+      }
+    }
+
+    // Reload existing client databases
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">    if (useGCS) {</span>
+<span class="nc" id="L65">      reloadClientDatabasesCloud();</span>
+    } else {
+<span class="fc" id="L67">      reloadClientDatabasesLocal();</span>
+    }
+
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">    if (isSetupMode) {</span>
+<span class="nc" id="L71">      setupExampleClientDatabase(&quot;demoClientId&quot;);</span>
+<span class="nc" id="L72">      System.out.println(&quot;Example data setup completed for client ID: demoClientId&quot;);</span>
+    }
+
+<span class="fc" id="L75">    System.out.println(&quot;LiveSched service started&quot;);</span>
+<span class="fc" id="L76">  }</span>
+
+  /**
+   * Overrides the client databases, used when testing.
+   *
+   * @param testData  A {@code MyFileDatabase} object referencing test data.
+   * @param clientId  A {@code String} object referencing the client ID.
+   */
+  public static void overrideDatabase(MyFileDatabase testData, String clientId) {
+<span class="fc" id="L85">    clientDatabases.put(clientId, testData);</span>
+<span class="fc" id="L86">    saveData = false;</span>
+<span class="fc" id="L87">  }</span>
+
+  /**
+   * Restores the client databases, used when testing.
+   *
+   * @param clientId  A {@code String} object referencing the client ID.
+   */
+  public static void restoreDatabase(String clientId) {
+<span class="fc" id="L95">    clientDatabases.remove(clientId);</span>
+<span class="fc" id="L96">    saveData = true;</span>
+<span class="fc" id="L97">  }</span>
+
+  /**
+   * Reloads client databases from Google Cloud Storage (GCS).
+   */
+  public void reloadClientDatabasesCloud() {
+    try {
+      // List objects in the bucket
+<span class="fc" id="L105">      Page&lt;Blob&gt; blobs = storage.list(&quot;innov8-livesched-bucket&quot;,</span>
+<span class="fc" id="L106">          Storage.BlobListOption.prefix(&quot;gcs_&quot;),</span>
+<span class="fc" id="L107">          Storage.BlobListOption.currentDirectory());</span>
+
+      // Loop through all objects to find matching files
+<span class="fc" id="L110">      Map&lt;String, String&gt; clientFiles = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">      for (Blob blob : blobs.iterateAll()) {</span>
+<span class="fc" id="L112">        String name = blob.getName();</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (name.contains(&quot;_tasks.txt&quot;)) {</span>
+<span class="fc" id="L114">          String clientId = name.substring(4, name.indexOf(&quot;_tasks.txt&quot;));</span>
+<span class="fc" id="L115">          clientFiles.put(clientId, &quot;tasks&quot;);</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        } else if (name.contains(&quot;_resourceTypes.txt&quot;)) {</span>
+<span class="fc" id="L117">          String clientId = name.substring(4, name.indexOf(&quot;_resourceTypes.txt&quot;));</span>
+<span class="fc" id="L118">          clientFiles.put(clientId, &quot;resourceTypes&quot;);</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">        } else if (name.contains(&quot;_schedules.txt&quot;)) {</span>
+<span class="fc" id="L120">          String clientId = name.substring(4, name.indexOf(&quot;_schedules.txt&quot;));</span>
+<span class="fc" id="L121">          clientFiles.put(clientId, &quot;schedules&quot;);</span>
+        }
+<span class="fc" id="L123">      }</span>
+
+      // Load data for all existing clients
+<span class="fc bfc" id="L126" title="All 2 branches covered.">      for (String clientId : clientFiles.keySet()) {</span>
+<span class="fc" id="L127">        String taskFilePath = generateClientFilePath(clientId, TASK_FILE_PATH);</span>
+<span class="fc" id="L128">        String resourceTypeFilePath = generateClientFilePath(clientId, RESOURCE_TYPE_FILE_PATH);</span>
+<span class="fc" id="L129">        String scheduleFilePath = generateClientFilePath(clientId, SCHEDULE_FILE_PATH);</span>
+
+<span class="fc" id="L131">        String taskObjectName = generateClientObjectName(clientId, TASK_FILE_PATH);</span>
+<span class="fc" id="L132">        String resourceObjectName = generateClientObjectName(clientId, RESOURCE_TYPE_FILE_PATH);</span>
+<span class="fc" id="L133">        String scheduleObjectName = generateClientObjectName(clientId, SCHEDULE_FILE_PATH);</span>
+
+<span class="fc" id="L135">        MyFileDatabase database = new MyFileDatabase(0, taskFilePath, resourceTypeFilePath,</span>
+            scheduleFilePath, taskObjectName, resourceObjectName, scheduleObjectName);
+
+<span class="fc" id="L138">        clientDatabases.put(clientId, database);</span>
+<span class="fc" id="L139">        System.out.println(&quot;Loaded database for client ID (GCS): &quot; + clientId);</span>
+<span class="fc" id="L140">      }</span>
+<span class="nc" id="L141">    } catch (Exception e) {</span>
+<span class="nc" id="L142">      System.out.println(&quot;Error accessing GCS bucket: &quot; + e.getMessage());</span>
+<span class="fc" id="L143">    }</span>
+<span class="fc" id="L144">  }</span>
+
+  /**
+   * Reloads client databases from local file system.
+   */
+  public void reloadClientDatabasesLocal() {
+<span class="fc" id="L150">    File tmpDir = new File(&quot;/tmp&quot;);</span>
+<span class="pc bpc" id="L151" title="2 of 4 branches missed.">    if (!tmpDir.exists() || !tmpDir.isDirectory()) {</span>
+<span class="nc" id="L152">      System.out.println(&quot;No existing databases found.&quot;);</span>
+<span class="nc" id="L153">      return;</span>
+    }
+
+    // Scan tmp directory for files matching the pattern clientId_tasks.txt
+<span class="fc" id="L157">    File[] taskFiles = tmpDir.listFiles((dir, name) -&gt; name.endsWith(TASK_FILE_PATH));</span>
+<span class="pc bpc" id="L158" title="2 of 4 branches missed.">    if (taskFiles == null || taskFiles.length == 0) {</span>
+<span class="fc" id="L159">      System.out.println(&quot;No existing task files found.&quot;);</span>
+<span class="fc" id="L160">      return;</span>
+    }
+
+    // Load data for all existing clients
+<span class="nc bnc" id="L164" title="All 2 branches missed.">    for (File taskFile : taskFiles) {</span>
+<span class="nc" id="L165">      String fileName = taskFile.getName();</span>
+<span class="nc" id="L166">      String clientId = fileName.substring(0, fileName.indexOf(&quot;_tasks.txt&quot;)); // Get clientId</span>
+
+<span class="nc" id="L168">      String taskFilePath = generateClientFilePath(clientId, TASK_FILE_PATH);</span>
+<span class="nc" id="L169">      String resourceTypeFilePath = generateClientFilePath(clientId, RESOURCE_TYPE_FILE_PATH);</span>
+<span class="nc" id="L170">      String scheduleFilePath = generateClientFilePath(clientId, SCHEDULE_FILE_PATH);</span>
+
+<span class="nc" id="L172">      String taskObjectName = generateClientObjectName(clientId, TASK_FILE_PATH);</span>
+<span class="nc" id="L173">      String resourceObjectName = generateClientObjectName(clientId, RESOURCE_TYPE_FILE_PATH);</span>
+<span class="nc" id="L174">      String scheduleObjectName = generateClientObjectName(clientId, SCHEDULE_FILE_PATH);</span>
+
+<span class="nc" id="L176">      MyFileDatabase database = new MyFileDatabase(0, taskFilePath, resourceTypeFilePath,</span>
+          scheduleFilePath, taskObjectName, resourceObjectName, scheduleObjectName);
+
+<span class="nc" id="L179">      clientDatabases.put(clientId, database);</span>
+<span class="nc" id="L180">      System.out.println(&quot;Loaded database for client ID (Local): &quot; + clientId);</span>
+    }
+<span class="nc" id="L182">  }</span>
+
+  /**
+   * Retrieves the database instance associated with the specified client ID.
+   *
+   * @param clientId  A {@code String} the identifier for the client whose database is retrieved
+   *
+   * @return the {@code MyFileDatabase} instance associated with the specified client ID
+   */
+  public static synchronized MyFileDatabase getClientFileDatabase(String clientId) {
+<span class="fc bfc" id="L192" title="All 2 branches covered.">    if (!clientDatabases.containsKey(clientId)) {</span>
+<span class="fc" id="L193">      System.out.println(&quot;Initializing a new database for client ID: &quot; + clientId);</span>
+
+      // Generate file paths and object names for new client
+<span class="fc" id="L196">      String taskFilePath = generateClientFilePath(clientId, TASK_FILE_PATH);</span>
+<span class="fc" id="L197">      String resourceTypeFilePath = generateClientFilePath(clientId, RESOURCE_TYPE_FILE_PATH);</span>
+<span class="fc" id="L198">      String scheduleFilePath = generateClientFilePath(clientId, SCHEDULE_FILE_PATH);</span>
+
+<span class="fc" id="L200">      String taskObjectName = generateClientObjectName(clientId, TASK_FILE_PATH);</span>
+<span class="fc" id="L201">      String resourceObjectName = generateClientObjectName(clientId, RESOURCE_TYPE_FILE_PATH);</span>
+<span class="fc" id="L202">      String scheduleObjectName = generateClientObjectName(clientId, SCHEDULE_FILE_PATH);</span>
+
+<span class="fc" id="L204">      MyFileDatabase myFileDatabase = new MyFileDatabase(1, taskFilePath, resourceTypeFilePath,</span>
+          scheduleFilePath, taskObjectName, resourceObjectName, scheduleObjectName);
+
+<span class="fc" id="L207">      clientDatabases.put(clientId, myFileDatabase);</span>
+    }
+
+<span class="fc" id="L210">    return clientDatabases.get(clientId);</span>
+  }
+
+  /**
+   * Creates an example database for demo purposes.
+   *
+   * @param clientId  The client ID to create an example database for
+   */
+  public void setupExampleClientDatabase(String clientId) {
+<span class="fc bfc" id="L219" title="All 2 branches covered.">    if (clientId == null) {</span>
+<span class="fc" id="L220">      throw new IllegalArgumentException(&quot;ClientId is null&quot;);</span>
+    }
+<span class="fc bfc" id="L222" title="All 2 branches covered.">    if (clientId.trim().isEmpty()) {</span>
+<span class="fc" id="L223">      throw new IllegalArgumentException(&quot;ClientId is empty&quot;);</span>
+    }
+    // Generate file paths and object names for demo
+<span class="fc" id="L226">    String taskFilePath = generateClientFilePath(clientId, TASK_FILE_PATH);</span>
+<span class="fc" id="L227">    String resourceTypeFilePath = generateClientFilePath(clientId, RESOURCE_TYPE_FILE_PATH);</span>
+<span class="fc" id="L228">    String scheduleFilePath = generateClientFilePath(clientId, SCHEDULE_FILE_PATH);</span>
+
+<span class="fc" id="L230">    String taskObjectName = generateClientObjectName(clientId, TASK_FILE_PATH);</span>
+<span class="fc" id="L231">    String resourceObjectName = generateClientObjectName(clientId, RESOURCE_TYPE_FILE_PATH);</span>
+<span class="fc" id="L232">    String scheduleObjectName = generateClientObjectName(clientId, SCHEDULE_FILE_PATH);</span>
+
+<span class="fc" id="L234">    MyFileDatabase demoDatabase = new MyFileDatabase(1, taskFilePath, resourceTypeFilePath,</span>
+        scheduleFilePath, taskObjectName, resourceObjectName, scheduleObjectName);
+
+<span class="fc" id="L237">    setupExampleData(demoDatabase); // Load database with example resources and tasks</span>
+<span class="fc" id="L238">    clientDatabases.put(clientId, demoDatabase);</span>
+<span class="fc" id="L239">  }</span>
+
+  /**
+   * Populates the database with some example resources and tasks.
+   *
+   * @param myFileDatabase The database to generate example data for
+   */
+  public void setupExampleData(MyFileDatabase myFileDatabase) {
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">    if (myFileDatabase == null) {</span>
+<span class="nc" id="L248">      throw new IllegalArgumentException(&quot;MyFileDatabase is null&quot;);</span>
+    }
+<span class="fc" id="L250">    ResourceType bed = new ResourceType(&quot;Bed&quot;, 20, 40.84, -73.94);</span>
+<span class="fc" id="L251">    ResourceType nurse = new ResourceType(&quot;Nurse&quot;, 15, 40.84, -73.94);</span>
+<span class="fc" id="L252">    ResourceType doctor = new ResourceType(&quot;Doctor&quot;, 10, 40.84, -73.94);</span>
+<span class="fc" id="L253">    ResourceType ambulance = new ResourceType(&quot;Ambulance&quot;, 5, 40.84, -73.94);</span>
+
+<span class="fc" id="L255">    List&lt;ResourceType&gt; allResourceTypes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L256">    allResourceTypes.add(bed);</span>
+<span class="fc" id="L257">    allResourceTypes.add(nurse);</span>
+<span class="fc" id="L258">    allResourceTypes.add(doctor);</span>
+<span class="fc" id="L259">    allResourceTypes.add(ambulance);</span>
+
+<span class="fc" id="L261">    Map&lt;ResourceType, Integer&gt; emergencyResources = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L262">    emergencyResources.put(bed, 2); // for two people at the same time</span>
+<span class="fc" id="L263">    emergencyResources.put(doctor, 2);</span>
+<span class="fc" id="L264">    emergencyResources.put(nurse, 2);</span>
+
+<span class="fc" id="L266">    Task emergency = new Task(</span>
+        &quot;1&quot;, &quot;ER&quot;, emergencyResources, 1,
+<span class="fc" id="L268">        LocalDateTime.of(2024, 12, 17, 10, 00), LocalDateTime.of(2024, 12, 17, 13, 00),</span>
+        40.81, -73.96);
+
+<span class="fc" id="L271">    List&lt;Task&gt; allTasks = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L272">    allTasks.add(emergency);</span>
+
+<span class="fc" id="L274">    Map&lt;ResourceType, Integer&gt; checkupResources = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L275">    checkupResources.put(nurse, 1);</span>
+<span class="fc" id="L276">    checkupResources.put(doctor, 1);</span>
+
+<span class="fc" id="L278">    Task checkup = new Task(</span>
+        &quot;2&quot;, &quot;checkup&quot;, checkupResources, 3,
+<span class="fc" id="L280">        LocalDateTime.of(2024, 12, 19, 10, 00), LocalDateTime.of(2024, 12, 19, 10, 30),</span>
+        40.81, -73.96);
+
+<span class="fc" id="L283">    allTasks.add(checkup);</span>
+
+<span class="fc" id="L285">    Map&lt;ResourceType, Integer&gt; transportResources = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L286">    transportResources.put(ambulance, 1);</span>
+<span class="fc" id="L287">    transportResources.put(nurse, 1);</span>
+
+<span class="fc" id="L289">    Task patientTransport = new Task(</span>
+        &quot;3&quot;, &quot;transport&quot;, transportResources, 2,
+<span class="fc" id="L291">        LocalDateTime.of(2024, 12, 17, 10, 15), LocalDateTime.of(2024, 12, 17, 10, 45),</span>
+        40.83, -73.91);
+
+<span class="fc" id="L294">    allTasks.add(patientTransport);</span>
+
+<span class="fc" id="L296">    myFileDatabase.setAllResourceTypes(allResourceTypes);</span>
+<span class="fc" id="L297">    myFileDatabase.setAllTasks(allTasks);</span>
+<span class="fc" id="L298">  }</span>
+
+  /**
+   * Generates file paths based on the client ID.
+   *
+   * @param clientId The unique identifier for the client
+   * @param fileName The name of the file
+   * @return The full path for the file
+   */
+  public static String generateClientFilePath(String clientId, String fileName) {
+<span class="fc bfc" id="L308" title="All 4 branches covered.">    if (clientId == null || fileName == null) {</span>
+<span class="fc" id="L309">      throw new IllegalArgumentException(&quot;clientId and fileName cannot be null&quot;);</span>
+    }
+<span class="fc bfc" id="L311" title="All 4 branches covered.">    if (clientId.trim().isEmpty() || fileName.trim().isEmpty()) {</span>
+<span class="fc" id="L312">      throw new IllegalArgumentException(&quot;clientId and fileName cannot be empty&quot;);</span>
+    }
+<span class="fc" id="L314">    return &quot;/tmp/&quot; + clientId + &quot;_&quot; + fileName;</span>
+  }
+
+  /**
+   * Generates gcs object name based on the client ID.
+   *
+   * @param clientId The unique identifier for the client
+   * @param fileName The name of the file
+   * @return The full name for the object
+   */
+  private static String generateClientObjectName(String clientId, String fileName) {
+<span class="fc" id="L325">    return &quot;gcs_&quot; + clientId + &quot;_&quot; + fileName;</span>
+  }
+
+  /**
+   * This contains all the overheading teardown logic, it will
+   * mainly be focused on saving all the created user data to a
+   * file, so it will be ready for the next setup.
+   */
+  @PreDestroy
+  public void onTermination() {
+<span class="fc" id="L335">    System.out.println(&quot;Termination&quot;);</span>
+<span class="pc bpc" id="L336" title="1 of 2 branches missed.">    if (saveData) {</span>
+<span class="fc bfc" id="L337" title="All 2 branches covered.">      for (Map.Entry&lt;String, MyFileDatabase&gt; entry : clientDatabases.entrySet()) {</span>
+<span class="fc" id="L338">        String clientId = entry.getKey();</span>
+<span class="fc" id="L339">        System.out.println(&quot;Saving data for client ID: &quot; + clientId);</span>
+
+<span class="fc" id="L341">        MyFileDatabase database = entry.getValue();</span>
+<span class="fc" id="L342">        database.saveContentsToFile(1); // Save tasks</span>
+<span class="fc" id="L343">        database.saveContentsToFile(2); // Save resourceTypes</span>
+<span class="fc" id="L344">        database.saveContentsToFile(3); // Save schedule</span>
+<span class="fc" id="L345">      }</span>
+    }
+<span class="fc" id="L347">  }</span>
+
+  public static Map&lt;String, MyFileDatabase&gt; clientDatabases;
+<span class="fc" id="L350">  public static boolean useGCS = false; // Default is local mode (Not use Google Cloud Storage)</span>
+
+<span class="fc" id="L352">  private final Storage storage = StorageOptions.getDefaultInstance().getService();</span>
+  private static final String TASK_FILE_PATH = &quot;tasks.txt&quot;;
+  private static final String RESOURCE_TYPE_FILE_PATH = &quot;resourceTypes.txt&quot;;
+  private static final String SCHEDULE_FILE_PATH = &quot;schedules.txt&quot;;
+  private static final String APP_ENGINE_ENV = &quot;standard&quot;; // Constant for environment check
+<span class="fc" id="L357">  private static boolean saveData = true;</span>
+
+  // Detect App Engine environment and enable GCS if running in App Engine
+  static {
+<span class="fc" id="L361">    String env = System.getenv(&quot;GAE_ENV&quot;);</span>
+<span class="pc bpc" id="L362" title="1 of 2 branches missed.">    if (APP_ENGINE_ENV.equals(env)) {</span>
+<span class="nc" id="L363">      useGCS = true;</span>
+<span class="nc" id="L364">      System.out.println(&quot;Running in App Engine: GCS enabled.&quot;);</span>
+    }
+<span class="fc" id="L366">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
