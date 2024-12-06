@@ -29,7 +29,8 @@ jobs:
           credentials_json: ${{ secrets.GCS_CREDENTIALS }}
 
       - name: Set up Google Cloud credentials
-        run: echo "${{ secrets.GCS_CREDENTIALS }}" > "$HOME/gcp-key.json"
+        run: |
+          echo "${{ secrets.GCS_CREDENTIALS }}" | base64 -d > "$HOME/gcp-key.json"
 
       - name: Debug Google Cloud Credentials
         run: cat $HOME/gcp-key.json
