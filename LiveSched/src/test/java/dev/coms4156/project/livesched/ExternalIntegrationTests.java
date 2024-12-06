@@ -49,9 +49,6 @@ public class ExternalIntegrationTests {
 
     // Set up Google Cloud credentials
     String keyPath = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
-    if (keyPath == "$HOME/gcp-key.json") {
-      keyPath = System.getProperty("user.home") + "/gcp-key.json";
-    }
     if (keyPath == null || keyPath.isEmpty()) {
       keyPath = "innov8-livesched-503ee847946e.json";
     }

@@ -35,7 +35,7 @@ jobs:
       - name: Build and Test with Maven
         run: mvn -B clean test --file LiveSched/pom.xml
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp-key.json
+          GOOGLE_APPLICATION_CREDENTIALS: /home/runner/work/Innov8/Innov8/gha-creds-59454578fc40cfe3.json
 
       - name: Checkstyle Analysis
         run: |
