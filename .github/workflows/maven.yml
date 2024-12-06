@@ -31,6 +31,18 @@ jobs:
       - name: Set up Google Cloud credentials
         run: echo "${{ secrets.GCS_CREDENTIALS }}" > "$HOME/gcp-key.json"
 
+      - name: Debug Google Cloud Credentials
+        run: cat $HOME/gcp-key.json
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp-key.json
+
+      - name: Test GCS Authentication
+        run: |
+          gcloud auth activate-service-account --key-file=$HOME/gcp-key.json
+          gsutil ls gs://innov8-livesched-bucket
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp-key.json
+
       - name: Build and Test with Maven
         run: mvn -B clean test --file LiveSched/pom.xml
         env:
