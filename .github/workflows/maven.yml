@@ -28,6 +28,9 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCS_CREDENTIALS }}
 
+      - name: Set up Google Cloud credentials
+        run: echo "${{ secrets.GCS_CREDENTIALS }}" > "$HOME/gcp-key.json"
+
       - name: Build and Test with Maven
         run: mvn -B clean test --file LiveSched/pom.xml
         env:
